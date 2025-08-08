@@ -100,13 +100,13 @@ export default function LoginAsCode() {
           variant="ghost"
           className="bg-yellow-500 w-full hover:bg-yellow-600 text-white hover:text-white font-bold"
         >
-          Login with code
+          Login with OTP
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>
-            {isEnterCode ? "Enter 6 digits code" : "Login with code"}
+            {isEnterCode ? "Enter 6 digits code" : "Login with OTP"}
           </DialogTitle>
           <DialogDescription>
             {isEnterCode
