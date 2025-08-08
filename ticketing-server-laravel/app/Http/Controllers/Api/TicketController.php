@@ -27,7 +27,6 @@ class TicketController extends Controller
 
         $userRole = $user->userRole;
 
-
         $automationBranches = $user->assignedBranches->pluck('blist_id');
 
         $assignedBranchCas = $user->assignedBranchCas->pluck('blist_id');
@@ -244,7 +243,7 @@ class TicketController extends Controller
             ->where('status', TicketStatus::EDITED)
             ->get();
 
-        $groupedTckts = $tckts->groupBy(function ($item) {
+        $groupedTickets = $tckts->groupBy(function ($item) {
             return implode('|', [
                 $item->branch_name,
                 $item->isCounted,
@@ -255,7 +254,7 @@ class TicketController extends Controller
             ]);
         });
 
-        $totalTickets = $groupedTckts->count();
+        $totalTickets = $groupedTickets->count();
 
         return response()->json([
             "count" => $totalTickets,

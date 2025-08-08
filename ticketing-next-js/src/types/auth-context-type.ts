@@ -1,0 +1,20 @@
+import { AxiosResponse } from "axios";
+import { Dispatch, SetStateAction } from "react";
+
+export interface CredentialType {
+  usernameOrEmail: string;
+  password: string;
+}
+
+export interface AuthContextType {
+  user: any | null;
+  setUser?: () => Dispatch<SetStateAction<any>>;
+  isAuthenticated: boolean;
+  setIsAuthenticated?: () => Dispatch<SetStateAction<boolean>>;
+  isLoading: boolean;
+  setIsLoading?: () => Dispatch<SetStateAction<boolean>>;
+  login: (credentials: CredentialType) => Promise<AxiosResponse<any, any>>;
+  logout: () => Promise<void>;
+  fetchUserProfile: () => Promise<void>;
+  loginAsOtp: (code: string, email: string) => Promise<AxiosResponse<any, any>>;
+}

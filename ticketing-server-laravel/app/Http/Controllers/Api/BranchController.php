@@ -14,7 +14,7 @@ class BranchController extends Controller
      */
     public function index()
     {
-        $branches = BranchList::all();
+        $branches = BranchList::orderBy('b_code')->get();
 
         return response()->json([
             "data" => $branches

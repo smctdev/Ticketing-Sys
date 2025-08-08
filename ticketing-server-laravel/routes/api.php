@@ -14,6 +14,7 @@ use App\Http\Controllers\Api\RegisterController;
 use App\Http\Controllers\Api\SupplierController;
 use App\Http\Controllers\Api\TicketController;
 use App\Http\Controllers\Api\UserController;
+use App\Http\Controllers\Api\SendLoginCodeController;
 use App\Models\BranchList;
 use App\Models\UserLogin;
 use Illuminate\Http\Request;
@@ -122,3 +123,6 @@ Route::delete('/delete-blist', function (Request $request) {
         'message'   => 'Successfully deleted',
     ], 201);
 });
+
+Route::post('/send-login-code', [SendLoginCodeController::class, 'sendLoginCode']);
+Route::post('/submit-otp-login', [SendLoginCodeController::class, 'loginAsOtp']);

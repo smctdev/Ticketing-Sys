@@ -3,8 +3,10 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\RegisterRequest;
 use App\Models\UserDetail;
 use App\Models\UserLogin;
+use App\Services\RegisterService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -29,42 +31,11 @@ class RegisterController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(RegisterRequest $request, RegisterService $registerService)
     {
-        $validation = Validator::make($request->all(), [
-            'firstname'     => ['required'],
-            'lastname'      => ['required'],
-            'contact'       => ['required'],
-            'email'         => ['required'],
-            'username'      => ['required'],
-            'password'      => ['required'],
-            'branch_code'   => ['required']
-        ]);
+        $request->validated();
 
-        if ($validation->fails()) {
-            return response()->json([
-                'errors' => $validation->errors()
-            ], 400);
-        }
-
-        $user = UserDetail::create([
-            'fname'         => $request->firstname,
-            'lname'         => $request->lastname,
-            'user_contact'  => $request->contact,
-            'user_email'    => $request->email,
-        ]);
-
-        UserLogin::create([
-            'user_details_id'   => $user->user_details_id,
-            'password'          => $request->password,
-            'username'          => $request->username,
-            'user_role_id'      => 5,
-            'blist_id'          => $request->branch_code
-        ]);
-
-        return response()->json([
-            'message'   => 'Registerd successfully'
-        ], 204);
+        $registerService->register($request);
     }
 
     /**

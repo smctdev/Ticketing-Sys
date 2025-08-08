@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\LoginRequest;
 use App\Models\UserLogin;
+use App\Services\LoginService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
@@ -29,49 +31,11 @@ class LoginController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(LoginRequest $request, LoginService $loginService)
     {
-        $validation = Validator::make($request->all(), [
-            "usernameOrEmail"   => ['required'],
-            "password"          => ["required"],
-        ]);
+        $request->validated();
 
-        if ($validation->fails()) {
-            return response()->json([
-                'errors'    => $validation->errors(),
-            ], 400);
-        }
-
-        $user = UserLogin::with('userDetail')
-            ->where('username', $request->usernameOrEmail)
-            ->orWhereHas('userDetail', function ($query) use ($request) {
-                $query->where('user_email', $request->usernameOrEmail);
-            })
-            ->first();
-
-        if (!$user) {
-            return response()->json([
-                'error' => 'Username or email not found',
-            ], 400);
-        }
-
-        $credentials = Auth::guard('web')->attempt([
-            'username'       => $user->userDetail->user_email === $request->usernameOrEmail ? $user->username : $request->usernameOrEmail,
-            'password'       => $request->password,
-        ]);
-
-        if ($credentials) {
-            $request->session()->regenerate();
-
-            return response()->json([
-                'message'   =>  'Login successfully',
-            ], 204);
-        }
-
-        return response()->json([
-            'message'       => 'Invalid credentials',
-            'wow' => $user->userDetail->user_email
-        ], 400);
+        $loginService->authenticate($request);
     }
 
     /**

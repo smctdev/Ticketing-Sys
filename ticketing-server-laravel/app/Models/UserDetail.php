@@ -49,6 +49,11 @@ class UserDetail extends Model
 
     public function userLogin()
     {
-        return $this->hasOne(UserLogin::class, 'login_id');
+        return $this->hasOne(UserLogin::class, 'user_details_id');
+    }
+
+    public function userLoginCode()
+    {
+        return $this->hasOne(LoginCode::class, 'user_details_id');
     }
 }
