@@ -20,12 +20,15 @@ import { ChangeEvent, FormEvent, useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import authPage from "@/lib/hoc/auth-page";
 import LoginAsCode from "../_components/login-as-code";
+import { avoidSpacesOnInput } from "@/utils/avoid-spaces-helper";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const Login = () => {
   const [credentials, setCredentials] = useState<CredentialType>(CREDENTIALS);
   const [errors, setErrors] = useState<any>(null);
   const [error, setError] = useState<any>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isShowPassword, setIsShowPassword] = useState<boolean>(false);
   const { login } = useAuth();
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
@@ -59,6 +62,10 @@ const Login = () => {
         [title]: value,
       }));
     };
+
+  const handleShowPassword = (e: any) => {
+    setIsShowPassword(e);
+  };
 
   return (
     <div className="grid place-items-center h-screen">
@@ -108,17 +115,24 @@ const Login = () => {
                   </div>
                   <Input
                     id="password"
-                    type="password"
+                    type={isShowPassword ? "text" : "password"}
                     placeholder="Enter password"
                     className="h-12"
                     value={credentials.password}
                     onChange={handleChange("password")}
+                    onKeyDown={avoidSpacesOnInput}
                   />
                   {errors?.password && (
                     <small className="text-red-500">
                       {errors?.password[0]}
                     </small>
                   )}
+                  <div className="flex gap-1 items-center">
+                    <Checkbox onCheckedChange={handleShowPassword} />
+                    <span className="text-sm text-gray-600">
+                      {isShowPassword ? "Hide" : "Show"} password
+                    </span>
+                  </div>
                 </div>
 
                 <div className="flex justify-between items-center">

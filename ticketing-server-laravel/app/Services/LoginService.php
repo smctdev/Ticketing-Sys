@@ -29,7 +29,7 @@ class LoginService
         if ($credentials) {
             $request->session()->regenerate();
 
-            $user?->userDetail?->userLoginCode->delete();
+            $user?->userDetail?->userLoginCode?->delete();
 
             throw new HttpException(204, 'Login successfully');
         }

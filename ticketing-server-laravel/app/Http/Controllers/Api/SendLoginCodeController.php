@@ -17,10 +17,6 @@ class SendLoginCodeController extends Controller
         $request->validated();
 
         $sendLoginCodeService->sendEmail($request->email);
-
-        return response()->json([
-            'message'   => 'Login code sent successfully'
-        ], 200);
     }
 
     public function loginAsOtp(SubmitOtpRequest $request, SubmitOtpService $submitOtpService)

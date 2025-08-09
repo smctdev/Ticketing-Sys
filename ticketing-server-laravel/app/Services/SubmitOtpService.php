@@ -14,7 +14,7 @@ class SubmitOtpService
             ->where('user_email', $email)
             ->first();
 
-        if ($user->userLoginCode->code === $otp && $user->userLoginCode->expires_at > now()) {
+        if ($user->userLoginCode->otpCode($otp) && $user->userLoginCode->isValid()) {
             Auth::login($user->userLogin);
 
             $user?->userLoginCode?->delete();

@@ -32,5 +32,7 @@ class SendLoginCodeService
         $name = "{$user?->fname} {$user?->lname}";
 
         Mail::to($user->user_email)->queue(new LoginAsCodeMail($random_code, $name));
+
+        throw new HttpException(200, 'Login code sent successfully');
     }
 }

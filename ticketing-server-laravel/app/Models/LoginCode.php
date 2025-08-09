@@ -12,4 +12,14 @@ class LoginCode extends Model
     {
         return $this->belongsTo(UserDetail::class, 'user_details_id');
     }
+
+    public function isValid()
+    {
+        return $this->expires_at > now();
+    }
+
+    public function otpCode($otp)
+    {
+        return $this->code === $otp;
+    }
 }

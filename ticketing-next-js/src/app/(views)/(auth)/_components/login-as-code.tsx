@@ -113,23 +113,25 @@ export default function LoginAsCode() {
               ? "Please enter the 6 digits code sent to your email."
               : "Enter your email address below to get a login code."}
           </DialogDescription>
-          <DialogDescription className="flex flex-col gap-1">
-            {isEnterCode && (
-              <Alert variant="default" className="text-green-500">
-                <MessageCircleWarning />
-                <AlertTitle>Success!</AlertTitle>
-                <AlertDescription className="text-green-500">
-                  Login code sent to your email {email}
-                </AlertDescription>
-              </Alert>
-            )}
-            {error && (
-              <Alert variant="destructive">
-                <MessageCircleWarning />
-                <AlertTitle>Ops!</AlertTitle>
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
+          <DialogDescription className="flex flex-col gap-1" asChild>
+            <div>
+              {isEnterCode && (
+                <Alert variant="default" className="text-green-500">
+                  <MessageCircleWarning />
+                  <AlertTitle>Success!</AlertTitle>
+                  <AlertDescription className="text-green-500">
+                    Login code sent to your email {email}
+                  </AlertDescription>
+                </Alert>
+              )}
+              {error && (
+                <Alert variant="destructive">
+                  <MessageCircleWarning />
+                  <AlertTitle>Ops!</AlertTitle>
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
+            </div>
           </DialogDescription>
         </DialogHeader>
         <div className="flex items-center gap-2">

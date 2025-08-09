@@ -1,10 +1,18 @@
 import Logo from "@/assets/logo.png";
 import {
+  Building,
   ChevronRight,
+  FileUserIcon,
   Home,
+  LayoutDashboard,
   MenuIcon,
   Notebook,
+  ShieldUserIcon,
   TicketCheck,
+  UserCog2,
+  Users2,
+  UserSearch,
+  UserStar,
 } from "lucide-react";
 import Image from "next/image";
 import {
@@ -43,28 +51,16 @@ import {
 import { Button } from "./button";
 import Link from "next/link";
 import { useState } from "react";
-
-const items = [
-  { title: "Dashboard", url: "/dashboard", icon: Home },
-  { title: "Tickets", url: "/tickets", icon: TicketCheck },
-  { title: "Reports", url: "/reports", icon: Notebook },
-];
-
-const collapsibleItems = [
-  { title: "Branches", url: "/branches" },
-  { title: "Categories", url: "/categories" },
-  { title: "Suppliers", url: "/suppliers" },
-  { title: "Users", url: "/users" },
-  { title: "Automations", url: "/automations" },
-  { title: "Accountings", url: "/accountings" },
-  { title: "CAS", url: "/cas" },
-  { title: "Area Managers", url: "/area-managers" },
-];
+import {
+  SIDEBAR_ITEMS,
+  COLLAPSABLE_SIDEBAR_ITEMS,
+} from "@/constants/sidebar-items";
 
 export function AppSidebar() {
   const { open } = useSidebar();
   const { logout, user } = useAuth();
   const [isCollapsibleOpen, setIsCollapsibleOpen] = useState<boolean>(true);
+  const { isAdmin } = useAuth();
 
   const handleLogout = () => {
     Swal.fire({
@@ -111,59 +107,79 @@ export function AppSidebar() {
           {open && <SidebarGroupLabel>Applications</SidebarGroupLabel>}
           <SidebarGroupContent>
             <SidebarMenu>
-              {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
+              {SIDEBAR_ITEMS.map((item, index) => (
+                <SidebarMenuItem key={index}>
                   <SidebarMenuButton asChild tooltip={item.title}>
-                    <a href={item.url}>
+                    <Link href={item.url}>
                       <item.icon className="h-4 w-4" />
                       {open && <span>{item.title}</span>}
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
             </SidebarMenu>
+          </SidebarGroupContent>
+          {open && isAdmin && (
+            <SidebarGroupLabel>Admin Panel</SidebarGroupLabel>
+          )}
+          <SidebarGroupContent hidden={!isAdmin}>
             <SidebarMenu>
-              <Collapsible
-                defaultOpen
-                className="group"
-                onOpenChange={handleCollapsibleOpen}
-              >
-                <SidebarMenuItem>
-                  <CollapsibleTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      className="w-full justify-between text-left !p-2"
-                    >
-                      <span className="flex gap-2 items-center">
-                        <MenuIcon className="w-4 h-4" />
-                        Others
-                      </span>
+              {open ? (
+                <Collapsible
+                  defaultOpen
+                  className="group"
+                  onOpenChange={handleCollapsibleOpen}
+                >
+                  <SidebarMenuItem>
+                    <CollapsibleTrigger asChild>
+                      <SidebarMenuButton asChild tooltip="Others">
+                        <Button
+                          variant="ghost"
+                          className="w-full justify-between text-left !p-2"
+                        >
+                          <span className="flex gap-2 items-center">
+                            <MenuIcon className="w-4 h-4" />
+                            Others
+                          </span>
 
-                      <ChevronRight
-                        className={`w-4 h-4 ${
-                          isCollapsibleOpen && "rotate-90"
-                        } trasition-all duration-300 ease-in-out`}
-                      />
-                    </Button>
-                  </CollapsibleTrigger>
+                          <ChevronRight
+                            className={`w-4 h-4 ${
+                              isCollapsibleOpen && "rotate-90"
+                            } trasition-all duration-300 ease-in-out`}
+                          />
+                        </Button>
+                      </SidebarMenuButton>
+                    </CollapsibleTrigger>
 
-                  <CollapsibleContent>
-                    <SidebarMenuSub>
-                      <SidebarMenuSubItem />
-                      {collapsibleItems?.map((item, index) => (
-                        <Link href={item.url} key={index}>
-                          <Button
-                            variant="ghost"
-                            className="w-full justify-start text-left"
-                          >
-                            {item.title}
-                          </Button>
-                        </Link>
-                      ))}
-                    </SidebarMenuSub>
-                  </CollapsibleContent>
-                </SidebarMenuItem>
-              </Collapsible>
+                    <CollapsibleContent>
+                      <SidebarMenuSub>
+                        <SidebarMenuSubItem />
+                        {COLLAPSABLE_SIDEBAR_ITEMS?.map((item, index) => (
+                          <Link href={item.url} key={index}>
+                            <Button
+                              variant="ghost"
+                              className="w-full justify-start text-left"
+                            >
+                              {item.title}
+                            </Button>
+                          </Link>
+                        ))}
+                      </SidebarMenuSub>
+                    </CollapsibleContent>
+                  </SidebarMenuItem>
+                </Collapsible>
+              ) : (
+                COLLAPSABLE_SIDEBAR_ITEMS?.map((item, index) => (
+                  <SidebarMenuItem key={index}>
+                    <SidebarMenuButton asChild tooltip={item.title}>
+                      <Link href={item.url}>
+                        <item.icon className="h-4 w-4" />
+                        {open && <span>{item.title}</span>}
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))
+              )}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -175,7 +191,7 @@ export function AppSidebar() {
             <div className="flex items-center gap-2 cursor-pointer">
               <Avatar className="h-10 w-10">
                 <AvatarImage src={user?.user_detail?.profile_pic} alt="User" />
-                <AvatarFallback className="border">
+                <AvatarFallback className="border font-bold">
                   {nameShortHand(user?.full_name)}
                 </AvatarFallback>
               </Avatar>

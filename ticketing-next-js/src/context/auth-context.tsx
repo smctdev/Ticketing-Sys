@@ -14,6 +14,7 @@ import {
   fetchProfile,
 } from "@/lib/sanctum";
 import { api } from "@/lib/api";
+import { ROLE } from "@/constants/roles";
 
 export const AuthContext = createContext<AuthContextType | undefined>(
   undefined
@@ -27,6 +28,7 @@ export default function AuthContextProvider({
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [user, setUser] = useState<any | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+  const [isAdmin, setIsAdmin] = useState<boolean>(false);
 
   useEffect(() => {
     fetchUserProfile();
@@ -34,13 +36,18 @@ export default function AuthContextProvider({
 
   async function login(credentials: CredentialType) {
     const response = await sanctumLogin(credentials);
-    if (response.status === 204) {
-      const profile = await fetchProfile();
 
-      if (profile.status === 200) {
-        setUser(profile.data);
-        setIsAuthenticated(true);
-      }
+    if (response.status !== 204) return response;
+
+    const profile = await fetchProfile();
+
+    if (profile.status !== 200) return response;
+
+    setUser(profile.data);
+    setIsAuthenticated(true);
+
+    if (profile.data.user_role.role_name === ROLE.ADMIN) {
+      setIsAdmin(true);
     }
 
     return response;
@@ -58,6 +65,7 @@ export default function AuthContextProvider({
       if (error.response.status === 401) {
         setUser(null);
         setIsAuthenticated(false);
+        setIsAdmin(false);
       }
     } finally {
       setIsLoading(false);
@@ -70,6 +78,7 @@ export default function AuthContextProvider({
       if (response.status === 204) {
         setUser(null);
         setIsAuthenticated(false);
+        setIsAdmin(false);
       }
     } catch (error) {
       console.error(error);
@@ -78,12 +87,17 @@ export default function AuthContextProvider({
 
   async function loginAsOtp(code: string, email: string) {
     const response = await api.post("/submit-otp-login", { otp: code, email });
-    if (response.status === 200) {
-      const profile = await fetchProfile();
-      if (profile.status === 200) {
-        setUser(profile.data);
-        setIsAuthenticated(true);
-      }
+    if (response.status !== 200) return response;
+
+    const profile = await fetchProfile();
+
+    if (profile.status !== 200) return response;
+
+    setUser(profile.data);
+    setIsAuthenticated(true);
+
+    if (profile.data.user_role.role_name === ROLE.ADMIN) {
+      setIsAdmin(true);
     }
 
     return response;
@@ -95,6 +109,7 @@ export default function AuthContextProvider({
         user,
         isLoading,
         isAuthenticated,
+        isAdmin,
         login,
         logout,
         fetchUserProfile,

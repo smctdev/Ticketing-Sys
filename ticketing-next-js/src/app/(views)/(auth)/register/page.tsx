@@ -30,6 +30,7 @@ import { UserDetailsType } from "@/types/user-details";
 import { api } from "@/lib/api";
 import useFetch from "@/hooks/useFetch";
 import Swal from "sweetalert2";
+import { avoidSpacesOnInput } from "@/utils/avoid-spaces-helper";
 
 const register = () => {
   const [formInput, setFormInput] = useState<UserDetailsType>(USER_DETAILS);
@@ -267,6 +268,7 @@ const register = () => {
                     className="h-12"
                     value={formInput.password}
                     onChange={handleChange("password")}
+                    onKeyDown={avoidSpacesOnInput}
                   />
                   {errors?.password && (
                     <small className="text-red-500">
@@ -290,6 +292,7 @@ const register = () => {
                     className="h-12"
                     value={formInput.password_confirmation}
                     onChange={handleChange("password_confirmation")}
+                    onKeyDown={avoidSpacesOnInput}
                   />
                   {errors?.password_confirmation && (
                     <small className="text-red-500">
