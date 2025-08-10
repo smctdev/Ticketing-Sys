@@ -30,8 +30,10 @@ class LogoutController extends Controller
     public function store(Request $request)
     {
         Auth::guard('web')->logout();
-        $request->session()->regenerateToken();
+        
         $request->session()->invalidate();
+
+        $request->session()->regenerateToken();
 
         return response()->json([
             'message'   => 'Successfully logged out'
