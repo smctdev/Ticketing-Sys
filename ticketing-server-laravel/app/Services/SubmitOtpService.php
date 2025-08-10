@@ -8,14 +8,16 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class SubmitOtpService
 {
-    public function submitOtp($otp, $email)
+    public function submitOtp($otp, $email, $session)
     {
         $user = UserDetail::with('userLoginCode', 'userLogin')
             ->where('user_email', $email)
             ->first();
 
         if ($user->userLoginCode->otpCode($otp) && $user->userLoginCode->isValid()) {
-            Auth::login($user->userLogin);
+            Auth::guard('web')->login($user->userLogin);
+
+            $session->regenerate();
 
             $user?->userLoginCode?->delete();
 
