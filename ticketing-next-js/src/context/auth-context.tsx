@@ -56,9 +56,14 @@ export default function AuthContextProvider({
   async function fetchUserProfile() {
     try {
       const response = await fetchProfile();
-      if (response.status === 200) {
-        setUser(response.data);
-        setIsAuthenticated(true);
+
+      if (response.status !== 200) return;
+
+      setUser(response.data);
+      setIsAuthenticated(true);
+
+      if (response.data.user_role.role_name === ROLE.ADMIN) {
+        setIsAdmin(true);
       }
     } catch (error: any) {
       console.error(error);

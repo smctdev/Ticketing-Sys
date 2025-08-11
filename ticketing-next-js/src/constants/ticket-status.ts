@@ -1,0 +1,5 @@
+export const TICKET_STATUS = {
+  EDITED: "EDITED",
+  REJECTED: "REJECTED",
+  PENDING: "PENDING",
+};

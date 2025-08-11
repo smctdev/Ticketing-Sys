@@ -2,9 +2,12 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\TicketStatus;
+use App\Enums\UserRoles;
 use App\Http\Controllers\Controller;
 use App\Models\Ticket;
 use App\Models\UserLogin;
+use App\Services\TicketService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -76,146 +79,134 @@ class DashboardController extends Controller
 
     private function userCount()
     {
-        $userCount = UserLogin::where('login_id', '!=', Auth::id())
-            ->whereHas('userRole', fn($query) => $query->where('role_name', 'Automation'))
+        $total_users = UserLogin::where('login_id', '!=', Auth::id())
             ->count();
-        return $userCount;
+
+        $total_automation = UserLogin::where('login_id', '!=', Auth::id())
+            ->whereHas("userRole", fn($query) => $query->where('role_name', UserRoles::AUTOMATION))
+            ->count();
+
+        $total_accounting_head = UserLogin::where('login_id', '!=', Auth::id())
+            ->whereHas("userRole", fn($query) => $query->where('role_name', UserRoles::ACCOUNTING_HEAD))
+            ->count();
+
+        $total_branch_head = UserLogin::where('login_id', '!=', Auth::id())
+            ->whereHas("userRole", fn($query) => $query->where('role_name', UserRoles::BRANCH_HEAD))
+            ->count();
+
+        $total_staff = UserLogin::where('login_id', '!=', Auth::id())
+            ->whereHas("userRole", fn($query) => $query->where('role_name', UserRoles::STAFF))
+            ->count();
+
+        $total_cas = UserLogin::where('login_id', '!=', Auth::id())
+            ->whereHas("userRole", fn($query) => $query->where('role_name', UserRoles::CAS))
+            ->count();
+
+        $total_accounting_staff = UserLogin::where('login_id', '!=', Auth::id())
+            ->whereHas("userRole", fn($query) => $query->where('role_name', UserRoles::ACCOUNTING_STAFF))
+            ->count();
+
+        $total_area_manager = UserLogin::where('login_id', '!=', Auth::id())
+            ->whereHas("userRole", fn($query) => $query->where('role_name', UserRoles::AREA_MANAGER))
+            ->count();
+
+        return [
+            'total_users'               => $total_users,
+            'total_automation'          => $total_automation,
+            'total_accounting_head'     => $total_accounting_head,
+            'total_branch_head'         => $total_branch_head,
+            'total_staff'               => $total_staff,
+            'total_cas'                 => $total_cas,
+            'total_accounting_staff'    => $total_accounting_staff,
+            'total_area_manager'        => $total_area_manager
+        ];
     }
 
     private function ticketCompletedCount()
     {
-        $ticketsThisMonth = Ticket::whereHas('ticketDetail', fn($query) => $query->whereMonth('date_created', now()->month)->when(Auth::user()->userRole->role_name !== 'Admin', fn($subQuery) => $subQuery->where('login_id', Auth::id())))
+        $ticketsThisMonth = Ticket::whereHas('ticketDetail', fn($query) => $query->whereMonth('date_completed', now()->month))
             ->count();
-        $ticketsLastMonth = Ticket::whereHas('ticketDetail', fn($query) => $query->whereMonth('date_created', now()->subMonth()->month)->when(Auth::user()->userRole->role_name !== 'Admin', fn($subQuery) => $subQuery->where('login_id', Auth::id())))
+
+        $ticketsLastMonth = Ticket::whereHas('ticketDetail', fn($query) => $query->whereMonth('date_completed', now()->subMonth()->month))
             ->count();
         $percentageThanLastMonth = $ticketsLastMonth === 0 ? 0 : ($ticketsThisMonth - $ticketsLastMonth) / $ticketsLastMonth * 100;
 
         return [
-            $ticketsThisMonth,
-            $ticketsLastMonth,
-            number_format($percentageThanLastMonth, 2, ".", ",")
+            "tickets_this_month"              => $ticketsThisMonth,
+            "tickets_last_month"              => $ticketsLastMonth,
+            "tickets_percentage_this_month"   => number_format($percentageThanLastMonth, 2, ".", ",")
         ];
     }
 
     private function ticketThisWeekCount()
     {
-        $ticketsThisWeek = Ticket::whereHas('ticketDetail', fn($query) => $query->whereBetween('date_created', [now()->startOfWeek(), now()->endOfWeek()])->when(Auth::user()->userRole->role_name !== 'Admin', fn($subQuery) => $subQuery->where('login_id', Auth::id())))
+        $ticketsThisWeek = Ticket::whereHas('ticketDetail', fn($query) => $query->whereBetween('date_completed', [now()->startOfWeek(), now()->endOfWeek()]))
             ->count();
-        $ticketsLastWeek = Ticket::whereHas('ticketDetail', fn($query) => $query->whereBetween('date_created', [now()->subWeek()->startOfWeek(), now()->subWeek()->endOfWeek()])->when(Auth::user()->userRole->role_name !== 'Admin', fn($subQuery) => $subQuery->where('login_id', Auth::id())))
+
+        $ticketsLastWeek = Ticket::whereHas('ticketDetail', fn($query) => $query->whereBetween('date_completed', [now()->subWeek()->startOfWeek(), now()->subWeek()->endOfWeek()]))
             ->count();
+
         $percentageThanLastWeek = $ticketsLastWeek === 0 ? 0 : ($ticketsThisWeek - $ticketsLastWeek) / $ticketsLastWeek * 100;
 
         return [
-            $ticketsThisWeek,
-            $ticketsLastWeek,
-            number_format($percentageThanLastWeek, 2, ".", ",")
+            "tickets_this_week"                 => $ticketsThisWeek,
+            "tickets_last_week"                 => $ticketsLastWeek,
+            "tickets_percentage_this_week"      => number_format($percentageThanLastWeek, 2, ".", ",")
         ];
     }
 
-    private function ticketPendingCount()
+    private function ticketsData()
     {
-        $tickets = Ticket::where('status', "PENDING")
-            ->when(Auth::user()->userRole->role_name !== 'Admin', fn($subQuery) => $subQuery->where('login_id', Auth::id()))
+        $ticketsPending = Ticket::where('status', TicketStatus::PENDING)
             ->count();
-        $ticketsRejected = Ticket::where('status', "REJECTED")
-            ->when(Auth::user()->userRole->role_name !== 'Admin', fn($subQuery) => $subQuery->where('login_id', Auth::id()))
+
+        $ticketsRejected = Ticket::where('status', TicketStatus::REJECTED)
+            ->count();
+
+        $ticketsEdited = Ticket::where('status', TicketStatus::EDITED)
             ->count();
 
         return [
-            $tickets,
-            $ticketsRejected
+            "tickets_pending"   => $ticketsPending,
+            "tickets_rejected"  => $ticketsRejected,
+            "tickets_edited"    => $ticketsEdited
         ];
     }
 
-    private function getTicketThisWeek()
+    public function adminDashboardData()
     {
-        $weekDays = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
-        $tickets = Ticket::whereHas('ticketDetail', fn($query) => $query->whereBetween('date_created', [now()->startOfWeek(), now()->endOfWeek()]))
-            ->when(Auth::user()->userRole->role_name !== 'Admin', fn($subQuery) => $subQuery->where('login_id', Auth::id()))
-            ->get();
-
-        $countsByDay = $tickets->groupBy(fn($ticket) => Carbon::parse($ticket->ticketDetail->date_created)->format('l'))
-            ->map(fn($group) => $group->count());
-
-        $result = collect($weekDays)->map(fn($day) => [
-            'day'   => $day,
-            'count' => $countsByDay[$day] ?? 0,
-        ]);
-
-        return $result;
+        return response()->json([
+            "total_users"                           => $this->userCount(),
+            "tickets_completed_this_month_data"     => $this->ticketCompletedCount(),
+            "tickets_completed_this_week_data"      => $this->ticketThisWeekCount(),
+            "tickets"                               => $this->ticketsData(),
+        ], 200);
     }
 
-    private function getTicketThisYear()
+
+
+    public function userDashboardData($ticketService)
     {
-        $year = now()->year;
 
-        $tickets = Ticket::whereHas('ticketDetail', fn($query) => $query->whereYear('date_created', $year))
-            ->when(Auth::user()->userRole->role_name !== 'Admin', fn($subQuery) => $subQuery->where('login_id', Auth::id()))
-            ->get();
-
-        $ticketsByMonth = $tickets->groupBy(fn($ticket) => Carbon::parse($ticket->ticketDetail->date_created)->format('Y-m'))
-            ->map
-            ->count();
-
-        $allMonths = collect(range(1, 12))->map(fn($month) => sprintf('%d-%02d', $year, $month));
-
-
-        $result = $allMonths->map(fn($month) => [
-            'month' => $month,
-            'count' => $ticketsByMonth[$month] ?? 0,
-        ]);
-
-        return $result;
-    }
-
-    private function getTicketLastYear()
-    {
-        $year = now()->year;
-
-        $tickets = Ticket::whereHas('ticketDetail', fn($query) => $query->whereYear('date_created', now()->subYear()->year))
-            ->when(Auth::user()->userRole->role_name !== 'Admin', fn($subQuery) => $subQuery->where('login_id', Auth::id()))
-            ->get();
-
-        $ticketsByMonth = $tickets->groupBy(fn($ticket) => Carbon::parse($ticket->ticketDetail->date_created)->format('Y-m'))
-            ->map
-            ->count();
-
-        $allMonths = collect(range(1, 12))->map(fn($month) => sprintf('%d-%02d', $year, $month));
-
-
-        $result = $allMonths->map(fn($month) => [
-            'month' => $month,
-            'count' => $ticketsByMonth[$month] ?? 0,
-        ]);
-
-        return $result;
+        return response()->json([
+            "message"                   => "Dashboard data fetched successfully",
+            "data"                      => $ticketService->getDashboardData(),
+            "total_tickets"             => $ticketService->getTotalTickets(),
+            "total_edited_tickets"      => $ticketService->getTotalEditedTickets(),
+            "total_rejected_tickets"    => $ticketService->getTotalRejectedTickets(),
+            "total_pending_tickets"     => $ticketService->getTotalPendingTickets(),
+            'recent_tickets'            => $ticketService->getRecentTickets(),
+        ], 200);
     }
 
     public function dashboardData()
     {
-        $userCount = $this->userCount();
-        [$ticketsThisMonth, $ticketsLastMonth, $percentageThanLastMonth] = $this->ticketCompletedCount();
-        [$ticketsThisWeek, $ticketsLastWeek, $percentageThanLastWeek] = $this->ticketThisWeekCount();
-        [$tickets, $ticketsRejected] = $this->ticketPendingCount();
-        $thisWeekStats = $this->getTicketThisWeek();
-        $thisYearStats = $this->getTicketThisYear();
-        $lastYearStats = $this->getTicketLastYear();
-
-        return response()->json([
-            "totalUsers"                => $userCount,
-            "thisLastYearStats"         => $lastYearStats,
-            "thisYearStats"             => $thisYearStats,
-            "ticketsThisMonth"          => $ticketsThisMonth,
-            "ticketsLastMonth"          => $ticketsLastMonth,
-            "percentageThanLastMonth"   => $percentageThanLastMonth,
-            "ticketsThisWeek"           => $ticketsThisWeek,
-            "ticketsLastWeek"           => $ticketsLastWeek,
-            "percentageThanLastWeek"    => $percentageThanLastWeek,
-            "tickets"                   => $tickets,
-            "ticketsRejected"           => $ticketsRejected,
-            "thisWeekStats"             => $thisWeekStats
-        ], 200);
+        if (Auth::user()->isAdmin()) {
+            return $this->adminDashboardData();
+        } else {
+            return $this->userDashboardData(new TicketService());
+        }
     }
 
     /**

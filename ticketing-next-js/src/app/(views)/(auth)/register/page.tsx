@@ -19,16 +19,16 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { LoaderCircle, MessageCircleWarning, Terminal } from "lucide-react";
+import { LoaderCircle, MessageCircleWarning } from "lucide-react";
 import Link from "next/link";
 import { ChangeEvent, FormEvent, useMemo, useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useRouter } from "next/navigation";
 import authPage from "@/lib/hoc/auth-page";
 import { USER_DETAILS } from "@/constants/user-details";
-import { UserDetailsType } from "@/types/user-details";
+import { UserDetailsType } from "@/types/user-details-type";
 import { api } from "@/lib/api";
-import useFetch from "@/hooks/useFetch";
+import useFetch from "@/hooks/use-fetch";
 import Swal from "sweetalert2";
 import { avoidSpacesOnInput } from "@/utils/avoid-spaces-helper";
 

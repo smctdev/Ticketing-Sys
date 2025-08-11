@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\UserRoles;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
 
@@ -78,5 +79,50 @@ class UserLogin extends Authenticatable
     public function assignedAreaManagers()
     {
         return $this->hasMany(AssignedAreaManager::class, "login_id", "login_id");
+    }
+
+    public function isAdmin()
+    {
+        return $this->userRole->role_name === UserRoles::ADMIN;
+    }
+
+    public function isAutomation()
+    {
+        return $this->userRole->role_name === UserRoles::AUTOMATION;
+    }
+
+    public function isAutomationManager()
+    {
+        return $this->userRole->role_name === UserRoles::AUTOMATION_MANAGER;
+    }
+
+    public function isAccountingHead()
+    {
+        return $this->userRole->role_name === UserRoles::ACCOUNTING_HEAD;
+    }
+
+    public function isBranchHead()
+    {
+        return $this->userRole->role_name === UserRoles::BRANCH_HEAD;
+    }
+
+    public function isStaff()
+    {
+        return $this->userRole->role_name === UserRoles::STAFF;
+    }
+
+    public function isAccountingStaff()
+    {
+        return $this->userRole->role_name === UserRoles::ACCOUNTING_STAFF;
+    }
+
+    public function isAreaManager()
+    {
+        return $this->userRole->role_name === UserRoles::AREA_MANAGER;
+    }
+
+    public function isCas()
+    {
+        return $this->userRole->role_name === UserRoles::CAS;
     }
 }

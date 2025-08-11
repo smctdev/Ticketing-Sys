@@ -26,28 +26,28 @@ Route::middleware("auth:sanctum")->group(function () {
     Route::get('/profile', fn(Request $request) =>  $request->user()->load('userDetail', 'userRole', 'branch'));
 
     Route::controller(BranchController::class)->group(function () {
-        Route::get('/getTopBranches', 'getTopBranches');
-        Route::get('/getAllBranchCategories', 'getAllBranchCategories');
-        Route::get('/getAllBranchesTable', 'getAllBranchesTable');
+        Route::get('/get-top-branches', 'getTopBranches');
+        Route::get('/get-all-branch-categories', 'getAllBranchCategories');
+        Route::get('/get-all-branches-table', 'getAllBranchesTable');
     });
 
     Route::controller(DashboardController::class)->group(function () {
-        Route::get('/getAutomationData', 'index');
+        Route::get('/get-automation-data', 'index');
         Route::get('/dashboard-data', 'dashboardData');
     });
 
     Route::controller(NotificationController::class)->group(function () {
-        Route::get('/getAllNotifs', 'index');
+        Route::get('/notifications', 'index');
     });
 
     Route::controller(SupplierController::class)->group(function () {
-        Route::get('/getAllSupplierTable', 'index');
+        Route::get('/suppliers', 'index');
     });
 
     Route::controller(TicketController::class)->group(function () {
-        Route::get('/getAllTickets', 'index');
-        Route::get('/getAllCompleted', 'reports');
-        Route::put('/updateNotif/{id}', 'updateNotif');
+        Route::get('/tickets', 'index');
+        Route::get('/reports', 'reports');
+        Route::put('/update-notif/{id}', 'updateNotif');
     });
 
     Route::controller(CategoryController::class)->group(function () {

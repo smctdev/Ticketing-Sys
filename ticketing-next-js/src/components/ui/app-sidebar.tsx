@@ -1,19 +1,5 @@
 import Logo from "@/assets/logo.png";
-import {
-  Building,
-  ChevronRight,
-  FileUserIcon,
-  Home,
-  LayoutDashboard,
-  MenuIcon,
-  Notebook,
-  ShieldUserIcon,
-  TicketCheck,
-  UserCog2,
-  Users2,
-  UserSearch,
-  UserStar,
-} from "lucide-react";
+import { ChevronRight, MenuIcon } from "lucide-react";
 import Image from "next/image";
 import {
   Sidebar,
@@ -31,6 +17,11 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -102,7 +93,7 @@ export function AppSidebar() {
         </div>
       </SidebarHeader>
       <Separator />
-      <SidebarContent>
+      <SidebarContent className="overflow-x-hidden">
         <SidebarGroup>
           {open && <SidebarGroupLabel>Applications</SidebarGroupLabel>}
           <SidebarGroupContent>
@@ -200,9 +191,14 @@ export function AppSidebar() {
                   <span className="text-sm font-medium capitalize">
                     {user?.full_name}
                   </span>
-                  <span className="text-xs text-muted-foreground">
-                    {user?.user_detail?.user_email}
-                  </span>
+                  <Tooltip>
+                    <TooltipTrigger className="text-xs w-45 text-muted-foreground truncate text-start">
+                      {user?.user_detail?.user_email}
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{user?.user_detail?.user_email}</p>
+                    </TooltipContent>
+                  </Tooltip>
                 </div>
               )}
             </div>

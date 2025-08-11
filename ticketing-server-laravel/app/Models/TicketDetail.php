@@ -15,11 +15,13 @@ class TicketDetail extends Model
     protected function casts(): array
     {
         return [
-            'td_purpose'    => 'array',
-            'td_from'       => 'array',
-            'td_to'         => 'array',
-            'td_support'    => 'array',
-            'date_created'  => 'datetime',
+            'td_purpose'               => 'array',
+            'td_from'                  => 'array',
+            'td_to'                    => 'array',
+            'td_support'               => 'array',
+            'date_created'             => 'datetime',
+            'date_completed'           => 'datetime',
+            'ticket_transaction_date'  => 'datetime',
         ];
     }
 
