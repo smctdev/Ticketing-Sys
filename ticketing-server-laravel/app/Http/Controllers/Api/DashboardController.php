@@ -5,6 +5,8 @@ namespace App\Http\Controllers\Api;
 use App\Enums\TicketStatus;
 use App\Enums\UserRoles;
 use App\Http\Controllers\Controller;
+use App\Models\BranchList;
+use App\Models\Supplier;
 use App\Models\Ticket;
 use App\Models\UserLogin;
 use App\Services\TicketService;
@@ -173,6 +175,16 @@ class DashboardController extends Controller
         ];
     }
 
+    public function totalBranches()
+    {
+        return BranchList::count();
+    }
+
+    public function totalSuppliers()
+    {
+        return Supplier::count();
+    }
+
     public function adminDashboardData()
     {
 
@@ -181,6 +193,8 @@ class DashboardController extends Controller
             "tickets_completed_this_month_data"     => $this->ticketCompletedCount(),
             "tickets_completed_this_week_data"      => $this->ticketThisWeekCount(),
             "tickets"                               => $this->ticketsData(),
+            'branches'                              => $this->totalBranches(),
+            'suppliers'                             => $this->totalSuppliers(),
         ], 200);
     }
 

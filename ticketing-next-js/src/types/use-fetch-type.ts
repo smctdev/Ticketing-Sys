@@ -1,4 +1,5 @@
 import { ChangeEvent } from "react";
+import { PaginationType } from "./pagination-type";
 
 export interface UseFetchType {
   data: any;
@@ -10,4 +11,14 @@ export interface UseFetchType {
   handlePageChange: (newPage: number | string) => void;
   handlePerPageChange: (perPage: number | string) => void;
   handleShort: (column: any, direction: any) => void;
+  filterBy: FilterByType;
+  pagination: PaginationType;
+  handleFilter: (e: any) => void;
+  handleReset: () => void;
+}
+
+export interface FilterByType {
+  status: string;
+  search: string;
+  defaultSearchValue: string;
 }

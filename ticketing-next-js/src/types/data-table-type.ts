@@ -2,12 +2,12 @@ export interface DataTableType {
   data: any;
   columns: any;
   loading?: boolean;
-  pageTotal?: number;
+  pageTotal?: any;
   direction?: any;
   column?: any;
-  handlePageChange?: () => void;
-  handlePerPageChange?: () => void;
-  handleShort?: () => void;
-  perPage?: number;
+  handlePageChange?: (newPage: number | string) => void;
+  handlePerPageChange?: (perPage: number | string) => void;
+  handleShort?: (column: any, direction: any) => void;
+  perPage?: any;
   searchTerm?: string;
 }

@@ -22,6 +22,10 @@ class TicketController extends Controller
 
         $take = request('limit');
 
+        $search = request('search');
+
+        $filter_by = request('filter_by');
+
         $user = Auth::user();
 
         $userRole = $user->userRole;
@@ -49,21 +53,79 @@ class TicketController extends Controller
             'approveAcctgSup',
             'branch'
         )
+            ->when(
+                $filter_by !== 'ALL',
+                fn($q)
+                =>
+                $q->where('status', $filter_by)
+            )
+            ->when(
+                $search,
+                fn($q)
+                =>
+                $q->where(
+                    fn($q)
+                    =>
+                    $q->where('ticket_code', 'LIKE', "%{$search}%")
+                        ->orWhere('branch_name', 'LIKE', "%{$search}%")
+                        ->orWhereHas(
+                            'ticketDetail',
+                            fn($q)
+                            =>
+                            $q->whereHas(
+                                'ticketCategory',
+                                fn($q)
+                                =>
+                                $q->where('category_name', 'LIKE', "%{$search}%")
+                                    ->orWhere('category_shortcut', 'LIKE', "%{$search}%")
+                            )
+                        )
+                        ->orWhereHas(
+                            'userLogin',
+                            fn($q)
+                            =>
+                            $q->whereHas(
+                                'userDetail',
+                                fn($q)
+                                =>
+                                $q->where('fname', 'LIKE', "%{$search}%")
+                                    ->orWhere('lname', 'LIKE', "%{$search}%")
+                                    ->orWhereRaw('CONCAT(fname, " ", lname) LIKE ?', ["%{$search}%"])
+                                    ->orWhereRaw('CONCAT(lname, " ", fname) LIKE ?', ["%{$search}%"])
+                            )
+                        )
+                        ->orWhereHas(
+                            'assignedTicket',
+                            fn($q)
+                            =>
+                            $q->whereHas(
+                                'userDetail',
+                                fn($q)
+                                =>
+                                $q->where('fname', 'LIKE', "%{$search}%")
+                                    ->orWhere('lname', 'LIKE', "%{$search}%")
+                                    ->orWhereRaw('CONCAT(fname, " ", lname) LIKE ?', ["%{$search}%"])
+                                    ->orWhereRaw('CONCAT(lname, " ", fname) LIKE ?', ["%{$search}%"])
+                            )
+                        )
+                )
+            )
             ->when($ticket_category, fn($query) => $query->whereHas('ticketDetail', fn($subQuery) => $subQuery->where('ticket_category_id', $ticket_category)))
             ->when($bcode, fn($query) => $query->where('branch_id', $bcode))
-            ->when($userRole->role_name !== UserRoles::ADMIN, function ($query) use ($userRole, $automationBranches, $assignedBranchCas, $assignedAreaManagers, $accountingHeadCodes) {
-                $query->where(function ($subQuery) use ($userRole, $automationBranches, $assignedBranchCas, $assignedAreaManagers, $accountingHeadCodes) {
+            ->when($userRole->role_name !== UserRoles::ADMIN, function ($query) use ($userRole, $automationBranches, $assignedBranchCas, $assignedAreaManagers, $accountingHeadCodes, $user) {
+                $query->where(function ($subQuery) use ($userRole, $automationBranches, $assignedBranchCas, $assignedAreaManagers, $accountingHeadCodes, $user) {
                     if ($userRole->role_name === UserRoles::STAFF) {
-                        $subQuery->where('login_id', Auth::id());
+                        $subQuery->where('login_id', Auth::id())
+                            ->whereNot('status', TicketStatus::EDITED);
                     }
                     if ($userRole->role_name === UserRoles::AUTOMATION) {
                         $subQuery->where(fn($q) => $q->whereHas('editedBy')->orWhereHas('assignedTicket'))
-                            ->whereIn('status', [TicketStatus::PENDING, TicketStatus::EDITED])
+                            ->whereIn('status', TicketStatus::PENDING)
                             ->whereIn('branch_id', $automationBranches);
                     }
                     if ($userRole->role_name === UserRoles::BRANCH_HEAD) {
-                        $subQuery->whereIn('status', [TicketStatus::REJECTED, TicketStatus::EDITED])
-                            ->where('branch_id', $userRole->user_role_id);
+                        $subQuery->whereNot('status', TicketStatus::EDITED)
+                            ->where('branch_id', $user->blist_id);
                     }
 
                     if ($userRole->role_name === UserRoles::CAS) {
@@ -82,8 +144,9 @@ class TicketController extends Controller
                     }
 
                     if ($userRole->role_name === UserRoles::ACCOUNTING_STAFF) {
-                        $subQuery->whereIn('status', [TicketStatus::PENDING, TicketStatus::REJECTED])
-                            ->where('login_id', Auth::id());
+                        $subQuery->whereNot('status', TicketStatus::EDITED)
+                            ->where('login_id', Auth::id())
+                            ->orWhere('branch_id', $user->blist_id);
                     }
                 });
             })
@@ -91,73 +154,8 @@ class TicketController extends Controller
             ->paginate($take);
 
         return response()->json([
-            "count" => $tickets->total(),
-            "rows"  => $tickets->map(function ($ticket) {
-                return [
-                    "ticket_id"                     => $ticket->ticket_id,
-                    "ticket_code"                   => $ticket->ticket_code,
-                    "login_id"                      => $ticket->login_id,
-                    "ticket_details_id"             => $ticket->ticket_details_id,
-                    "branch_id"                     => $ticket->branch_id,
-                    "branch_name"                   => $ticket->branch_name,
-                    "status"                        => $ticket->status,
-                    "isCounted"                     => $ticket->isCounted,
-                    "isApproved"                    => $ticket->isApproved,
-                    "assigned_person"               => $ticket->assigned_person,
-                    "edited_by"                     => $ticket->edited_by,
-                    "notifStaff"                    => $ticket->notifStaff,
-                    "notifHead"                     => $ticket->notifHead,
-                    "notifAccounting"               => $ticket->notifAccounting,
-                    "notifAutomation"               => $ticket->notifAutomation,
-                    "notifAUTM"                     => $ticket->notifAUTM,
-                    "notifAdmin"                    => $ticket->notifAdmin,
-                    "displayTicket"                 => $ticket->displayTicket,
-                    "approveHead"                   => $ticket->approveHead,
-                    "approveAcctgStaff"             => $ticket->approveAcctgStaff,
-                    "approveAcctgSup"               => $ticket->approveAcctgSup,
-                    "approveAutm"                   => $ticket->approveAutm,
-                    "answer"                        => $ticket->answer,
-                    "appTBranchHead"                => $ticket->appTBranchHead,
-                    "appTAccStaff"                  => $ticket->appTAccStaff,
-                    "appTAccHead"                   => $ticket->appTAccHead,
-                    "appTAutomationHead"            => $ticket->appTAutomationHead,
-                    "appTEdited"                    => $ticket->appTEdited,
-                    "UserTicket"                    => [
-                        "login_id"                  => $ticket->userLogin?->login_id,
-                        "blist_id"                  => $ticket->userLogin?->blist_id,
-                        "requesting_password"       => $ticket->userLogin?->requesting_password,
-                        "UserDetails"               => $ticket->userLogin?->userDetail,
-                        "UserRole"                  => $ticket->userLogin?->userRole,
-                        "Branch"                    => $ticket->userLogin?->branch,
-                    ],
-                    "ApproveAccountingStaff"        => $ticket->approveAcctgStaff,
-                    "ApproveAccountingHead"         => $ticket->approveHead,
-                    "Branch"                        => $ticket->branch,
-                    "TicketDetails"                 => [
-                        "ticket_details_id"         => $ticket->ticketDetail?->ticket_details_id,
-                        "ticket_transaction_date"   => $ticket->ticketDetail?->ticket_transaction_date,
-                        "td_ref_number"             => $ticket->ticketDetail?->td_ref_number,
-                        "td_purpose"                => $ticket->ticketDetail?->td_purpose,
-                        "td_from"                   => $ticket->ticketDetail?->td_from,
-                        "td_to"                     => $ticket->ticketDetail?->td_to,
-                        "td_note"                   => $ticket->ticketDetail?->td_note,
-                        "td_support"                => $ticket->ticketDetail?->td_support,
-                        "supplier"                  => $ticket->ticketDetail?->supplier,
-                        "date_created"              => $ticket->ticketDetail?->date_created,
-                        "time"                      => $ticket->ticketDetail?->time,
-                        "date_completed"            => $ticket->ticketDetail?->date_completed,
-                        "Category"                  => $ticket->ticketDetail?->ticketCategory,
-                        "Supplier"                  => $ticket->ticketDetail?->supplier
-                    ],
-                    "AssignedTicket"                => [
-                        "login_id"                  => $ticket->assignedTicket?->login_id,
-                        "requesting_password"       => $ticket->assignedTicket?->requesting_password,
-                        "UserDetails"               => $ticket->assignedTicket?->userDetail,
-                        "UserRole"                  => $ticket->assignedTicket?->userRole,
-                        "Branch"                    => $ticket->assignedTicket?->branch
-                    ],
-                ];
-            })
+            "message"       => "Tickets fetched successfully",
+            "data"          => $tickets
         ], 200);
     }
 

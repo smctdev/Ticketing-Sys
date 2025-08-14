@@ -2,7 +2,7 @@ import { Badge } from "@/components/ui/badge";
 import formatDateAndTime from "@/utils/format-date-and-time";
 import statusColor from "@/utils/ticket-status-color";
 
-export const userDashboardColumns = [
+export const USER_DASHBOARD_TABLE_COLUMNS = [
   {
     name: "Ticket Code",
     cell: (row: any) => row.ticket_code,

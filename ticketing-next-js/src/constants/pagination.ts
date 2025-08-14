@@ -2,7 +2,7 @@ export const PAGINATION = {
   page: 1,
   perPage: 10,
   totalRecords: 0,
-  sortBy: "created_at",
+  sortBy: "ticket_id",
   sortDirection: "desc",
   isLoading: false,
 };

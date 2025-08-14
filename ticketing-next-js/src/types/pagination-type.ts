@@ -1,7 +1,7 @@
 export interface PaginationType {
-  page: number | string;
-  perPage: number | string;
-  totalRecords: number | string;
+  page: any;
+  perPage: any;
+  totalRecords: any;
   sortBy: string;
   sortDirection: string;
   isLoading: boolean;

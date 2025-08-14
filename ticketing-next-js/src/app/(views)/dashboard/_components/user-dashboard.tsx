@@ -15,7 +15,7 @@ import {
   TicketXIcon,
 } from "lucide-react";
 import RecentTicketTransactions from "./recent-edited-ticket-transactions";
-import { userDashboardColumns } from "../_constants/user-dashboard-table";
+import { USER_DASHBOARD_TABLE_COLUMNS } from "../_constants/user-dashboard-table-columns";
 
 export default function UserDashboard({
   data,
@@ -117,7 +117,7 @@ export default function UserDashboard({
                 <CardContent>
                   <DataTableComponent
                     data={data?.data?.data}
-                    columns={userDashboardColumns}
+                    columns={USER_DASHBOARD_TABLE_COLUMNS}
                     loading={isLoading}
                   />
                 </CardContent>
