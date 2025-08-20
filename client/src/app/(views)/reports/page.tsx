@@ -16,7 +16,6 @@ import { saveAs } from "file-saver";
 import { useState } from "react";
 import { api } from "@/lib/api";
 import formattedDate from "@/utils/format-date";
-import formatDateAndTime from "@/utils/format-date-and-time";
 import { formatDate } from "date-fns";
 
 function Reports() {
