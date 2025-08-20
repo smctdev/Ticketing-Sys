@@ -1,33 +1,36 @@
-import { FILTER_BY } from "@/constants/filter-by";
 import { PAGINATION } from "@/constants/pagination";
 import { api } from "@/lib/api";
 import { PaginationType } from "@/types/pagination-type";
-import { FilterByType, UseFetchType } from "@/types/use-fetch-type";
+import { UseFetchType } from "@/types/use-fetch-type";
+import formattedDate from "@/utils/format-date";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 
 export default function useFetch({
   url,
   isPaginated = false,
+  filters = false,
 }: {
   url: string;
   isPaginated?: boolean;
+  filters?: any;
 }): UseFetchType {
   const [data, setData] = useState<any>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<null | string>(null);
   const [pagination, setPagination] = useState<PaginationType>(PAGINATION);
-  const [filterBy, setFilterBy] = useState<FilterByType>(FILTER_BY);
+  const [filterBy, setFilterBy] = useState<any>(filters);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
+  const [isFiltered, setIsFiltered] = useState<boolean>(false);
 
   useEffect(() => {
     const fetchData = async () => {
+      const { defaultSearchValue, ...filteredData } = filterBy;
       const payload = {
         page: pagination.page,
         limit: pagination.perPage,
         // sortBy: pagination.sortBy,
         // sortDirection: pagination.sortDirection,
-        search: filterBy.search,
-        filter_by: filterBy.status,
+        ...filteredData,
       };
       try {
         const response = await api.get(url, {
@@ -61,8 +64,15 @@ export default function useFetch({
     // pagination?.sortBy,
     // pagination.sortDirection,
     isPaginated,
-    filterBy.search,
     filterBy.status,
+    filterBy.search,
+    filterBy.branch_code,
+    filterBy.branch_type,
+    filterBy.ticket_category,
+    filterBy.edited_end_date,
+    filterBy.edited_start_date,
+    filterBy.edited_transaction_end_date,
+    filterBy.edited_transaction_start_date,
   ]);
 
   const handleSearchTerm =
@@ -70,7 +80,7 @@ export default function useFetch({
     (e: ChangeEvent<HTMLInputElement>) => {
       const value = e.target.value;
 
-      setFilterBy((filterBy) => ({
+      setFilterBy((filterBy: any) => ({
         ...filterBy,
         defaultSearchValue: value,
       }));
@@ -78,11 +88,12 @@ export default function useFetch({
       if (debounceRef.current) clearTimeout(debounceRef.current);
 
       debounceRef.current = setTimeout(() => {
-        setFilterBy((filterBy) => ({
+        setFilterBy((filterBy: any) => ({
           ...filterBy,
           search: value,
         }));
         setIsLoading(true);
+        setIsFiltered(true);
       }, debounce);
     };
 
@@ -95,12 +106,22 @@ export default function useFetch({
     setIsLoading(true);
   };
 
-  const handleFilter = (value: any) => {
-    setFilterBy((filterBy) => ({
+  const handleSelectFilter = (item: string) => (value: any) => {
+    setFilterBy((filterBy: any) => ({
       ...filterBy,
-      status: value,
+      [item]: value,
     }));
     setIsLoading(true);
+    setIsFiltered(true);
+  };
+
+  const handleDateFilter = (item: string) => (value: any) => {
+    setFilterBy((filterBy: any) => ({
+      ...filterBy,
+      [item]: formattedDate(value),
+    }));
+    setIsLoading(true);
+    setIsFiltered(true);
   };
 
   const handlePerPageChange = (perPage: number | string) => {
@@ -122,9 +143,10 @@ export default function useFetch({
   };
 
   const handleReset = () => {
-    setFilterBy(FILTER_BY);
-    if (filterBy.status !== "ALL" || filterBy.search) {
+    setFilterBy(filters);
+    if (isFiltered) {
       setIsLoading(true);
+      setIsFiltered(false);
     }
   };
 
@@ -138,7 +160,8 @@ export default function useFetch({
     handleShort,
     filterBy,
     pagination,
-    handleFilter,
+    handleSelectFilter,
+    handleDateFilter,
     handleReset,
   };
 }

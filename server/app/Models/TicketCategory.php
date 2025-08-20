@@ -16,4 +16,9 @@ class TicketCategory extends Model
     {
         return $this->belongsTo(GroupCategory::class, 'group_code', 'id');
     }
+
+    public function ticketDetails()
+    {
+        return $this->hasMany(TicketDetail::class, 'ticket_category_id', 'ticket_category_id');
+    }
 }

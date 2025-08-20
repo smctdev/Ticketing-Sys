@@ -18,10 +18,10 @@ import { LoaderCircle, MessageCircleWarning } from "lucide-react";
 import Link from "next/link";
 import { ChangeEvent, FormEvent, useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import authPage from "@/lib/hoc/auth-page";
 import LoginAsCode from "../_components/login-as-code";
 import { avoidSpacesOnInput } from "@/utils/avoid-spaces-helper";
 import { Checkbox } from "@/components/ui/checkbox";
+import withOutAuthPage from "@/lib/hoc/with-out-auth-page";
 
 const Login = () => {
   const [credentials, setCredentials] = useState<CredentialType>(CREDENTIALS);
@@ -183,4 +183,4 @@ const Login = () => {
   );
 };
 
-export default authPage(Login);
+export default withOutAuthPage(Login);

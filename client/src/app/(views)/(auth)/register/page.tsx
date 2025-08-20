@@ -24,15 +24,15 @@ import Link from "next/link";
 import { ChangeEvent, FormEvent, useMemo, useState } from "react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { useRouter } from "next/navigation";
-import authPage from "@/lib/hoc/auth-page";
 import { USER_DETAILS } from "@/constants/user-details";
 import { UserDetailsType } from "@/types/user-details-type";
 import { api } from "@/lib/api";
 import useFetch from "@/hooks/use-fetch";
 import Swal from "sweetalert2";
 import { avoidSpacesOnInput } from "@/utils/avoid-spaces-helper";
+import withOutAuthPage from "@/lib/hoc/with-out-auth-page";
 
-const register = () => {
+const Register = () => {
   const [formInput, setFormInput] = useState<UserDetailsType>(USER_DETAILS);
   const [errors, setErrors] = useState<any>(null);
   const [error, setError] = useState<any>(null);
@@ -190,6 +190,7 @@ const register = () => {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
+                        <SelectItem disabled value="Select a Branch Code">Select a Branch Code</SelectItem>
                         {useMemo(() => {
                           return data?.data?.length > 0 ? (
                             data?.data?.map((branch: any, index: number) => (
@@ -334,4 +335,4 @@ const register = () => {
   );
 };
 
-export default authPage(register);
+export default withOutAuthPage(Register);

@@ -11,9 +11,10 @@ export interface UseFetchType {
   handlePageChange: (newPage: number | string) => void;
   handlePerPageChange: (perPage: number | string) => void;
   handleShort: (column: any, direction: any) => void;
-  filterBy: FilterByType;
+  filterBy: any;
   pagination: PaginationType;
-  handleFilter: (e: any) => void;
+  handleSelectFilter: (item: string) => (e: any) => void;
+  handleDateFilter: (item: string) => (e: any) => void;
   handleReset: () => void;
 }
 

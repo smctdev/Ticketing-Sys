@@ -7,6 +7,8 @@ use App\Http\Controllers\Api\BranchController;
 use App\Http\Controllers\Api\CasController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\ExportReportsController;
+use App\Http\Controllers\Api\ForFilterDataController;
 use App\Http\Controllers\Api\LoginController;
 use App\Http\Controllers\Api\LogoutController;
 use App\Http\Controllers\Api\NotificationController;
@@ -77,6 +79,16 @@ Route::middleware("auth:sanctum")->group(function () {
     Route::controller(AreaManagerController::class)->group(function () {
         Route::get('/getAllAreaManager', 'index');
     });
+
+    Route::controller(ForFilterDataController::class)->group(function () {
+        Route::get('/for-filter-datas', 'index');
+    });
+
+    Route::controller(ExportReportsController::class)->group(
+        fn()
+        =>
+        Route::post('/export-reports', 'exortReports')
+    );
 });
 
 // GUEST ROUTES

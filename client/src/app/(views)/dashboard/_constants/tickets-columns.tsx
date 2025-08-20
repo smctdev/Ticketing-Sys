@@ -1,7 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import formatDateAndTime from "@/utils/format-date-and-time";
 import statusColor from "@/utils/ticket-status-color";
-import { Eye, Pencil, Trash } from "lucide-react";
 
 export const TICKETS_COLUMNS = [
   {

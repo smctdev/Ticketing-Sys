@@ -2,10 +2,9 @@
 
 import DataTableComponent from "@/components/data-table";
 import useFetch from "@/hooks/use-fetch";
-import appPage from "@/lib/hoc/app-page";
 import { TICKETS_COLUMNS } from "../dashboard/_constants/tickets-columns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Eye, Funnel, Pencil, Ticket, Trash } from "lucide-react";
+import { Funnel, Pencil, Ticket, Trash } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -17,6 +16,8 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
 import { ViewTicketDetails } from "../dashboard/_components/view-ticket-details";
+import withAuthPage from "@/lib/hoc/with-auth-page";
+import { TICKETS_FILTER } from "@/constants/filter-by";
 
 function Tickets() {
   const {
@@ -28,11 +29,12 @@ function Tickets() {
     handleShort,
     filterBy,
     pagination,
-    handleFilter,
+    handleSelectFilter,
     handleReset,
   } = useFetch({
     url: "/tickets",
     isPaginated: true,
+    filters: TICKETS_FILTER,
   });
 
   const TICKET_COLUMNS_ACTIONS = [
@@ -69,7 +71,10 @@ function Tickets() {
         </CardHeader>
         <CardContent>
           <div className="w-full flex gap-2 justify-evenly">
-            <Select onValueChange={handleFilter} value={filterBy.status}>
+            <Select
+              onValueChange={handleSelectFilter("status")}
+              value={filterBy.status}
+            >
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Filter by status" />
               </SelectTrigger>
@@ -129,4 +134,4 @@ function Tickets() {
   );
 }
 
-export default appPage(Tickets);
+export default withAuthPage(Tickets);

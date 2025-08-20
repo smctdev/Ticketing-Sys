@@ -1,10 +1,9 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/auth-context";
 import Link from "next/link";
 
-export default function Error() {
+export default function Unauthorized() {
   return (
     <div className="fixed top-0 bottom-0 left-0 right-0 z-50 flex items-center justify-center bg-white">
       <div className="max-w-md w-full rounded-xl overflow-hidden">
@@ -25,21 +24,19 @@ export default function Error() {
               />
             </svg>
             <h2 className="text-xl font-semibold text-gray-800 mt-4">
-              Oops! Something went wrong to this page.
+              Oops! Access denied.
             </h2>
             <p className="text-gray-600 mt-2">
-              Please try again later or return to the previous page or reload
-              the page.
+              You do not have permission to view this page.
             </p>
           </div>
           <div className="space-y-4">
-            <Button
-              type="button"
-              onClick={() => window.location.reload()}
-              className="w-full px-4 py-6 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-medium rounded-lg text-center transition duration-200"
+            <Link
+              href="/dashboard"
+              className="block w-full px-4 py-3 bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-700 hover:to-cyan-600 text-white font-medium rounded-lg text-center transition duration-200"
             >
-              Reload page
-            </Button>
+              Return to Dashboard
+            </Link>
           </div>
         </div>
       </div>
