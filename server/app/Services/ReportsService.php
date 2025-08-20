@@ -84,33 +84,32 @@ class ReportsService
                 $query->where(function ($subQuery) use ($userRole, $automationBranches, $assignedBranchCas, $assignedAreaManagers, $accountingHeadCodes, $user) {
                     switch ($userRole->role_name) {
                         case UserRoles::STAFF:
-                            $subQuery->where('login_id', Auth::id())
-                                ->whereNot('status', TicketStatus::EDITED);
+                            $subQuery->where('login_id', Auth::id());
                             break;
                         case UserRoles::AUTOMATION:
-                            $subQuery->where(fn($q) => $q->whereHas('editedBy')->orWhereHas('assignedTicket'))
-                                ->whereIn('status', TicketStatus::PENDING)
+                            $subQuery->where(
+                                fn($q)
+                                =>
+                                $q->whereHas('editedBy')
+                                    ->orWhereHas('assignedTicket')
+                            )
+                                ->where('status', TicketStatus::EDITED)
                                 ->whereIn('branch_id', $automationBranches);
                             break;
                         case UserRoles::BRANCH_HEAD:
-                            $subQuery->whereNot('status', TicketStatus::EDITED)
-                                ->where('branch_id', $user->blist_id);
+                            $subQuery->where('branch_id', $user->blist_id);
                             break;
                         case UserRoles::CAS:
-                            $subQuery->where('status', TicketStatus::PENDING)
-                                ->whereIn('branch_id', $assignedBranchCas);
+                            $subQuery->whereIn('branch_id', $assignedBranchCas);
                             break;
                         case UserRoles::AREA_MANAGER:
-                            $subQuery->where('status', TicketStatus::PENDING)
-                                ->whereIn('branch_id', $assignedAreaManagers);
+                            $subQuery->whereIn('branch_id', $assignedAreaManagers);
                             break;
                         case UserRoles::ACCOUNTING_HEAD:
-                            $subQuery->where('status', TicketStatus::PENDING)
-                                ->whereHas('ticketDetail', fn($triQuery) => $triQuery->whereHas('ticketCategory', fn($ticketQuery) => $ticketQuery->whereIn('group_code', $accountingHeadCodes)));
+                            $subQuery->whereHas('ticketDetail', fn($triQuery) => $triQuery->whereHas('ticketCategory', fn($ticketQuery) => $ticketQuery->whereIn('group_code', $accountingHeadCodes)));
                             break;
                         case UserRoles::ACCOUNTING_STAFF:
-                            $subQuery->whereNot('status', TicketStatus::EDITED)
-                                ->where('login_id', Auth::id())
+                            $subQuery->where('login_id', Auth::id())
                                 ->orWhere('branch_id', $user->blist_id);
                             break;
                     }
@@ -245,33 +244,32 @@ class ReportsService
                 $query->where(function ($subQuery) use ($userRole, $automationBranches, $assignedBranchCas, $assignedAreaManagers, $accountingHeadCodes, $user) {
                     switch ($userRole->role_name) {
                         case UserRoles::STAFF:
-                            $subQuery->where('login_id', Auth::id())
-                                ->whereNot('status', TicketStatus::EDITED);
+                            $subQuery->where('login_id', Auth::id());
                             break;
                         case UserRoles::AUTOMATION:
-                            $subQuery->where(fn($q) => $q->whereHas('editedBy')->orWhereHas('assignedTicket'))
-                                ->whereIn('status', TicketStatus::PENDING)
+                            $subQuery->where(
+                                fn($q)
+                                =>
+                                $q->whereHas('editedBy')
+                                    ->orWhereHas('assignedTicket')
+                            )
+                                ->where('status', TicketStatus::EDITED)
                                 ->whereIn('branch_id', $automationBranches);
                             break;
                         case UserRoles::BRANCH_HEAD:
-                            $subQuery->whereNot('status', TicketStatus::EDITED)
-                                ->where('branch_id', $user->blist_id);
+                            $subQuery->where('branch_id', $user->blist_id);
                             break;
                         case UserRoles::CAS:
-                            $subQuery->where('status', TicketStatus::PENDING)
-                                ->whereIn('branch_id', $assignedBranchCas);
+                            $subQuery->whereIn('branch_id', $assignedBranchCas);
                             break;
                         case UserRoles::AREA_MANAGER:
-                            $subQuery->where('status', TicketStatus::PENDING)
-                                ->whereIn('branch_id', $assignedAreaManagers);
+                            $subQuery->whereIn('branch_id', $assignedAreaManagers);
                             break;
                         case UserRoles::ACCOUNTING_HEAD:
-                            $subQuery->where('status', TicketStatus::PENDING)
-                                ->whereHas('ticketDetail', fn($triQuery) => $triQuery->whereHas('ticketCategory', fn($ticketQuery) => $ticketQuery->whereIn('group_code', $accountingHeadCodes)));
+                            $subQuery->whereHas('ticketDetail', fn($triQuery) => $triQuery->whereHas('ticketCategory', fn($ticketQuery) => $ticketQuery->whereIn('group_code', $accountingHeadCodes)));
                             break;
                         case UserRoles::ACCOUNTING_STAFF:
-                            $subQuery->whereNot('status', TicketStatus::EDITED)
-                                ->where('login_id', Auth::id())
+                            $subQuery->where('login_id', Auth::id())
                                 ->orWhere('branch_id', $user->blist_id);
                             break;
                     }

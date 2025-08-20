@@ -294,7 +294,7 @@ function Reports() {
             <File size={18} />
             <span>Reports</span>
           </CardTitle>
-          {data?.data?.data?.length !== 0 && (
+          {data?.data?.data && data?.data?.data?.length !== 0 && (
             <Button
               type="button"
               variant={"ghost"}
