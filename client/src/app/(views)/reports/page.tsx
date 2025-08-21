@@ -231,17 +231,17 @@ function Reports() {
         `${
           filterBy?.edited_transaction_start_date &&
           filterBy?.edited_transaction_end_date &&
-          `Transaction Date-${formatDate(
+          `Transaction-Date-${formatDate(
             filterBy?.edited_transaction_start_date,
             "MMMM-dd-yyyy"
           )}-To-${formatDate(
             filterBy?.edited_transaction_end_date,
             "MMMM-dd-yyyy"
-          )}`
+          )}-`
         }${
           filterBy?.edited_start_date &&
           filterBy?.edited_end_date &&
-          `Transaction Date-${formatDate(
+          `Edited-Date-${formatDate(
             filterBy?.edited_start_date,
             "MMMM-dd-yyyy"
           )}-To-${formatDate(filterBy?.edited_end_date, "MMMM-dd-yyyy")}`
