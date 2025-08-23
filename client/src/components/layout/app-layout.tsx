@@ -1,7 +1,12 @@
 import { ReactNode } from "react";
 import { SidebarTrigger, useSidebar } from "../ui/sidebar";
 import { AppSidebar } from "../ui/app-sidebar";
-import { Breadcrumb, BreadcrumbItem } from "@/components/ui/breadcrumb";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbList,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { usePathname } from "next/navigation";
 import { BellDotIcon, BellOffIcon } from "lucide-react";
 import {
@@ -15,7 +20,8 @@ import {
 const AppLayout = ({ children }: { children: ReactNode }) => {
   const { open } = useSidebar();
   const pathname = usePathname();
-  const path = pathname === "/" ? "Home" : pathname.split("/");
+  const path: any =
+    pathname === "/" ? "Home" : pathname.replace(/-/g, " ").split("/").slice(1);
   return (
     <>
       <AppSidebar />
@@ -25,11 +31,24 @@ const AppLayout = ({ children }: { children: ReactNode }) => {
             <div className="flex justify-between items-center">
               <div className="flex gap-3 items-center">
                 <SidebarTrigger />
-                <Breadcrumb>
-                  <BreadcrumbItem className="text-black capitalize">
-                    {path}
-                  </BreadcrumbItem>
-                </Breadcrumb>
+                {path.map((p: string, index: number) => (
+                  <Breadcrumb key={index}>
+                    <BreadcrumbList>
+                      <BreadcrumbItem className="text-black capitalize">
+                        <span
+                          className={`${
+                            path.length - 1 === index
+                              ? "font-bold"
+                              : "font-semibold"
+                          } text-gray-600`}
+                        >
+                          {p}
+                        </span>
+                      </BreadcrumbItem>
+                      {path.length - 1 !== index && <BreadcrumbSeparator />}
+                    </BreadcrumbList>
+                  </Breadcrumb>
+                ))}
               </div>
               <div className="mr-3">
                 <DropdownMenu>

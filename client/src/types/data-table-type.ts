@@ -1,3 +1,5 @@
+import { ConditionalStyles } from "react-data-table-component";
+
 export interface DataTableType {
   data: any;
   columns: any;
@@ -10,4 +12,5 @@ export interface DataTableType {
   handleShort?: (column: any, direction: any) => void;
   perPage?: any;
   searchTerm?: string;
+  conditionalRowStyles?: ConditionalStyles<unknown>[] | undefined;
 }

@@ -19,8 +19,9 @@ export default function useFetch({
   const [error, setError] = useState<null | string>(null);
   const [pagination, setPagination] = useState<PaginationType>(PAGINATION);
   const [filterBy, setFilterBy] = useState<any>(filters);
-  const debounceRef = useRef<NodeJS.Timeout | null>(null);
   const [isFiltered, setIsFiltered] = useState<boolean>(false);
+  const [isRefresh, setIsRefresh] = useState<boolean>(false);
+  const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -73,6 +74,7 @@ export default function useFetch({
     filterBy.edited_start_date,
     filterBy.edited_transaction_end_date,
     filterBy.edited_transaction_start_date,
+    isRefresh,
   ]);
 
   const handleSearchTerm =
@@ -118,7 +120,7 @@ export default function useFetch({
   const handleDateFilter = (item: string) => (value: any) => {
     setFilterBy((filterBy: any) => ({
       ...filterBy,
-      [item]: formattedDate(value),
+      [item]: formattedDate(value) || "",
     }));
     setIsLoading(true);
     setIsFiltered(true);
@@ -163,5 +165,7 @@ export default function useFetch({
     handleSelectFilter,
     handleDateFilter,
     handleReset,
+    setIsRefresh,
+    isRefresh,
   };
 }

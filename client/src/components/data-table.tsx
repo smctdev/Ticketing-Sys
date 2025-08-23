@@ -2,7 +2,6 @@ import { paginationRowsPerPageOptions } from "@/constants/pagination-rows-per-pa
 import TableLoader from "./loaders/table-loader";
 import DataTable from "react-data-table-component";
 import { DataTableType } from "@/types/data-table-type";
-import useFetch from "@/hooks/use-fetch";
 
 export default function DataTableComponent({
   data,
@@ -16,6 +15,7 @@ export default function DataTableComponent({
   handlePerPageChange,
   perPage,
   searchTerm,
+  conditionalRowStyles,
 }: DataTableType) {
   const NoData = () => {
     return (
@@ -46,6 +46,7 @@ export default function DataTableComponent({
       persistTableHead={true}
       noDataComponent={<NoData />}
       paginationPerPage={perPage}
+      conditionalRowStyles={conditionalRowStyles}
     />
   );
 }

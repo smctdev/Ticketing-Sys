@@ -1,4 +1,4 @@
-import { ChangeEvent } from "react";
+import { ChangeEvent, Dispatch, SetStateAction } from "react";
 import { PaginationType } from "./pagination-type";
 
 export interface UseFetchType {
@@ -16,6 +16,8 @@ export interface UseFetchType {
   handleSelectFilter: (item: string) => (e: any) => void;
   handleDateFilter: (item: string) => (e: any) => void;
   handleReset: () => void;
+  setIsRefresh: Dispatch<SetStateAction<boolean>>;
+  isRefresh: boolean;
 }
 
 export interface FilterByType {

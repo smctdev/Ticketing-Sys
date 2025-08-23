@@ -9,4 +9,9 @@ class GroupCategory extends Model
     public $timestamps = false;
 
     protected $guarded = [];
+
+    public function ticketCategories()
+    {
+        return $this->hasMany(TicketCategory::class, 'group_code', 'id');
+    }
 }

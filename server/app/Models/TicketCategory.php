@@ -12,7 +12,7 @@ class TicketCategory extends Model
 
     protected $guarded = [];
 
-    public function categoryGroup()
+    public function groupCategory()
     {
         return $this->belongsTo(GroupCategory::class, 'group_code', 'id');
     }

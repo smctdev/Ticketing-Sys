@@ -15,3 +15,7 @@ export const REPORTS_FILTER = {
   edited_transaction_start_date: "",
   edited_transaction_end_date: "",
 };
+
+export const BRANCHES_FILTER = {
+  search: "",
+};

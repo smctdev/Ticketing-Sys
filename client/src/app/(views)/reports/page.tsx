@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import withAuthPage from "@/lib/hoc/with-auth-page";
 import { REPORTS_FILTER } from "@/constants/filter-by";
 import { REPORTS_COLUMNS } from "../dashboard/_constants/reports-columns";
-import { ViewReportDetails } from "../dashboard/_components/view-report-details";
+import { ViewReportDetails } from "./_components/view-report-details";
 import DateFilter from "./_components/date-filter";
 import SelectFilter from "./_components/select-filter";
 import * as XLSX from "xlsx";
@@ -17,9 +17,11 @@ import { useState } from "react";
 import { api } from "@/lib/api";
 import formattedDate from "@/utils/format-date";
 import { formatDate } from "date-fns";
+import { useAuth } from "@/context/auth-context";
 
 function Reports() {
   const [isLoadingToExport, setIsLoadingToExport] = useState<boolean>(false);
+  const { user } = useAuth();
   const {
     data,
     isLoading,
@@ -49,6 +51,19 @@ function Reports() {
           <ViewReportDetails data={row} />
         </div>
       ),
+    },
+  ];
+
+  const conditionalRowStyles = [
+    {
+      when: (row: any) => row.counted === 1,
+      style: {
+        backgroundColor: "#fee2e2",
+        color: "#991b1b",
+        "&:hover": {
+          backgroundColor: "#fecaca",
+        },
+      },
     },
   ];
 
@@ -83,7 +98,7 @@ function Reports() {
 
         for (let i = 0; i < maxLength; i++) {
           exportData.push({
-            "Ticket Code": i === 0 ? t?.ticket_code : "", // only show once
+            "Ticket Code": i === 0 ? t?.ticket_code : "",
             "Transaction Date":
               i === 0
                 ? formattedDate(t?.ticket_detail?.ticket_transaction_date)
@@ -131,9 +146,9 @@ function Reports() {
 
       exportData.push({
         "Ticket Code": "",
-        "Transaction Date": "",
+        "Transaction Date": "TOTAL:",
         Category: "",
-        "Reference Number": "TOTAL:",
+        "Reference Number": "",
         Purpose: "",
         From: "",
         To: "",
@@ -152,10 +167,10 @@ function Reports() {
         exportData.push({
           "Ticket Code": "",
           "Transaction Date": "",
-          Category: "",
-          "Reference Number": "",
-          Purpose: total?.branch_name,
-          From: total?.ticket_count,
+          Category: total?.branch_name,
+          "Reference Number": total?.ticket_count,
+          Purpose: "",
+          From: "",
           To: "",
           Note: "",
           Branch: "",
@@ -189,12 +204,28 @@ function Reports() {
       });
 
       exportData.push({
-        "Ticket Code": "DATE EXPORTED:",
-        "Transaction Date": formatDate(
-          new Date(),
-          `MMMM dd, yyyy 'at' hh:mm a`
-        ),
-        Category: "",
+        "Ticket Code": "",
+        "Transaction Date": "EXPORTED BY:",
+        Category: user?.full_name,
+        "Reference Number": "",
+        Purpose: "",
+        From: "",
+        To: "",
+        Note: "",
+        Branch: "",
+        "Requested By": "",
+        "Approve By BM/BS": "",
+        "Approve By Acctg. Staff": "",
+        "Approve By Accounting Head": "",
+        "Edited By": "",
+        "Date Edited": "",
+        Counted: "",
+      });
+
+      exportData.push({
+        "Ticket Code": "",
+        "Transaction Date": "DATE EXPORTED:",
+        Category: formatDate(new Date(), `MMMM dd, yyyy 'at' hh:mm a`),
         "Reference Number": "",
         Purpose: "",
         From: "",
@@ -325,6 +356,7 @@ function Reports() {
             pageTotal={pagination.totalRecords}
             searchTerm={filterBy.search}
             perPage={pagination.perPage}
+            conditionalRowStyles={conditionalRowStyles}
           />
         </CardContent>
       </Card>

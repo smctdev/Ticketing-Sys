@@ -39,7 +39,7 @@ const Register = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const router = useRouter();
   const { isLoading: branchIsLoading, data } = useFetch({
-    url: "/getAllBranches",
+    url: "/branches",
   });
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {

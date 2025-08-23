@@ -19,12 +19,12 @@ export const SIDEBAR_ITEMS = [
 ];
 
 export const COLLAPSABLE_SIDEBAR_ITEMS = [
-  { title: "Branches", url: "/branches", icon: Building },
-  { title: "Categories", url: "/categories", icon: LayoutDashboard },
-  { title: "Suppliers", url: "/suppliers", icon: Truck },
-  { title: "Users", url: "/users", icon: Users2 },
-  { title: "Automations", url: "/automations", icon: UserCog2 },
-  { title: "Accountings", url: "/accountings", icon: UserSearch },
-  { title: "CAS", url: "/cas", icon: FileUserIcon },
-  { title: "Area Managers", url: "/area-managers", icon: ShieldUserIcon },
+  { title: "Branches", url: "/admin/branches", icon: Building },
+  { title: "Categories", url: "/admin/categories", icon: LayoutDashboard },
+  { title: "Suppliers", url: "/admin/suppliers", icon: Truck },
+  { title: "Users", url: "/admin/users", icon: Users2 },
+  { title: "Automations", url: "/admin/automations", icon: UserCog2 },
+  { title: "Accountings", url: "/admin/accountings", icon: UserSearch },
+  { title: "CAS", url: "/admin/cas", icon: FileUserIcon },
+  { title: "Area Managers", url: "/admin/area-managers", icon: ShieldUserIcon },
 ];

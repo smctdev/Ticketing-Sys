@@ -2,12 +2,13 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
-  Activity,
   ArrowDown,
   ArrowUp,
+  CalendarDays,
+  CalendarMinus2,
   Clock,
   Edit,
-  Ticket,
+  FileChartLine,
   Users,
   X,
 } from "lucide-react";
@@ -62,7 +63,7 @@ export default function TopCard({ data, totalTickets }: any) {
       <Card className="hover:shadow hover:bg-gray-50">
         <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
           <CardTitle className="text-sm font-medium">Monthly Tickets</CardTitle>
-          <Activity className="h-4 w-4 text-muted-foreground" />
+          <CalendarDays className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
@@ -97,7 +98,7 @@ export default function TopCard({ data, totalTickets }: any) {
       <Card className="hover:shadow hover:bg-gray-50">
         <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
           <CardTitle className="text-sm font-medium">Weekly Tickets</CardTitle>
-          <Ticket className="h-4 w-4 text-muted-foreground" />
+          <CalendarMinus2 className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">
@@ -130,7 +131,7 @@ export default function TopCard({ data, totalTickets }: any) {
       <Card className="hover:shadow hover:bg-gray-50">
         <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
           <CardTitle className="text-sm font-medium">Ticket Status</CardTitle>
-          <Ticket className="h-4 w-4 text-muted-foreground" />
+          <FileChartLine className="h-4 w-4 text-muted-foreground" />
         </CardHeader>
         <CardContent>
           <div className="text-2xl font-bold">{totalTickets}</div>

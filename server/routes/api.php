@@ -31,6 +31,7 @@ Route::middleware("auth:sanctum")->group(function () {
         Route::get('/get-top-branches', 'getTopBranches');
         Route::get('/get-all-branch-categories', 'getAllBranchCategories');
         Route::get('/get-all-branches-table', 'getAllBranchesTable');
+        Route::get('/admin-branches', 'getAllBranches');
     });
 
     Route::controller(DashboardController::class)->group(function () {
@@ -54,9 +55,10 @@ Route::middleware("auth:sanctum")->group(function () {
 
     Route::controller(CategoryController::class)->group(function () {
         Route::get('/getAllCategories', 'index');
-        Route::get('/getAllCategoriesTable', 'getAllCategoriesTable');
+        Route::get('/admin-ticket-categories', 'adminTicketCategories');
         Route::get('/getAssignedCategories', 'assignedCategories');
         Route::get('/getAssignedCategoryGroup/{id}', 'assignedCategoryGroup');
+
         Route::patch('/ticket-category/{id}/show-hide', 'showHide');
     });
 
@@ -93,7 +95,7 @@ Route::middleware("auth:sanctum")->group(function () {
 
 // GUEST ROUTES
 Route::controller(BranchController::class)->group(function () {
-    Route::get('/getAllBranches', 'index');
+    Route::get('/branches', 'index');
 });
 
 Route::controller(LoginController::class)->group(function () {

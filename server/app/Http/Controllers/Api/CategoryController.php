@@ -39,31 +39,39 @@ class CategoryController extends Controller
         return response()->json($assignedCategoryGroup, 200);
     }
 
-    public function getAllCategoriesTable()
+    public function adminTicketCategories()
     {
         $limit = request('limit');
 
         $search = request('search');
 
-        $ticketCategories = TicketCategory::with('categoryGroup')
-            ->when($search, fn($query)
-            => $query->whereHas('categoryGroup', fn($subQuery)
-            => $subQuery->where('group_code', 'LIKE', "%$search%")))
-            ->orWhere('category_shortcut', 'LIKE', "%$search%")
-            ->orWhere('category_name', 'LIKE', "%$search%")
-            ->orWhere('show_hide', 'LIKE', "%$search%")
+        $ticketCategories = TicketCategory::with('groupCategory')
+            ->when(
+                $search,
+                fn($query)
+                =>
+                $query->where(
+                    fn($q)
+                    =>
+                    $q->whereAny([
+                        'category_shortcut',
+                        'category_name',
+                        'show_hide'
+                    ], 'LIKE', "%$search%")
+                )
+                    ->orWhereRelation(
+                        'groupCategory',
+                        fn($subQuery)
+                        =>
+                        $subQuery->where('group_code', 'LIKE', "%$search%")
+                    )
+            )
+            ->orderByDesc('show_hide')
             ->paginate($limit);
 
         return response()->json([
-            'count'                     => $ticketCategories->total(),
-            'rows'                      => $ticketCategories->map(fn($ticketCategory) => [
-                "ticket_category_id"    => $ticketCategory->ticket_category_id,
-                "category_shortcut"     => $ticketCategory->category_shortcut,
-                "category_name"         => $ticketCategory->category_name,
-                "group_code"            => $ticketCategory->group_code,
-                "show_hide"             => $ticketCategory->show_hide,
-                "CategoryGroup"         => $ticketCategory->categoryGroup
-            ])
+            'message'       => 'Ticket categories fetched successfully',
+            'data'          => $ticketCategories
         ], 200);
     }
 
@@ -107,22 +115,22 @@ class CategoryController extends Controller
         //
     }
 
-    public function showHide($id)
+    public function showHide(Request $request, $id)
     {
         $ticketCategory = TicketCategory::find($id);
 
         if (!$ticketCategory) {
-            return response()->json("Category not found", 400);
+            return response()->json("Category not found", 404);
         }
 
-        $showHide = $ticketCategory->show_hide === "hide" ? "show" : "hide";
+        $showHide = $request->show_hide ? "show" : "hide";
 
         $ticketCategory->update([
             "show_hide" => $showHide
         ]);
 
         return response()->json([
-            "message" => "Category $ticketCategory->show_hide successfully"
+            "message"   => "Category {$ticketCategory->show_hide} successfully"
         ], 200);
     }
 

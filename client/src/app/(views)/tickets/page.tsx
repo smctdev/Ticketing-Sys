@@ -15,9 +15,10 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-import { ViewTicketDetails } from "../dashboard/_components/view-ticket-details";
+import { ViewTicketDetails } from "./_components/view-ticket-details";
 import withAuthPage from "@/lib/hoc/with-auth-page";
 import { TICKETS_FILTER } from "@/constants/filter-by";
+import { CreateTicket } from "./_components/create-ticket";
 
 function Tickets() {
   const {
@@ -109,10 +110,13 @@ function Tickets() {
       </Card>
       <Card className="gap-0">
         <CardHeader>
-          <CardTitle className="font-bold text-lg text-gray-600 flex items-center gap-1">
-            <Ticket size={18} />
-            <span>Tickets</span>
-          </CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="font-bold text-lg text-gray-600 flex items-center gap-1">
+              <Ticket size={18} />
+              <span>Tickets</span>
+            </CardTitle>
+            <CreateTicket />
+          </div>
         </CardHeader>
         <CardContent>
           <DataTableComponent

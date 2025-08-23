@@ -21,6 +21,48 @@ class BranchController extends Controller
         ], 200);
     }
 
+    public function getAllBranches()
+    {
+        $limit = request('limit');
+        $search = request('search');
+
+        $branches = BranchDetail::with('branch')
+            ->when(
+                $search,
+                fn($query)
+                =>
+                $query->where(
+                    fn($q)
+                    =>
+                    $q->whereAny([
+                        'b_address',
+                        'b_contact',
+                        'b_email'
+                    ], 'LIKE', "%$search%")
+                        ->orWhereRelation(
+                            'branch',
+                            fn($sq)
+                            =>
+                            $sq->whereAny([
+                                'b_code',
+                                'b_name',
+                                'category'
+                            ], 'LIKE', "%$search%")
+                        )
+                )
+            )
+            ->orderBy(
+                BranchList::select('b_code')
+                    ->whereColumn('branch_details.blist_id', 'branch_lists.blist_id')
+            )
+            ->paginate($limit);
+
+        return response()->json([
+            'message'       => 'Branches fetched successfully',
+            'data'          => $branches
+        ], 200);
+    }
+
     public function getTopBranches()
     {
         $topBranches = BranchList::withCount('editedTickets')
