@@ -2,8 +2,11 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\UserRoles;
 use App\Http\Controllers\Controller;
+use App\Models\UserDetail;
 use App\Models\UserLogin;
+use App\Models\UserRole;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
@@ -16,37 +19,22 @@ class UserController extends Controller
         $limit = request('limit');
         $search = request('search');
 
-        $users = UserLogin::when($search, fn($query) =>
-        $query->whereHas('userDetail', fn($subQuery) =>
-        $subQuery->where('fname', 'LIKE', "%$search%")
-            ->orWhere('lname', 'LIKE', "%$search%")
-            ->orWhere('user_contact', 'LIKE', "%$search%")
-            ->orWhere('user_email', 'LIKE', "%$search%")
-            ->orWhereRaw("CONCAT(fname, ' ', lname) LIKE ?", ["%$search%"]))
-            ->orWhereHas('userRole', fn($subQuery) =>
-            $subQuery->where('role_name', 'LIKE', "%$search%"))
-            ->orWhereHas('branch', fn($subQuery) =>
-            $subQuery->where('b_code', 'LIKE', "%$search%")
-                ->orWhere('b_name', 'LIKE', "%$search%")
-                ->where('category', 'LIKE', "%$search%")))
+        $users = UserLogin::search($search)
             ->with('userDetail', 'branch', 'userRole')
+            ->orderByDesc(
+                UserRole::select('role_name')
+                    ->whereColumn('user_logins.user_role_id', 'user_roles.user_role_id')
+                    ->where('role_name', UserRoles::AUTOMATION)
+            )
+            ->orderBy(
+                UserDetail::select('fname')
+                    ->whereColumn('user_logins.user_details_id', 'user_details.user_details_id')
+            )
             ->paginate($limit);
 
         return response()->json([
-            'count'                     => $users->total(),
-            'rows'                      => $users->map(fn($user) => [
-                "login_id"              => $user->login_id,
-                "user_details_id"       => $user->user_details_id,
-                "username"              => $user->username,
-                "full_name"             => $user->full_name,
-                "user_role_id"          => $user->user_role_id,
-                "blist_id"              => $user->blist_id,
-                "requesting_password"   => $user->requesting_password,
-                "UserDetails"           => $user->userDetail,
-                "UserRole"              => $user->userRole,
-                "Branch"                => $user->branch,
-                "branches"              => [$user->branch?->b_code]
-            ])
+            "message"       => "Users fetched successfully",
+            "data"          => $users
         ], 200);
     }
 

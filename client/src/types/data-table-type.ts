@@ -13,4 +13,5 @@ export interface DataTableType {
   perPage?: any;
   searchTerm?: string;
   conditionalRowStyles?: ConditionalStyles<unknown>[] | undefined;
+  currentPage?: any;
 }

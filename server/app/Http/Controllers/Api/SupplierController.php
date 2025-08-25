@@ -16,16 +16,17 @@ class SupplierController extends Controller
         $limit = request('limit');
         $search = request('search');
 
-        $suppliers = Supplier::when($search, fn($query) =>
-        $query->where('suppliers', 'LIKE', "%$search%"))
+        $suppliers = Supplier::when(
+            $search,
+            fn($query)
+            =>
+            $query->where('suppliers', 'LIKE', "%$search%")
+        )
             ->paginate($limit);
 
         return response()->json([
-            "count"             => $suppliers->total(),
-            "rows"              => $suppliers->map(fn($supplier) => [
-                'id'            => $supplier->id,
-                'supplier'      => $supplier->suppliers
-            ])
+            "message"           => "Suppliers fetched successfully",
+            "data"              => $suppliers
         ], 200);
     }
 

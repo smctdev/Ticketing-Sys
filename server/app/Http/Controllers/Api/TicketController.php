@@ -122,7 +122,7 @@ class TicketController extends Controller
                             break;
                         case UserRoles::AUTOMATION:
                             $subQuery->where(fn($q) => $q->whereHas('editedBy')->orWhereHas('assignedTicket'))
-                                ->whereIn('status', TicketStatus::PENDING)
+                                ->where('status', TicketStatus::PENDING)
                                 ->whereIn('branch_id', $automationBranches);
                             break;
                         case UserRoles::BRANCH_HEAD:
@@ -237,7 +237,7 @@ class TicketController extends Controller
     public function updateNotif(Request $request, $id)
     {
         $ticket = Ticket::find($id);
-        $userRole = Auth::user()->userRole;
+        $user = Auth::user();
 
         if (!$ticket) {
             return response()->json("No ticket found", 404);
@@ -245,17 +245,17 @@ class TicketController extends Controller
 
         $dataToUpdate = [];
 
-        if ($userRole->role_name === UserRoles::ADMIN || $userRole->role_name === UserRoles::AUTOMATION) {
+        if ($user->isAdmin() || $user->isAutomation()) {
             $dataToUpdate["notifAdmin"] = 0;
-        } elseif ($userRole->role_name === UserRoles::ACCOUNTING_HEAD) {
+        } elseif ($user->isAccountingHead()) {
             $dataToUpdate["notifAccounting"] = 0;
-        } elseif ($userRole->role_name === UserRoles::BRANCH_HEAD) {
+        } elseif ($user->isBranchHead()) {
             $dataToUpdate["notifHead"] = 0;
-        } elseif ($userRole->role_name === UserRoles::STAFF) {
+        } elseif ($user->isStaff()) {
             $dataToUpdate["notifStaff"] = 0;
-        } elseif ($userRole->role_name === UserRoles::ACCOUNTING_STAFF) {
+        } elseif ($user->isAccountingStaff()) {
             $dataToUpdate["notifAccounting"] = 0;
-        } elseif ($userRole->role_name === UserRoles::AUTOMATION_MANAGER) {
+        } elseif ($user->isAutomationManager()) {
             $dataToUpdate["notifAUTM"] = 0;
         } elseif (!empty($dataToUpdate)) {
             $ticket->update($dataToUpdate);

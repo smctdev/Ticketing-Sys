@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\UserRoles;
 use App\Http\Controllers\Controller;
 use App\Models\GroupCategory;
 use App\Models\UserLogin;
@@ -14,21 +15,25 @@ class AccountingController extends Controller
      */
     public function index()
     {
+        $search = request('search');
+        $limit = request('limit');
+
         $accountings = UserLogin::with('userRole', 'branch', 'userDetail', 'assignedCategories.categoryGroupCode')
-            ->whereHas("userRole", fn($query) => $query->where('role_name', 'Accounting Head')->orWhere('role_name', "Accounting Staff"))
-            ->get();
+            ->search($search)
+            ->whereRelation(
+                "userRole",
+                fn($query)
+                =>
+                $query->where('role_name', UserRoles::ACCOUNTING_HEAD)
+                    ->orWhere('role_name', UserRoles::ACCOUNTING_STAFF)
+            )
+            ->paginate($limit);
 
         $allGroupCategory = GroupCategory::all();
 
         return response()->json([
-            'accountings'               => $accountings->map(fn($user) => [
-                'login_id'              => $user->login_id,
-                "UserDetails"           => $user->userDetail,
-                "UserRole"              => $user->userRole,
-                "Branch"                => $user->branch,
-                "AssignedCategories"    => $user->assignedCategories
-            ]),
-            'group_categories'          => $allGroupCategory
+            'data'               => $accountings,
+            'group_categories'   => $allGroupCategory
         ], 200);
     }
 

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\AssignedCategory;
+use App\Models\GroupCategory;
 use App\Models\TicketCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -67,6 +68,11 @@ class CategoryController extends Controller
                     )
             )
             ->orderByDesc('show_hide')
+            ->orderByDesc(
+                GroupCategory::select('group_code')
+                    ->whereColumn('group_categories.id', 'ticket_categories.group_code')
+                    ->where('group_code', 'Automation')
+            )
             ->paginate($limit);
 
         return response()->json([

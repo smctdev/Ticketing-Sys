@@ -14,8 +14,8 @@ export default function SelectFilter({
   filterBy,
 }: any) {
   return (
-    <div className="grid grid-cols-3 gap-2">
-      <div className="flex flex-col gap-2">
+    <div className="flex gap-2">
+      <div className="flex flex-col gap-2 w-full">
         <Label htmlFor="branch_code">Branch Code</Label>
         <Select
           onValueChange={handleSelectFilter("branch_code")}
@@ -45,7 +45,7 @@ export default function SelectFilter({
           </SelectContent>
         </Select>
       </div>
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 w-full">
         <Label htmlFor="ticket_category">Ticket Category</Label>
         <Select
           onValueChange={handleSelectFilter("ticket_category")}
@@ -80,7 +80,7 @@ export default function SelectFilter({
           </SelectContent>
         </Select>
       </div>
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 w-full">
         <Label htmlFor="branch_type">Branch Type</Label>
         <Select
           onValueChange={handleSelectFilter("branch_type")}

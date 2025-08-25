@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\UserRoles;
 use App\Http\Controllers\Controller;
 use App\Models\BranchList;
 use App\Models\UserLogin;
@@ -14,22 +15,25 @@ class CasController extends Controller
      */
     public function index()
     {
-        $cas = UserLogin::with("assignedBranchCas.branch", "userRole", "userDetail")
-            ->whereHas("userRole", fn($query) => $query->where("role_name", "CAS"))
-            ->get();
+        $limit = request('limit');
+        $search = request('search');
+
+        $cas = UserLogin::with("assignedBranchCas.branch:blist_id,b_code", "userRole", "userDetail")
+            ->search($search)
+            ->whereRelation(
+                "userRole",
+                fn($query)
+                =>
+                $query->where("role_name", UserRoles::CAS)
+            )
+            ->paginate($limit);
 
         $remainingBranches = BranchList::whereDoesntHave("assignedBranchCas")
             ->get();
 
         return response()->json([
-            "cas"                   => $cas->map(fn($user) => [
-                "login_id"          => $user->login_id,
-                "UserDetails"       => $user->userDetail,
-                "UserRole"          => $user->userRole,
-                "Branch"            => $user->branch,
-                "AssignedBranches"  => $user->assignedBranchCas
-            ]),
-            "remainingBranches"     => $remainingBranches
+            "data"                   => $cas,
+            "remaining_branches"     => $remainingBranches
         ], 200);
     }
 

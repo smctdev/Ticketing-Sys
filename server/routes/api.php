@@ -25,7 +25,20 @@ use Illuminate\Support\Facades\Route;
 
 // AUTHENTICATED ROUTES
 Route::middleware("auth:sanctum")->group(function () {
-    Route::get('/profile', fn(Request $request) =>  $request->user()->load('userDetail', 'userRole', 'branch'));
+    Route::get(
+        '/profile',
+        fn(Request $request)
+        =>
+        $request->user()->load(
+            'userDetail',
+            'userRole',
+            'branch',
+            'assignedCategories.branch:blist_id,b_code',
+            'assignedBranches.branch:blist_id,b_code',
+            'assignedBranchCas.branch:blist_id,b_code',
+            'assignedAreaManagers.branch:blist_id,b_code',
+        )
+    );
 
     Route::controller(BranchController::class)->group(function () {
         Route::get('/get-top-branches', 'getTopBranches');
@@ -63,23 +76,23 @@ Route::middleware("auth:sanctum")->group(function () {
     });
 
     Route::controller(UserController::class)->group(function () {
-        Route::get('/getAllUsersTable', 'index');
+        Route::get('/users', 'index');
     });
 
     Route::controller(AutomationController::class)->group(function () {
-        Route::get('/getAllAutomation', 'index');
+        Route::get('/automations', 'index');
     });
 
     Route::controller(AccountingController::class)->group(function () {
-        Route::get('/getAllAccounting', 'index');
+        Route::get('/accountings', 'index');
     });
 
     Route::controller(CasController::class)->group(function () {
-        Route::get('/getAllCAS', 'index');
+        Route::get('/cas', 'index');
     });
 
     Route::controller(AreaManagerController::class)->group(function () {
-        Route::get('/getAllAreaManager', 'index');
+        Route::get('/area-managers', 'index');
     });
 
     Route::controller(ForFilterDataController::class)->group(function () {

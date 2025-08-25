@@ -14,22 +14,25 @@ class AreaManagerController extends Controller
      */
     public function index()
     {
-        $areaManagers = UserLogin::with('userRole', 'userDetail', 'assignedAreaManagers.branch', 'branch')
-            ->whereHas("userRole", fn($query) => $query->where("role_name", "Area Manager"))
-            ->get();
+        $limit = request('limit');
+        $search = request('search');
+
+        $areaManagers = UserLogin::with('userRole', 'userDetail', 'assignedAreaManagers.branch:blist_id,b_code', 'branch')
+            ->search($search)
+            ->whereHas(
+                "userRole",
+                fn($query)
+                =>
+                $query->where("role_name", "Area Manager")
+            )
+            ->paginate($limit);
 
         $remainingBranches = BranchList::whereDoesntHave("assignedAreaManagers")
             ->get();
 
         return response()->json([
-            'AreaManagers'              => $areaManagers->map(fn($user) => [
-                'login_id'              => $user->login_id,
-                'UserDetails'           => $user->userDetail,
-                'UserRole'              => $user->userRole,
-                'Branch'                => $user->branch,
-                'AssignedBranches'      => $user->assignedAreaManagers
-            ]),
-            'remainingBranches'         => $remainingBranches
+            'data'                      => $areaManagers,
+            'remaining_branches'        => $remainingBranches
         ], 200);
     }
 

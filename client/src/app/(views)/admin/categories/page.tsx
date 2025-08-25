@@ -4,13 +4,14 @@ import DataTableComponent from "@/components/data-table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import useFetch from "@/hooks/use-fetch";
 import withAuthPage from "@/lib/hoc/with-auth-page";
-import { File, PenIcon, Trash } from "lucide-react";
-import { TICKET_CATEGORIES_COLUMNS } from "./_constants/ticket-categories-columns";
-import { BRANCHES_FILTER } from "@/constants/filter-by";
+import { FileStack, PenIcon, Trash } from "lucide-react";
+import { TICKET_CATEGORIES_COLUMNS } from "../_constants/ticket-categories-columns";
+import { SEARCH_FILTER } from "@/constants/filter-by";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
+import { AddCategory } from "../_components/add-category";
 
 function Categories() {
   const {
@@ -27,7 +28,7 @@ function Categories() {
   } = useFetch({
     url: "/admin-ticket-categories",
     isPaginated: true,
-    filters: BRANCHES_FILTER,
+    filters: SEARCH_FILTER,
   });
 
   const TICKET_CATEGORIES_COLUMNS_ACTIONS = [
@@ -39,6 +40,7 @@ function Categories() {
             disabled={isRefresh}
             checked={row?.show_hide === "show"}
             onCheckedChange={handleShowHide(row?.ticket_category_id)}
+            className="data-[state=checked]:bg-blue-500"
           />
         </div>
       ),
@@ -89,15 +91,16 @@ function Categories() {
       <Card className="gap-0">
         <CardHeader className="flex items-center justify-between py-2 px-6">
           <CardTitle className="font-bold text-lg text-gray-600 flex items-center gap-1">
-            <File size={18} />
-            <span>Branches</span>
+            <FileStack size={18} />
+            <span>Categories</span>
           </CardTitle>
-          <div>
+          <div className="flex gap-2 items-center">
             <Input
               type="search"
               onChange={handleSearchTerm(1000)}
               placeholder="Search..."
             />
+            <AddCategory />
           </div>
         </CardHeader>
         <CardContent>
@@ -116,6 +119,7 @@ function Categories() {
             pageTotal={pagination.totalRecords}
             searchTerm={filterBy.search}
             perPage={pagination.perPage}
+            currentPage={pagination.page}
           />
         </CardContent>
       </Card>

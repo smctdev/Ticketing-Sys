@@ -46,12 +46,14 @@ import {
   SIDEBAR_ITEMS,
   COLLAPSABLE_SIDEBAR_ITEMS,
 } from "@/constants/sidebar-items";
+import { usePathname } from "next/navigation";
 
 export function AppSidebar() {
   const { open } = useSidebar();
   const { logout, user } = useAuth();
   const [isCollapsibleOpen, setIsCollapsibleOpen] = useState<boolean>(true);
   const { isAdmin } = useAuth();
+  const pathname = usePathname();
 
   const handleLogout = () => {
     Swal.fire({
@@ -99,7 +101,10 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {SIDEBAR_ITEMS.map((item, index) => (
-                <SidebarMenuItem key={index}>
+                <SidebarMenuItem
+                  key={index}
+                  className={item.url === pathname ? "bg-muted rounded-md" : ""}
+                >
                   <SidebarMenuButton asChild tooltip={item.title}>
                     <Link href={item.url}>
                       <item.icon className="h-4 w-4" />
@@ -149,7 +154,11 @@ export function AppSidebar() {
                           <Link href={item.url} key={index}>
                             <Button
                               variant="ghost"
-                              className="w-full justify-start text-left"
+                              className={`${
+                                item.url === pathname
+                                  ? "bg-muted rounded-md"
+                                  : ""
+                              } w-full justify-start text-left`}
                             >
                               {item.title}
                             </Button>
@@ -163,7 +172,12 @@ export function AppSidebar() {
                 COLLAPSABLE_SIDEBAR_ITEMS?.map((item, index) => (
                   <SidebarMenuItem key={index}>
                     <SidebarMenuButton asChild tooltip={item.title}>
-                      <Link href={item.url}>
+                      <Link
+                        href={item.url}
+                        className={
+                          item.url === pathname ? "bg-muted rounded-md" : ""
+                        }
+                      >
                         <item.icon className="h-4 w-4" />
                         {open && <span>{item.title}</span>}
                       </Link>
@@ -206,11 +220,8 @@ export function AppSidebar() {
           <DropdownMenuContent side="top" align="start" className="w-48">
             <DropdownMenuLabel>My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => console.log("Profile")}>
-              Profile
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => console.log("Settings")}>
-              Settings
+            <DropdownMenuItem asChild>
+              <Link href="/profile">Profile</Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem onClick={handleLogout}>Logout</DropdownMenuItem>

@@ -4,10 +4,11 @@ import DataTableComponent from "@/components/data-table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import useFetch from "@/hooks/use-fetch";
 import withAuthPage from "@/lib/hoc/with-auth-page";
-import { File, PenIcon, Trash } from "lucide-react";
-import { BRANCHES_COLUMNS } from "./_constants/branches-columns";
-import { BRANCHES_FILTER } from "@/constants/filter-by";
+import { Building, PenIcon, Trash } from "lucide-react";
+import { BRANCHES_COLUMNS } from "../_constants/branches-columns";
+import { SEARCH_FILTER } from "@/constants/filter-by";
 import { Input } from "@/components/ui/input";
+import { AddBranch } from "../_components/add-branch";
 
 function Branches() {
   const {
@@ -22,7 +23,7 @@ function Branches() {
   } = useFetch({
     url: "/admin-branches",
     isPaginated: true,
-    filters: BRANCHES_FILTER,
+    filters: SEARCH_FILTER,
   });
 
   const BRANCHES_COLUMNS_ACTIONS = [
@@ -52,15 +53,16 @@ function Branches() {
       <Card className="gap-0">
         <CardHeader className="flex items-center justify-between py-2 px-6">
           <CardTitle className="font-bold text-lg text-gray-600 flex items-center gap-1">
-            <File size={18} />
+            <Building size={18} />
             <span>Branches</span>
           </CardTitle>
-          <div>
+          <div className="flex items-center gap-2">
             <Input
               type="search"
               onChange={handleSearchTerm(1000)}
               placeholder="Search..."
             />
+            <AddBranch />
           </div>
         </CardHeader>
         <CardContent>
@@ -76,6 +78,7 @@ function Branches() {
             pageTotal={pagination.totalRecords}
             searchTerm={filterBy.search}
             perPage={pagination.perPage}
+            currentPage={pagination.page}
           />
         </CardContent>
       </Card>

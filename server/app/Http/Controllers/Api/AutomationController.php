@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Enums\UserRoles;
 use App\Http\Controllers\Controller;
 use App\Models\BranchList;
 use App\Models\UserLogin;
@@ -17,23 +18,22 @@ class AutomationController extends Controller
         $limit = request('limit');
         $search = request('search');
 
-        $automations = UserLogin::with('userRole', 'branch', 'userDetail', 'assignedBranches.branch')
-            ->whereHas("userRole", fn($query) =>
-            $query->where('role_name', 'Automation'))
-            ->get();
+        $automations = UserLogin::with('userRole', 'branch', 'userDetail', 'assignedBranches.branch:blist_id,b_code')
+            ->whereRelation(
+                "userRole",
+                fn($query)
+                =>
+                $query->where('role_name', UserRoles::AUTOMATION)
+            )
+            ->search($search)
+            ->paginate($limit);
 
         $remainingBranches = BranchList::whereDoesntHave('assignedBranches')
             ->get();
 
         return response()->json([
-            'automations'           => $automations->map(fn($automation) => [
-                "login_id"          => $automation->login_id,
-                "UserDetails"       => $automation->userDetail,
-                "UserRole"          => $automation->userRole,
-                "Branch"            => $automation->branch,
-                "AssignedBranches"  => $automation->assignedBranches->map(fn($branch) => $branch->branch->b_code)
-            ]),
-            'remainingBranches'     => $remainingBranches
+            'data'                   => $automations,
+            'remaining_branches'     => $remainingBranches
         ], 200);
     }
 

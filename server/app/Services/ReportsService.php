@@ -93,7 +93,6 @@ class ReportsService
                                 $q->whereHas('editedBy')
                                     ->orWhereHas('assignedTicket')
                             )
-                                ->where('status', TicketStatus::EDITED)
                                 ->whereIn('branch_id', $automationBranches);
                             break;
                         case UserRoles::BRANCH_HEAD:
@@ -119,7 +118,6 @@ class ReportsService
             ->orderBy(
                 BranchList::select('category')
                     ->whereColumn('branch_lists.blist_id', 'tickets.branch_id')
-                    ->limit(1)
             )
             ->get();
 

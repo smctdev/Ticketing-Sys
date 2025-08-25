@@ -125,4 +125,44 @@ class UserLogin extends Authenticatable
     {
         return $this->userRole->role_name === UserRoles::CAS;
     }
+
+    public function scopeSearch($query, $term)
+    {
+        $query->when(
+            $term,
+            fn($query)
+            =>
+            $query->where(
+                fn($q)
+                =>
+                $q->where('username', 'LIKE', "%$term%")
+                    ->orWhereHas(
+                        'userDetail',
+                        fn($sq)
+                        =>
+                        $sq->whereAny([
+                            'fname',
+                            'lname',
+                            'user_contact',
+                            'user_email'
+                        ], 'LIKE', "%$term%")
+                            ->orWhereRaw("CONCAT(fname, ' ', lname) LIKE ?", ["%$term%"])
+                            ->orWhereRaw("CONCAT(lname, ' ', fname) LIKE ?", ["%$term%"])
+                    )
+                    ->orWhereHas(
+                        'userRole',
+                        fn($sq)
+                        =>
+                        $sq->where('role_name', 'LIKE', "%$term%")
+                    )
+                    ->orWhereHas(
+                        'branch',
+                        fn($sq)
+                        =>
+                        $sq->where('b_name', 'LIKE', "%$term%")
+                            ->orWhere('b_code', 'LIKE', "%$term%")
+                    )
+            )
+        );
+    }
 }

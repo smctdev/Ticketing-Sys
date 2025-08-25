@@ -18,9 +18,11 @@ import { api } from "@/lib/api";
 import formattedDate from "@/utils/format-date";
 import { formatDate } from "date-fns";
 import { useAuth } from "@/context/auth-context";
+import { toast } from "sonner";
 
 function Reports() {
   const [isLoadingToExport, setIsLoadingToExport] = useState<boolean>(false);
+  const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const { user } = useAuth();
   const {
     data,
@@ -68,6 +70,14 @@ function Reports() {
   ];
 
   const handleExport = async () => {
+    setIsGenerating(true);
+
+    setTimeout(() => {
+      setIsGenerating(false);
+    }, 3000);
+
+    if (isGenerating) return;
+
     setIsLoadingToExport(true);
     try {
       const response = await api.post("/export-reports", filterBy);
@@ -278,6 +288,10 @@ function Reports() {
           )}-To-${formatDate(filterBy?.edited_end_date, "MMMM-dd-yyyy")}`
         }-Ticketing-Report.xlsx`
       );
+      toast("succes", {
+        description: "Report has been generated successfully",
+        position: "bottom-center",
+      });
     } catch (error) {
       console.error(error);
     } finally {
@@ -331,7 +345,11 @@ function Reports() {
               onClick={handleExport}
               disabled={isLoadingToExport}
             >
-              {isLoadingToExport ? (
+              {isGenerating ? (
+                <>
+                  <Loader2Icon className="animate-spin" /> Generating...
+                </>
+              ) : isLoadingToExport ? (
                 <>
                   <Loader2Icon className="animate-spin" /> Exporting...
                 </>
@@ -357,6 +375,7 @@ function Reports() {
             searchTerm={filterBy.search}
             perPage={pagination.perPage}
             conditionalRowStyles={conditionalRowStyles}
+            currentPage={pagination.page}
           />
         </CardContent>
       </Card>

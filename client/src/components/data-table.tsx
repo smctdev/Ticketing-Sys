@@ -16,6 +16,7 @@ export default function DataTableComponent({
   perPage,
   searchTerm,
   conditionalRowStyles,
+  currentPage,
 }: DataTableType) {
   const NoData = () => {
     return (
@@ -47,6 +48,7 @@ export default function DataTableComponent({
       noDataComponent={<NoData />}
       paginationPerPage={perPage}
       conditionalRowStyles={conditionalRowStyles}
+      paginationDefaultPage={currentPage}
     />
   );
 }

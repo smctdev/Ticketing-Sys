@@ -19,8 +19,12 @@ import { ViewTicketDetails } from "./_components/view-ticket-details";
 import withAuthPage from "@/lib/hoc/with-auth-page";
 import { TICKETS_FILTER } from "@/constants/filter-by";
 import { CreateTicket } from "./_components/create-ticket";
+import { useEffect } from "react";
+import { useAuth } from "@/context/auth-context";
+import { ROLE } from "@/constants/roles";
 
 function Tickets() {
+  const { user } = useAuth();
   const {
     data,
     isLoading,
@@ -60,6 +64,17 @@ function Tickets() {
       ),
     },
   ];
+
+  const canCreateTicket = () => {
+    switch (user?.user_role?.role_name) {
+      case ROLE.USER:
+      case ROLE.ACCOUNTING_STAFF:
+      case ROLE.BRANCH_HEAD:
+        return true;
+      default:
+        return false;
+    }
+  };
 
   return (
     <div className="flex flex-col gap-3">
@@ -115,7 +130,7 @@ function Tickets() {
               <Ticket size={18} />
               <span>Tickets</span>
             </CardTitle>
-            <CreateTicket />
+            {canCreateTicket() && <CreateTicket />}
           </div>
         </CardHeader>
         <CardContent>
@@ -131,6 +146,7 @@ function Tickets() {
             pageTotal={pagination.totalRecords}
             searchTerm={filterBy.search}
             perPage={pagination.perPage}
+            currentPage={pagination.page}
           />
         </CardContent>
       </Card>
