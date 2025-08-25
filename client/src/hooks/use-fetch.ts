@@ -135,8 +135,6 @@ export default function useFetch({
     setIsLoading(true);
   };
 
-  console.log("pagination", pagination);
-
   const handleShort = (column: any, direction: any) => {
     setPagination((pagination) => ({
       ...pagination,
