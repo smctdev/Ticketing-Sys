@@ -3,9 +3,12 @@
 namespace App\Services;
 
 use App\Enums\TicketStatus;
+use App\Models\AssignedBranch;
 use App\Models\Ticket;
 use App\Models\TicketDetail;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class TicketService
 {
@@ -89,5 +92,64 @@ class TicketService
             )
             ->take(10)
             ->get(['ticket_code', 'status', 'ticket_id', 'ticket_details_id']);
+    }
+
+    public function storeTicket($request)
+    {
+        $user = Auth::user();
+
+        $assignedAutomation = AssignedBranch::with('assignedAutomation', 'branch')
+            ->where('blist_id', $user->blist_id)
+            ->first();
+
+
+        $data = DB::transaction(
+            function () use ($request, $user, $assignedAutomation) {
+                $paths = [];
+                $file = $request->file('ticket_support');
+
+                foreach ($file as $f) {
+                    $fileName = $f->getClientOriginalName();
+                    $paths[] = $f->storeAs('', $fileName, 'public');
+                }
+
+                $ticketDetail = TicketDetail::create([
+                    'ticket_category_id'        => $request->ticket_category,
+                    'ticket_transaction_date'   => $request->ticket_transaction_date,
+                    'td_support'                => $paths,
+                    'date_created'              => now(),
+                    'time'                      => now()->format('h:i:s A'),
+                ]);
+
+                do {
+                    $code = rand(100000, 999999);
+                } while (
+                    Ticket::query()
+                    ->where('ticket_code', $code)
+                    ->exists()
+                );
+
+                if (!$assignedAutomation) {
+                    throw new HttpException(404, 'Your current branch has no assigned automation.');
+                }
+
+                $ticket = $ticketDetail->ticket()->create(
+                    [
+                        'ticket_code'       => $code,
+                        'login_id'          => $user->login_id,
+                        'branch_id'         => $user->blist_id,
+                        'branch_name'       => $user->branch->b_name,
+                        'status'            => TicketStatus::PENDING,
+                        'isCounted'         => 1,
+                        'isApproved'        => 0,
+                        'assigned_person'   => $assignedAutomation->assignedAutomation->login_id,
+                    ]
+                );
+
+                return $ticket;
+            }
+        );
+
+        return $data;
     }
 }

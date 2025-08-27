@@ -36,6 +36,7 @@ function Tickets() {
     pagination,
     handleSelectFilter,
     handleReset,
+    setIsRefresh
   } = useFetch({
     url: "/tickets",
     isPaginated: true,
@@ -130,7 +131,7 @@ function Tickets() {
               <Ticket size={18} />
               <span>Tickets</span>
             </CardTitle>
-            {canCreateTicket() && <CreateTicket />}
+            {canCreateTicket() && <CreateTicket setIsRefresh={setIsRefresh} />}
           </div>
         </CardHeader>
         <CardContent>

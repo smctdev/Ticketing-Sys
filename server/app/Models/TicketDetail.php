@@ -41,4 +41,9 @@ class TicketDetail extends Model
     {
         return $this->belongsTo(Supplier::class, 'suppliers', 'id');
     }
+
+    public function ticket()
+    {
+        return $this->hasOne(Ticket::class, 'ticket_details_id', 'ticket_details_id');
+    }
 }

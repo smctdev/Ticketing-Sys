@@ -14,4 +14,9 @@ class AssignedBranch extends Model
     {
         return $this->belongsTo(BranchList::class, 'blist_id', 'blist_id');
     }
+
+    public function assignedAutomation()
+    {
+        return $this->belongsTo(UserLogin::class, 'login_id', 'login_id');
+    }
 }

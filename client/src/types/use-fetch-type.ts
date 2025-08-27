@@ -25,3 +25,9 @@ export interface FilterByType {
   search: string;
   defaultSearchValue: string;
 }
+
+export interface UseFetchDataType {
+  url: string;
+  isPaginated?: boolean;
+  filters?: any;
+}

@@ -31,7 +31,7 @@ class Ticket extends Model
 
     public function ticketDetail()
     {
-        return $this->belongsTo(TicketDetail::class, 'ticket_details_id');
+        return $this->belongsTo(TicketDetail::class, 'ticket_details_id', 'ticket_details_id');
     }
 
     public function branch()

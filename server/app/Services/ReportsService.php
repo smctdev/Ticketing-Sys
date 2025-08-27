@@ -90,10 +90,9 @@ class ReportsService
                             $subQuery->where(
                                 fn($q)
                                 =>
-                                $q->whereHas('editedBy')
-                                    ->orWhereHas('assignedTicket')
-                            )
-                                ->whereIn('branch_id', $automationBranches);
+                                $q->has('editedBy')
+                                    ->orHas('assignedTicket')
+                            );
                             break;
                         case UserRoles::BRANCH_HEAD:
                             $subQuery->where('branch_id', $user->blist_id);

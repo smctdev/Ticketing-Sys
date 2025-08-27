@@ -16,11 +16,15 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $categories = TicketCategory::where('show_hide', 'show')
+        $categories = TicketCategory::query()
+            ->where('show_hide', 'show')
             ->orderBy('category_shortcut', 'asc')
             ->get();
 
-        return response()->json($categories, 200);
+        return response()->json([
+            'message'       => "Categories fetched successfully",
+            'data'          => $categories
+        ], 200);
     }
 
     public function assignedCategories()

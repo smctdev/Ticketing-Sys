@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Api;
 use App\Enums\TicketStatus;
 use App\Enums\UserRoles;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\TicketRequest;
 use App\Models\Ticket;
 use App\Services\ReportsService;
+use App\Services\TicketService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -121,9 +123,9 @@ class TicketController extends Controller
                                 ->whereNot('status', TicketStatus::EDITED);
                             break;
                         case UserRoles::AUTOMATION:
-                            $subQuery->where(fn($q) => $q->whereHas('editedBy')->orWhereHas('assignedTicket'))
-                                ->where('status', TicketStatus::PENDING)
-                                ->whereIn('branch_id', $automationBranches);
+                            $subQuery->has('assignedPerson')
+                                ->where(fn($q) => $q->whereHas('editedBy')->orWhereHas('assignedTicket'))
+                                ->where('status', TicketStatus::PENDING);
                             break;
                         case UserRoles::BRANCH_HEAD:
                             $subQuery->whereNot('status', TicketStatus::EDITED)
@@ -205,9 +207,15 @@ class TicketController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(TicketRequest $request, TicketService $ticketService)
     {
-        //
+        $request->validated();
+
+        $data = $ticketService->storeTicket($request);
+
+        return response()->json([
+            "message"   => "Ticket with ticket code of {$data->ticket_code} created successfully",
+        ], 201);
     }
 
     /**

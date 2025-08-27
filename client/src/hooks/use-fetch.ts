@@ -1,7 +1,7 @@
 import { PAGINATION } from "@/constants/pagination";
 import { api } from "@/lib/api";
 import { PaginationType } from "@/types/pagination-type";
-import { UseFetchType } from "@/types/use-fetch-type";
+import { UseFetchDataType, UseFetchType } from "@/types/use-fetch-type";
 import formattedDate from "@/utils/format-date";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
 
@@ -9,11 +9,7 @@ export default function useFetch({
   url,
   isPaginated = false,
   filters = false,
-}: {
-  url: string;
-  isPaginated?: boolean;
-  filters?: any;
-}): UseFetchType {
+}: UseFetchDataType): UseFetchType {
   const [data, setData] = useState<any>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [error, setError] = useState<null | string>(null);
@@ -67,6 +63,7 @@ export default function useFetch({
     isPaginated,
     filterBy.status,
     filterBy.search,
+    filterBy.isLoading,
     filterBy.branch_code,
     filterBy.branch_type,
     filterBy.ticket_category,

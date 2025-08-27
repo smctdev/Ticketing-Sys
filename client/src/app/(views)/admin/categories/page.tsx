@@ -75,7 +75,7 @@ function Categories() {
         show_hide: e,
       });
       if (response.status === 200) {
-        toast("Success", {
+        toast.success("Success", {
           description: response.data.message,
           position: "bottom-center",
         });

@@ -64,12 +64,14 @@ Route::middleware("auth:sanctum")->group(function () {
         Route::get('/tickets', 'index');
         Route::get('/reports', 'reports');
         Route::put('/update-notif/{id}', 'updateNotif');
+        Route::post('/submit-ticket', 'store');
     });
 
     Route::controller(CategoryController::class)->group(function () {
-        Route::get('/getAllCategories', 'index');
+        Route::get('/categories', 'index');
         Route::get('/admin-ticket-categories', 'adminTicketCategories');
         Route::get('/getAssignedCategories', 'assignedCategories');
+
         Route::get('/getAssignedCategoryGroup/{id}', 'assignedCategoryGroup');
 
         Route::patch('/ticket-category/{id}/show-hide', 'showHide');
