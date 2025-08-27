@@ -148,6 +148,7 @@ export function CreateTicket({ setIsRefresh }: any) {
         (_, index) => index !== key
       ),
     }));
+
     setErrors((prevErrors: any) => {
       const newErrors: any = {};
 
