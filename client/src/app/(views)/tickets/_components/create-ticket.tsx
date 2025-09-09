@@ -96,7 +96,7 @@ export function CreateTicket({ setIsRefresh }: any) {
       const response = await api.post("/submit-ticket", formData);
       if (response.status === 201) {
         setError(null);
-        setErrors(null);
+        setErrors({});
         setOpen(false);
         setFormInput(TICKET_FORM_DATA);
         toast.success("Success", {
@@ -126,7 +126,10 @@ export function CreateTicket({ setIsRefresh }: any) {
 
     setFormInput((formData) => ({
       ...formData,
-      ticket_support: Array.from(files),
+      ticket_support: [
+        ...(formData.ticket_support || []),
+        ...Array.from(files),
+      ],
     }));
   };
 
@@ -192,7 +195,7 @@ export function CreateTicket({ setIsRefresh }: any) {
           <DialogHeader>
             <DialogTitle>Create Ticket</DialogTitle>
           </DialogHeader>
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-4 max-h-[calc(100vh-200px)] overflow-y-auto">
             <div className="flex flex-col gap-3">
               <Label htmlFor="date" className="px-1">
                 Transaction date
@@ -362,7 +365,7 @@ export function CreateTicket({ setIsRefresh }: any) {
               )}
             </div>
             {error && (
-              <div className="w-96 overflow-auto">
+              <div className="w-full">
                 <Alert variant="destructive">
                   <AlertCircleIcon />
                   <AlertDescription>{error}</AlertDescription>

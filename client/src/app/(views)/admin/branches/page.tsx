@@ -21,7 +21,7 @@ function Branches() {
     pagination,
     handleShort,
   } = useFetch({
-    url: "/admin-branches",
+    url: "/admin/branches",
     isPaginated: true,
     filters: SEARCH_FILTER,
   });

@@ -17,6 +17,7 @@ use App\Http\Controllers\Api\SupplierController;
 use App\Http\Controllers\Api\TicketController;
 use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\SendLoginCodeController;
+use App\Http\Controllers\Api\UserRoleController;
 use App\Models\BranchList;
 use App\Models\UserLogin;
 use Illuminate\Http\Request;
@@ -24,7 +25,10 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 
 // AUTHENTICATED ROUTES
-Route::middleware("auth:sanctum")->group(function () {
+Route::middleware([
+    "auth:sanctum",
+    "throttle:50,1"
+])->group(function () {
     Route::get(
         '/profile',
         fn(Request $request)
@@ -44,7 +48,7 @@ Route::middleware("auth:sanctum")->group(function () {
         Route::get('/get-top-branches', 'getTopBranches');
         Route::get('/get-all-branch-categories', 'getAllBranchCategories');
         Route::get('/get-all-branches-table', 'getAllBranchesTable');
-        Route::get('/admin-branches', 'getAllBranches');
+        Route::get('/admin/branches', 'getAllBranches');
     });
 
     Route::controller(DashboardController::class)->group(function () {
@@ -69,16 +73,17 @@ Route::middleware("auth:sanctum")->group(function () {
 
     Route::controller(CategoryController::class)->group(function () {
         Route::get('/categories', 'index');
-        Route::get('/admin-ticket-categories', 'adminTicketCategories');
+        Route::get('/admin/ticket-categories', 'adminTicketCategories');
         Route::get('/getAssignedCategories', 'assignedCategories');
-
         Route::get('/getAssignedCategoryGroup/{id}', 'assignedCategoryGroup');
-
         Route::patch('/ticket-category/{id}/show-hide', 'showHide');
     });
 
     Route::controller(UserController::class)->group(function () {
         Route::get('/users', 'index');
+        Route::post('/users', 'store');
+        Route::patch('/users/{id}/update', 'update');
+        Route::delete('/users/{id}/delete', 'destroy');
     });
 
     Route::controller(AutomationController::class)->group(function () {
@@ -106,23 +111,38 @@ Route::middleware("auth:sanctum")->group(function () {
         =>
         Route::post('/export-reports', 'exortReports')
     );
+
+    Route::controller(UserRoleController::class)->group(function () {
+        Route::get('admin/user-roles', 'index');
+        Route::get('admin/all-user-roles', 'allUserRoles');
+        Route::post('admin/user-roles', 'store');
+        Route::patch('admin/user-roles/{id}/update', 'update');
+        Route::delete('admin/user-roles/{id}/delete', 'destroy');
+    });
 });
 
 // GUEST ROUTES
-Route::controller(BranchController::class)->group(function () {
-    Route::get('/branches', 'index');
-});
+Route::middleware("throttle:10,1")->group(function () {
+    Route::controller(BranchController::class)->group(function () {
+        Route::get('/branches', 'index');
+    });
 
-Route::controller(LoginController::class)->group(function () {
-    Route::post('/login', 'store');
-});
+    Route::controller(LoginController::class)->group(function () {
+        Route::post('/login', 'store');
+    });
 
-Route::controller(RegisterController::class)->group(function () {
-    Route::post('/register', 'store');
-});
+    Route::controller(RegisterController::class)->group(function () {
+        Route::post('/register', 'store');
+    });
 
-Route::controller(LogoutController::class)->group(function () {
-    Route::post('/logout', 'store');
+    Route::controller(LogoutController::class)->group(function () {
+        Route::post('/logout', 'store');
+    });
+
+    Route::controller(SendLoginCodeController::class)->group(function () {
+        Route::post('/send-login-code', 'sendLoginCode');
+        Route::post('/submit-otp-login', 'loginAsOtp');
+    });
 });
 
 Route::post('/test-data', function (Request $request) {
@@ -143,15 +163,13 @@ Route::post('/test-data', function (Request $request) {
         'message'   => 'Successfully submitted',
         'datas'     => $datas,
     ], 201);
-});
+})->middleware('throttle:10,1');
 
 Route::delete('/delete-blist', function (Request $request) {
-    BranchList::whereIn('blist_id', $request->ids)->delete();
+    BranchList::query()
+        ->whereIn('blist_id', $request->ids)->delete();
 
     return response()->json([
         'message'   => 'Successfully deleted',
     ], 201);
-});
-
-Route::post('/send-login-code', [SendLoginCodeController::class, 'sendLoginCode']);
-Route::post('/submit-otp-login', [SendLoginCodeController::class, 'loginAsOtp']);
+})->middleware('throttle:10,1');

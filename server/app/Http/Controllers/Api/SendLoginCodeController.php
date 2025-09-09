@@ -16,7 +16,7 @@ class SendLoginCodeController extends Controller
     {
         $request->validated();
 
-        $sendLoginCodeService->sendEmail($request->email);
+        $sendLoginCodeService->sendEmail($request);
     }
 
     public function loginAsOtp(SubmitOtpRequest $request, SubmitOtpService $submitOtpService)
@@ -24,6 +24,6 @@ class SendLoginCodeController extends Controller
 
         $request->validated();
 
-        $submitOtpService->submitOtp($request->otp, $request->email, $request->session());
+        $submitOtpService->submitOtp($request);
     }
 }

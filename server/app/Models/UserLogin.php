@@ -96,6 +96,11 @@ class UserLogin extends Authenticatable
         return $this->userRole->role_name === UserRoles::AUTOMATION_MANAGER;
     }
 
+    public function isAutomationAdmin()
+    {
+        return $this->userRole->role_name === UserRoles::AUTOMATION_ADMIN;
+    }
+
     public function isAccountingHead()
     {
         return $this->userRole->role_name === UserRoles::ACCOUNTING_HEAD;

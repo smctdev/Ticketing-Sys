@@ -71,6 +71,8 @@ export default function useFetch({
     filterBy.edited_start_date,
     filterBy.edited_transaction_end_date,
     filterBy.edited_transaction_start_date,
+    filterBy.created_end_date,
+    filterBy.created_start_date,
     isRefresh,
   ]);
 

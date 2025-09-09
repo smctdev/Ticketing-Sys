@@ -19,4 +19,9 @@ class UserRole extends Model
             'role_name' => UserRoles::class,
         ];
     }
+
+    public function users()
+    {
+        return $this->hasMany(UserLogin::class, 'user_role_id');
+    }
 }

@@ -22,12 +22,6 @@ class DashboardController extends Controller
      */
     public function index()
     {
-        $automationData = UserLogin::with('userRole', 'userDetail', 'branch')
-            ->where("login_id", '!=', Auth::id())
-            ->whereHas('userRole', function ($query) {
-                $query->where('role_name', 'Automation');
-            })
-            ->get();
 
         $data = UserLogin::where('login_id', '!=', Auth::id())
             ->whereHas('userRole', function ($query) {
@@ -49,13 +43,8 @@ class DashboardController extends Controller
             ->get();
 
         return response()->json([
-            'automation' => $automationData->map(fn($automation) => [
-                'login_id'      => $automation->login_id,
-                'UserDetails'   => $automation->userDetail,
-                'UserRole'      => $automation->userRole,
-                'Branch'        => $automation->branch
-            ]),
-            'data'       => $data->map(function ($user) {
+
+            'data'                      => $data->map(function ($user) {
                 $categories = $user->editedByAutomationTickets
                     ->pluck('ticketDetail.ticketCategory')
                     ->filter()
@@ -67,6 +56,8 @@ class DashboardController extends Controller
                     ->filter()
                     ->firstWhere('id', $mostUsedCategoryId);
                 return [
+                    'full_name'         => $user->full_name,
+                    'profile_picture'   => $user->profile_picture,
                     'ticketsThisMonth'  => $user->ticketsThisMonth,
                     'ticketsLastMonth'  => $user->ticketsLastMonth,
                     'roundedPercentage' => $user->ticketsLastMonth === 0 ? 0 : ($user->ticketsThisMonth - $user->ticketsLastMonth) / $user->ticketsLastMonth * 100,
@@ -195,6 +186,7 @@ class DashboardController extends Controller
             "tickets"                               => $this->ticketsData(),
             'branches'                              => $this->totalBranches(),
             'suppliers'                             => $this->totalSuppliers(),
+            'automation_records'                    => $this->index()
         ], 200);
     }
 

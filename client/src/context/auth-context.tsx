@@ -46,7 +46,11 @@ export default function AuthContextProvider({
     setUser(profile.data);
     setIsAuthenticated(true);
 
-    if (profile.data.user_role.role_name === ROLE.ADMIN) {
+    if (
+      [ROLE.ADMIN, ROLE.AUTOMATION_ADMIN].includes(
+        profile.data.user_role.role_name
+      )
+    ) {
       setIsAdmin(true);
     }
 
@@ -62,7 +66,11 @@ export default function AuthContextProvider({
       setUser(response.data);
       setIsAuthenticated(true);
 
-      if (response.data.user_role.role_name === ROLE.ADMIN) {
+      if (
+        [ROLE.ADMIN, ROLE.AUTOMATION_ADMIN].includes(
+          response.data.user_role.role_name
+        )
+      ) {
         setIsAdmin(true);
       }
     } catch (error: any) {
@@ -101,7 +109,11 @@ export default function AuthContextProvider({
     setUser(profile.data);
     setIsAuthenticated(true);
 
-    if (profile.data.user_role.role_name === ROLE.ADMIN) {
+    if (
+      [ROLE.ADMIN, ROLE.AUTOMATION_ADMIN].includes(
+        profile.data.user_role.role_name
+      )
+    ) {
       setIsAdmin(true);
     }
 

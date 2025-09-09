@@ -13,4 +13,5 @@ enum UserRoles: string
     case CAS = 'CAS';
     case AREA_MANAGER = 'Area Manager';
     case AUTOMATION_MANAGER = 'Automation Manager';
+    case AUTOMATION_ADMIN = 'Automation Admin';
 }

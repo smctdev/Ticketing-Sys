@@ -8,6 +8,7 @@ import {
   TicketCheck,
   Truck,
   UserCog2,
+  UserLock,
   Users2,
   UserSearch,
 } from "lucide-react";
@@ -27,4 +28,5 @@ export const COLLAPSABLE_SIDEBAR_ITEMS = [
   { title: "Accountings", url: "/admin/accountings", icon: UserSearch },
   { title: "CAS", url: "/admin/cas", icon: FileUserIcon },
   { title: "Area Managers", url: "/admin/area-managers", icon: ShieldUserIcon },
+  { title: "User Roles", url: "/admin/user-roles", icon: UserLock },
 ];

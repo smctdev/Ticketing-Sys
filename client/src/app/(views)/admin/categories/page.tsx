@@ -26,7 +26,7 @@ function Categories() {
     setIsRefresh,
     isRefresh,
   } = useFetch({
-    url: "/admin-ticket-categories",
+    url: "/admin/ticket-categories",
     isPaginated: true,
     filters: SEARCH_FILTER,
   });

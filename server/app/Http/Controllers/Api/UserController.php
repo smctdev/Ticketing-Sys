@@ -4,9 +4,12 @@ namespace App\Http\Controllers\Api;
 
 use App\Enums\UserRoles;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\UpdateUserRequest;
 use App\Models\UserDetail;
 use App\Models\UserLogin;
 use App\Models\UserRole;
+use App\Services\ManageUserService;
 use Illuminate\Http\Request;
 
 class UserController extends Controller
@@ -49,9 +52,15 @@ class UserController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreUserRequest $request, ManageUserService $manageUserService)
     {
-        //
+        $request->validated();
+
+        $data = $manageUserService->storeUser($request);
+
+        return response()->json([
+            "message"       => "User \"{$data->user_email}\" created successfully",
+        ], 201);
     }
 
     /**
@@ -73,16 +82,26 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateUserRequest $request, string $id, ManageUserService $manageUserService)
     {
-        //
+        $request->validated();
+
+        $data = $manageUserService->updateUser($request, $id);
+
+        return response()->json([
+            "message"       => "User \"{$data->user_email}\" updated successfully",
+        ], 200);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(string $id, ManageUserService $manageUserService)
     {
-        //
+        $data = $manageUserService->deleteUser($id);
+
+        return response()->json([
+            "message"       => "User \"{$data->user_email}\" deleted successfully",
+        ], 200);
     }
 }

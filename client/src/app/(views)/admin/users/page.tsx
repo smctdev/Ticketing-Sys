@@ -8,7 +8,20 @@ import { PenIcon, Trash, Users2 } from "lucide-react";
 import { SEARCH_FILTER } from "@/constants/filter-by";
 import { Input } from "@/components/ui/input";
 import { USERS_COLUMNS } from "../_constants/users-columns";
-import { AddUser } from "../_components/add-users";
+import { AddUser } from "../_components/_user-dialogs/add-user";
+import { EditUser } from "../_components/_user-dialogs/edit-user";
+import { useMemo } from "react";
+import { SelectItem } from "@/components/ui/select";
+import { DeleteUser } from "../_components/_user-dialogs/delete-user";
+interface UserRoleTypes {
+  user_role_id: string;
+  role_name: string;
+}
+
+interface BranchCodeTypes {
+  blist_id: string;
+  b_code: string;
+}
 
 function Users() {
   const {
@@ -20,10 +33,18 @@ function Users() {
     filterBy,
     pagination,
     handleShort,
+    setIsRefresh,
   } = useFetch({
     url: "/users",
     isPaginated: true,
     filters: SEARCH_FILTER,
+  });
+  const { isLoading: branchIsLoading, data: branchData } = useFetch({
+    url: "/branches",
+  });
+
+  const { isLoading: userRoleIsLoading, data: userRoleData } = useFetch({
+    url: "/admin/all-user-roles",
   });
 
   const USERS_COLUMNS_ACTIONS = [
@@ -31,23 +52,48 @@ function Users() {
       name: "Action",
       cell: (row: any) => (
         <div className="flex gap-2">
-          <button
-            type="button"
-            className="text-blue-500 hover:text-blue-600 hover:scale-105 transition-all duration-300 ease-in-out"
-          >
-            <PenIcon size={18} />
-          </button>
-          <button
-            type="button"
-            className="text-red-500 hover:text-red-600 hover:scale-105 transition-all duration-300 ease-in-out"
-          >
-            <Trash size={18} />
-          </button>
+          <EditUser
+            setIsRefresh={setIsRefresh}
+            data={row}
+            branchMemo={branchMemo}
+            userRoleMemo={userRoleMemo}
+          />
+
+          <DeleteUser data={row} setIsRefresh={setIsRefresh} />
         </div>
       ),
       sortable: false,
     },
   ];
+
+  const branchMemo = useMemo(() => {
+    return branchIsLoading ? (
+      <SelectItem value="Loading...">Loading...</SelectItem>
+    ) : branchData?.data?.length === 0 ? (
+      <SelectItem value="No branches yet.">No branches yet.</SelectItem>
+    ) : (
+      branchData?.data?.map((item: BranchCodeTypes, index: number) => (
+        <SelectItem key={index} value={String(item.blist_id)}>
+          {item.b_code}
+        </SelectItem>
+      ))
+    );
+  }, [branchData?.data]);
+
+  const userRoleMemo = useMemo(() => {
+    return userRoleIsLoading ? (
+      <SelectItem value="Loading...">Loading...</SelectItem>
+    ) : userRoleData?.data?.length === 0 ? (
+      <SelectItem value="No roles yet.">No roles yet.</SelectItem>
+    ) : (
+      userRoleData?.data?.map((item: UserRoleTypes, index: number) => (
+        <SelectItem key={index} value={String(item.user_role_id)}>
+          {item.role_name}
+        </SelectItem>
+      ))
+    );
+  }, [userRoleData?.data]);
+
   return (
     <div className="flex flex-col gap-3">
       <Card className="gap-0">
@@ -62,7 +108,11 @@ function Users() {
               onChange={handleSearchTerm(1000)}
               placeholder="Search..."
             />
-            <AddUser />
+            <AddUser
+              setIsRefresh={setIsRefresh}
+              userRoleMemo={userRoleMemo}
+              branchMemo={branchMemo}
+            />
           </div>
         </CardHeader>
         <CardContent>

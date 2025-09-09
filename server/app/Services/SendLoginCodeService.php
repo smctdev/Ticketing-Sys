@@ -9,10 +9,10 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class SendLoginCodeService
 {
-    public function sendEmail($email)
+    public function sendEmail($request)
     {
         $user = UserDetail::with('userLoginCode')
-            ->where('user_email', $email)
+            ->where('user_email', $request->email)
             ->first();
 
         if (!$user) {

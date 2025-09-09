@@ -41,7 +41,7 @@ function Reports() {
     filters: REPORTS_FILTER,
   });
 
-  const { data: forFilterData } = useFetch({
+  const { data: forFilterData, isLoading: isLoadingForFilter } = useFetch({
     url: "/for-filter-datas",
   });
 
@@ -69,15 +69,20 @@ function Reports() {
     },
   ];
 
-  const handleExport = async () => {
+  const handleGenerate = () => {
     setIsGenerating(true);
 
     setTimeout(() => {
       setIsGenerating(false);
+      toast.success("Success", {
+        position: "bottom-center",
+        description: "Report has been generated successfully!",
+      });
+      handleExport();
     }, 3000);
+  };
 
-    if (isGenerating) return;
-
+  const handleExport = async () => {
     setIsLoadingToExport(true);
     try {
       const response = await api.post("/export-reports", filterBy);
@@ -127,7 +132,7 @@ function Reports() {
               i === 0 ? t?.approve_acctg_staff?.full_name : "",
             "Approve By Accounting Head":
               i === 0 ? t?.approve_acctg_sup?.full_name : "",
-            "Edited By": i === 0 ? t?.assigned_ticket?.full_name : "",
+            "Edited By": i === 0 ? t?.assigned_person?.full_name : "",
             "Date Edited":
               i === 0 ? formattedDate(t?.ticket_detail?.date_completed) : "",
             Counted: i === 0 ? (t?.isCounted === 0 ? "YES" : "NO") : "",
@@ -280,16 +285,23 @@ function Reports() {
             "MMMM-dd-yyyy"
           )}-`
         }${
+          filterBy?.created_start_date &&
+          filterBy?.created_end_date &&
+          `Created-Date-${formatDate(
+            filterBy?.created_start_date,
+            "MMMM-dd-yyyy"
+          )}-To-${formatDate(filterBy?.created_end_date, "MMMM-dd-yyyy")}-`
+        }${
           filterBy?.edited_start_date &&
           filterBy?.edited_end_date &&
           `Edited-Date-${formatDate(
             filterBy?.edited_start_date,
             "MMMM-dd-yyyy"
-          )}-To-${formatDate(filterBy?.edited_end_date, "MMMM-dd-yyyy")}`
-        }-Ticketing-Report.xlsx`
+          )}-To-${formatDate(filterBy?.edited_end_date, "MMMM-dd-yyyy")}-`
+        }Ticketing-Report.xlsx`
       );
-      toast("succes", {
-        description: "Report has been generated successfully",
+      toast.success("Succes", {
+        description: "Report has been exported successfully",
         position: "bottom-center",
       });
     } catch (error) {
@@ -309,9 +321,10 @@ function Reports() {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="w-full flex gap-2 flex-col">
+          <div className="w-full flex gap-2 flex-col space-y-5">
             <SelectFilter
               forFilterData={forFilterData}
+              isLoading={isLoadingForFilter}
               handleSelectFilter={handleSelectFilter}
               filterBy={filterBy}
             />
@@ -342,8 +355,8 @@ function Reports() {
             <Button
               type="button"
               variant={"ghost"}
-              onClick={handleExport}
-              disabled={isLoadingToExport}
+              onClick={handleGenerate}
+              disabled={isLoadingToExport || isGenerating}
             >
               {isGenerating ? (
                 <>

@@ -65,9 +65,4 @@ class Ticket extends Model
     {
         return $this->belongsTo(UserLogin::class, 'approveAcctgSup', 'login_id');
     }
-
-    public function assignedTicket()
-    {
-        return $this->belongsTo(UserLogin::class, 'assigned_person', 'login_id');
-    }
 }

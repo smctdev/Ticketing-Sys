@@ -21,7 +21,9 @@ const AppLayout = ({ children }: { children: ReactNode }) => {
   const { open } = useSidebar();
   const pathname = usePathname();
   const path: any =
-    pathname === "/" ? "Home" : pathname.replace(/-/g, " ").split("/").slice(1);
+    pathname === "/"
+      ? ["Home"]
+      : pathname.replace(/-/g, " ").split("/").slice(1);
   return (
     <>
       <AppSidebar />
@@ -31,13 +33,13 @@ const AppLayout = ({ children }: { children: ReactNode }) => {
             <div className="flex justify-between items-center">
               <div className="flex gap-3 items-center">
                 <SidebarTrigger />
-                {path.map((p: string, index: number) => (
+                {path?.map((p: string, index: number) => (
                   <Breadcrumb key={index}>
                     <BreadcrumbList>
                       <BreadcrumbItem className="text-black capitalize">
                         <span
                           className={`${
-                            path.length - 1 === index
+                            path?.length - 1 === index
                               ? "font-bold"
                               : "font-semibold"
                           } text-gray-600`}
@@ -45,7 +47,7 @@ const AppLayout = ({ children }: { children: ReactNode }) => {
                           {p}
                         </span>
                       </BreadcrumbItem>
-                      {path.length - 1 !== index && <BreadcrumbSeparator />}
+                      {path?.length - 1 !== index && <BreadcrumbSeparator />}
                     </BreadcrumbList>
                   </Breadcrumb>
                 ))}

@@ -15,6 +15,8 @@ class ExportReportsController extends Controller
         $edited_end_date = $request->edited_end_date;
         $edited_transaction_start_date = $request->edited_transaction_start_date;
         $edited_transaction_end_date = $request->edited_transaction_end_date;
+        $created_start_date = $request->created_start_date;
+        $created_end_date = $request->created_end_date;
         $branchCode = $request->branch_code;
         $ticketCategory = $request->ticket_category;
         $branchCategory = $request->branch_type;
@@ -30,6 +32,8 @@ class ExportReportsController extends Controller
             $edited_end_date,
             $edited_transaction_start_date,
             $edited_transaction_end_date,
+            $created_start_date,
+            $created_end_date,
             $branchCode,
             $ticketCategory,
             $branchCategory

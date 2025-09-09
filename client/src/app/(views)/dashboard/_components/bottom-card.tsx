@@ -199,7 +199,7 @@ export default function BottomCard({ data, totalTickets }: any) {
         <CardContent>
           <ScrollArea className="h-45">
             <div className="grid gap-2">
-              <Link className="w-full" href="/users">
+              <Link className="w-full" href="/admin/users">
                 <Button
                   type="button"
                   variant="outline"
@@ -209,7 +209,7 @@ export default function BottomCard({ data, totalTickets }: any) {
                   Manage Users
                 </Button>
               </Link>
-              <Link className="w-full" href="/branches">
+              <Link className="w-full" href="/admin/branches">
                 <Button
                   type="button"
                   variant="outline"
@@ -219,7 +219,7 @@ export default function BottomCard({ data, totalTickets }: any) {
                   Manage Branches
                 </Button>
               </Link>
-              <Link className="w-full" href="/suppliers">
+              <Link className="w-full" href="/admin/suppliers">
                 <Button
                   type="button"
                   variant="outline"

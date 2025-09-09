@@ -4,6 +4,7 @@ export const REPORTS_COLUMNS = [
     cell: (row: any) => row.branch_category,
     sortable: false,
     sortField: "ticket_code",
+    width: "100px"
   },
   {
     name: "Branch Code",

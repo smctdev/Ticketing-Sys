@@ -50,12 +50,12 @@ export default function LoginAsCode() {
       }
     } catch (error: any) {
       console.error(error);
-      if (error.response.status === 404) {
-        setError(error.response.data.message);
-        setErrors(null);
-      } else {
+      if (error.response.status === 422) {
         setErrors(error.response.data.errors);
         setError(null);
+      } else {
+        setError(error.response.data.message);
+        setErrors(null);
       }
     } finally {
       setIsLoading(false);
@@ -72,12 +72,12 @@ export default function LoginAsCode() {
       }
     } catch (error: any) {
       console.error(error);
-      if (error.response.status === 400) {
-        setError(error.response.data.message);
-        setErrors(null);
-      } else {
+      if (error.response.status === 422) {
         setErrors(error.response.data.errors);
         setError(null);
+      } else {
+        setError(error.response.data.message);
+        setErrors(null);
       }
     } finally {
       setIsLoading(false);
@@ -138,14 +138,18 @@ export default function LoginAsCode() {
           {isEnterCode ? (
             <div className="grid flex-1 gap-2">
               <Label className="text-sm">Enter 6 digits code</Label>
-              <InputOTP maxLength={6} onChange={handleChangeEventOtp}>
+              <InputOTP
+                maxLength={[0, 1, 2, 3, 4, 5].length}
+                onChange={handleChangeEventOtp}
+              >
                 <InputOTPGroup>
-                  <InputOTPSlot index={0} className="w-[67px] h-16" />
-                  <InputOTPSlot index={1} className="w-[67px] h-16" />
-                  <InputOTPSlot index={2} className="w-[67px] h-16" />
-                  <InputOTPSlot index={3} className="w-[67px] h-16" />
-                  <InputOTPSlot index={4} className="w-[67px] h-16" />
-                  <InputOTPSlot index={5} className="w-[67px] h-16" />
+                  {[0, 1, 2, 3, 4, 5].map((index) => (
+                    <InputOTPSlot
+                      index={index}
+                      className="w-[67px] h-16"
+                      key={index}
+                    />
+                  ))}
                 </InputOTPGroup>
               </InputOTP>
               {errors?.otp && (

@@ -37,6 +37,7 @@ const Register = () => {
   const [errors, setErrors] = useState<any>(null);
   const [error, setError] = useState<any>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isOpenSelect, setIsOpenSelect] = useState<boolean>(false);
   const router = useRouter();
   const { isLoading: branchIsLoading, data } = useFetch({
     url: "/branches",
@@ -92,6 +93,20 @@ const Register = () => {
       blist_id: e,
     }));
   };
+
+  const dataMemo = useMemo(() => {
+    return data?.data?.length > 0 ? (
+      data?.data?.map((branch: any, index: number) => (
+        <SelectItem value={String(branch.blist_id)} key={index}>
+          {branch.b_code.toUpperCase()}
+        </SelectItem>
+      ))
+    ) : (
+      <SelectItem disabled value="No branches found">
+        No Branches Found
+      </SelectItem>
+    );
+  }, [data]);
 
   return (
     <div className="grid place-items-center h-screen">
@@ -190,23 +205,10 @@ const Register = () => {
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
-                        <SelectItem disabled value="Select a Branch Code">Select a Branch Code</SelectItem>
-                        {useMemo(() => {
-                          return data?.data?.length > 0 ? (
-                            data?.data?.map((branch: any, index: number) => (
-                              <SelectItem
-                                value={String(branch.blist_id)}
-                                key={index}
-                              >
-                                {branch.b_code.toUpperCase()}
-                              </SelectItem>
-                            ))
-                          ) : (
-                            <SelectItem disabled value="No branches found">
-                              No Branches Found
-                            </SelectItem>
-                          );
-                        }, [data])}
+                        <SelectItem disabled value="Select a Branch Code">
+                          Select a Branch Code
+                        </SelectItem>
+                        {dataMemo}
                       </SelectGroup>
                     </SelectContent>
                   </Select>

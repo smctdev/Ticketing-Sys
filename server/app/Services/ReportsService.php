@@ -19,12 +19,13 @@ class ReportsService
         $edited_end_date,
         $edited_transaction_start_date,
         $edited_transaction_end_date,
+        $created_start_date,
+        $created_end_date,
         $branchCode,
         $ticketCategory,
         $branchCategory,
         $currentPage
     ) {
-        $automationBranches = $user->assignedBranches->pluck('blist_id');
 
         $assignedBranchCas = $user->assignedBranchCas->pluck('blist_id');
 
@@ -38,13 +39,24 @@ class ReportsService
             'userLogin.branch',
             'ticketDetail.ticketCategory',
             'ticketDetail.supplier',
-            'assignedTicket.userDetail',
-            'assignedTicket.userRole',
-            'assignedTicket.branch',
-            'approveAcctgStaff',
-            'approveHead',
-            'approveAutm',
-            'approveAcctgSup',
+            'assignedPerson.userDetail',
+            'assignedPerson.userRole',
+            'assignedPerson.branch',
+            'approveAcctgStaff.userDetail',
+            'approveAcctgStaff.userRole',
+            'approveAcctgStaff.branch',
+            'approveHead.userDetail',
+            'approveHead.userRole',
+            'approveHead.branch',
+            'approveAutm.userDetail',
+            'approveAutm.userRole',
+            'approveAutm.branch',
+            'approveAcctgSup.userDetail',
+            'approveAcctgSup.userRole',
+            'approveAcctgSup.branch',
+            'editedBy.userDetail',
+            'editedBy.userRole',
+            'editedBy.branch',
             'branch'
         )
             ->when(
@@ -59,6 +71,20 @@ class ReportsService
                     =>
                     $subQuery->whereBetween('date_completed', [$edited_start_date, $edited_end_date])
                         ->orWhereBetween('date_completed', [$edited_end_date, $edited_start_date])
+                )
+            )
+            ->when(
+                $created_start_date
+                    &&
+                    $created_end_date,
+                fn($query)
+                =>
+                $query->whereHas(
+                    'ticketDetail',
+                    fn($subQuery)
+                    =>
+                    $subQuery->whereBetween('date_created', [$created_start_date, $created_end_date])
+                        ->orWhereBetween('date_created', [$created_end_date, $created_start_date])
                 )
             )
             ->when(
@@ -80,19 +106,17 @@ class ReportsService
             ->when($branchCategory !== "ALL", fn($query) => $query->whereHas('branch', fn($subQuery) => $subQuery->where('category', $branchCategory)))
             ->whereHas('ticketDetail', fn($query) => $query->whereNotNull('date_completed')
                 ->where('date_completed', '!=', ''))
-            ->when($userRole->role_name !== UserRoles::ADMIN, function ($query) use ($userRole, $automationBranches, $assignedBranchCas, $assignedAreaManagers, $accountingHeadCodes, $user) {
-                $query->where(function ($subQuery) use ($userRole, $automationBranches, $assignedBranchCas, $assignedAreaManagers, $accountingHeadCodes, $user) {
+            ->when($userRole->role_name !== UserRoles::ADMIN || $userRole->role_name !== UserRoles::AUTOMATION_ADMIN, function ($query) use ($userRole, $assignedBranchCas, $assignedAreaManagers, $accountingHeadCodes, $user) {
+                $query->where(function ($subQuery) use ($userRole, $assignedBranchCas, $assignedAreaManagers, $accountingHeadCodes, $user) {
                     switch ($userRole->role_name) {
                         case UserRoles::STAFF:
-                            $subQuery->where('login_id', Auth::id());
+                            $subQuery->whereAny([
+                                'login_id',
+                                'edited_by'
+                            ], Auth::id());
                             break;
                         case UserRoles::AUTOMATION:
-                            $subQuery->where(
-                                fn($q)
-                                =>
-                                $q->has('editedBy')
-                                    ->orHas('assignedTicket')
-                            );
+                            $subQuery->where('assigned_person', $user->login_id);
                             break;
                         case UserRoles::BRANCH_HEAD:
                             $subQuery->where('branch_id', $user->blist_id);
@@ -114,10 +138,7 @@ class ReportsService
                 });
             })
             ->where('status', TicketStatus::EDITED)
-            ->orderBy(
-                BranchList::select('category')
-                    ->whereColumn('branch_lists.blist_id', 'tickets.branch_id')
-            )
+            ->orderBy('branch_name')
             ->get();
 
         $grouped = $tickets->groupBy(fn($item) => implode('|', [
@@ -177,11 +198,12 @@ class ReportsService
         $edited_end_date,
         $edited_transaction_start_date,
         $edited_transaction_end_date,
+        $created_start_date,
+        $created_end_date,
         $branchCode,
         $ticketCategory,
         $branchCategory,
     ) {
-        $automationBranches = $user->assignedBranches->pluck('blist_id');
 
         $assignedBranchCas = $user->assignedBranchCas->pluck('blist_id');
 
@@ -195,14 +217,25 @@ class ReportsService
             'userLogin.branch',
             'ticketDetail.ticketCategory',
             'ticketDetail.supplier',
-            'assignedTicket.userDetail',
-            'assignedTicket.userRole',
-            'assignedTicket.branch',
-            'approveHead',
-            'approveAutm',
+            'assignedPerson.userDetail',
+            'assignedPerson.userRole',
+            'assignedPerson.branch',
+            'approveAcctgStaff.userDetail',
+            'approveAcctgStaff.userRole',
+            'approveAcctgStaff.branch',
+            'approveHead.userDetail',
+            'approveHead.userRole',
+            'approveHead.branch',
+            'approveAutm.userDetail',
+            'approveAutm.userRole',
+            'approveAutm.branch',
+            'approveAcctgSup.userDetail',
+            'approveAcctgSup.userRole',
+            'approveAcctgSup.branch',
+            'editedBy.userDetail',
+            'editedBy.userRole',
+            'editedBy.branch',
             'branch',
-            'approveAcctgSup',
-            'approveAcctgStaff',
         )
             ->when(
                 $edited_start_date
@@ -216,6 +249,20 @@ class ReportsService
                     =>
                     $subQuery->whereBetween('date_completed', [$edited_start_date, $edited_end_date])
                         ->orWhereBetween('date_completed', [$edited_end_date, $edited_start_date])
+                )
+            )
+            ->when(
+                $created_start_date
+                    &&
+                    $created_end_date,
+                fn($query)
+                =>
+                $query->whereHas(
+                    'ticketDetail',
+                    fn($subQuery)
+                    =>
+                    $subQuery->whereBetween('date_created', [$created_start_date, $created_end_date])
+                        ->orWhereBetween('date_created', [$created_end_date, $created_start_date])
                 )
             )
             ->when(
@@ -237,21 +284,20 @@ class ReportsService
             ->when($branchCategory !== "ALL", fn($query) => $query->whereHas('branch', fn($subQuery) => $subQuery->where('category', $branchCategory)))
             ->whereHas('ticketDetail', fn($query) => $query->whereNotNull('date_completed')
                 ->where('date_completed', '!=', ''))
-            ->when($userRole->role_name !== UserRoles::ADMIN, function ($query) use ($userRole, $automationBranches, $assignedBranchCas, $assignedAreaManagers, $accountingHeadCodes, $user) {
-                $query->where(function ($subQuery) use ($userRole, $automationBranches, $assignedBranchCas, $assignedAreaManagers, $accountingHeadCodes, $user) {
+            ->when($userRole->role_name !== UserRoles::ADMIN || $userRole->role_name !== UserRoles::AUTOMATION_ADMIN, function ($query) use ($userRole, $assignedBranchCas, $assignedAreaManagers, $accountingHeadCodes, $user) {
+                $query->where(function ($subQuery) use ($userRole, $assignedBranchCas, $assignedAreaManagers, $accountingHeadCodes, $user) {
                     switch ($userRole->role_name) {
                         case UserRoles::STAFF:
                             $subQuery->where('login_id', Auth::id());
                             break;
                         case UserRoles::AUTOMATION:
-                            $subQuery->where(
-                                fn($q)
-                                =>
-                                $q->whereHas('editedBy')
-                                    ->orWhereHas('assignedTicket')
-                            )
-                                ->where('status', TicketStatus::EDITED)
-                                ->whereIn('branch_id', $automationBranches);
+                            $subQuery->whereAny(
+                                [
+                                    'assigned_person',
+                                    'edited_by'
+                                ],
+                                $user->login_id
+                            );
                             break;
                         case UserRoles::BRANCH_HEAD:
                             $subQuery->where('branch_id', $user->blist_id);
@@ -273,10 +319,8 @@ class ReportsService
                 });
             })
             ->where('status', TicketStatus::EDITED)
-            ->orderBy(
-                BranchList::select('category')
-                    ->whereColumn('branch_lists.blist_id', 'tickets.branch_id')
-            )
+            ->orderBy('branch_name')
+            ->where('isCounted', 0)
             ->get();
 
         $grouped = $tickets->groupBy(fn($item) => implode('|', [

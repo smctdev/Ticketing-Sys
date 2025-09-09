@@ -33,8 +33,6 @@ class TicketController extends Controller
 
         $userRole = $user->userRole;
 
-        $automationBranches = $user->assignedBranches->pluck('blist_id');
-
         $assignedBranchCas = $user->assignedBranchCas->pluck('blist_id');
 
         $assignedAreaManagers = $user->assignedAreaManagers->pluck('blist_id');
@@ -47,13 +45,21 @@ class TicketController extends Controller
             'userLogin.branch',
             'ticketDetail.ticketCategory',
             'ticketDetail.supplier',
-            'assignedTicket.userDetail',
-            'assignedTicket.userRole',
-            'assignedTicket.branch',
-            'approveAcctgStaff',
-            'approveHead',
-            'approveAutm',
+            'assignedPerson.userDetail',
+            'assignedPerson.userRole',
+            'assignedPerson.branch',
+            'approveAcctgStaff.userDetail',
+            'approveAcctgStaff.userRole',
+            'approveAcctgStaff.branch',
+            'approveHead.userDetail',
+            'approveHead.userRole',
+            'approveHead.branch',
+            'approveAutm.userDetail',
+            'approveAutm.userRole',
+            'approveAutm.branch',
             'approveAcctgSup.userDetail',
+            'approveAcctgSup.userRole',
+            'approveAcctgSup.branch',
             'branch'
         )
             ->when(
@@ -98,7 +104,7 @@ class TicketController extends Controller
                             )
                         )
                         ->orWhereHas(
-                            'assignedTicket',
+                            'assignedPerson',
                             fn($q)
                             =>
                             $q->whereHas(
@@ -115,16 +121,16 @@ class TicketController extends Controller
             )
             ->when($ticket_category, fn($query) => $query->whereHas('ticketDetail', fn($subQuery) => $subQuery->where('ticket_category_id', $ticket_category)))
             ->when($bcode, fn($query) => $query->where('branch_id', $bcode))
-            ->when($userRole->role_name !== UserRoles::ADMIN, function ($query) use ($userRole, $automationBranches, $assignedBranchCas, $assignedAreaManagers, $accountingHeadCodes, $user) {
-                $query->where(function ($subQuery) use ($userRole, $automationBranches, $assignedBranchCas, $assignedAreaManagers, $accountingHeadCodes, $user) {
+            ->when($userRole->role_name !== UserRoles::ADMIN, function ($query) use ($userRole, $assignedBranchCas, $assignedAreaManagers, $accountingHeadCodes, $user) {
+                $query->where(function ($subQuery) use ($userRole, $assignedBranchCas, $assignedAreaManagers, $accountingHeadCodes, $user) {
                     switch ($userRole->role_name) {
                         case UserRoles::STAFF:
                             $subQuery->where('login_id', Auth::id())
                                 ->whereNot('status', TicketStatus::EDITED);
                             break;
                         case UserRoles::AUTOMATION:
-                            $subQuery->has('assignedPerson')
-                                ->where(fn($q) => $q->whereHas('editedBy')->orWhereHas('assignedTicket'))
+                        case UserRoles::AUTOMATION_ADMIN:
+                            $subQuery->where('assigned_person', $user->login_id)
                                 ->where('status', TicketStatus::PENDING);
                             break;
                         case UserRoles::BRANCH_HEAD:
@@ -167,6 +173,8 @@ class TicketController extends Controller
         $edited_end_date = request('edited_end_date');
         $edited_transaction_start_date = request('edited_transaction_start_date');
         $edited_transaction_end_date = request('edited_transaction_end_date');
+        $created_start_date = request('created_start_date');
+        $created_end_date = request('created_end_date');
         $branchCode = request('branch_code');
         $ticketCategory = request('ticket_category');
         $branchCategory = request('branch_type');
@@ -184,6 +192,8 @@ class TicketController extends Controller
             $edited_end_date,
             $edited_transaction_start_date,
             $edited_transaction_end_date,
+            $created_start_date,
+            $created_end_date,
             $branchCode,
             $ticketCategory,
             $branchCategory,

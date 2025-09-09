@@ -7,43 +7,96 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useState } from "react";
+import { Check, ChevronDown } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { cn } from "@/lib/utils";
 
 export default function SelectFilter({
+  isLoading,
   forFilterData,
   handleSelectFilter,
   filterBy,
 }: any) {
+  const [open, setOpen] = useState(false);
+
+  const handleOnSelect = (value: string) => () => {
+    handleSelectFilter("branch_code")(value);
+    setOpen(false);
+  };
+
   return (
     <div className="flex gap-2">
       <div className="flex flex-col gap-2 w-full">
         <Label htmlFor="branch_code">Branch Code</Label>
-        <Select
-          onValueChange={handleSelectFilter("branch_code")}
-          value={filterBy.branch_code}
-        >
-          <SelectTrigger className="w-full">
-            <SelectValue placeholder="Filter by branch code" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectItem value="Filter by branch_code" disabled>
-                Filter by branch code
-              </SelectItem>
-              <SelectItem value="ALL">ALL</SelectItem>
-              {forFilterData?.branches?.length === 0 ? (
-                <SelectItem value="No branches found">
-                  No branches found
-                </SelectItem>
-              ) : (
-                forFilterData?.branches?.map((branch: any, index: number) => (
-                  <SelectItem key={index} value={branch.blist_id}>
-                    {branch.b_name} - ({branch.b_code})
-                  </SelectItem>
-                ))
-              )}
-            </SelectGroup>
-          </SelectContent>
-        </Select>
+        <Popover open={open} onOpenChange={setOpen}>
+          <PopoverTrigger asChild>
+            <Button
+              variant="outline"
+              role="combobox"
+              aria-expanded={open}
+              className="w-full justify-between"
+            >
+              {filterBy?.branch_code === "ALL"
+                ? "ALL"
+                : isLoading
+                ? "Loading..."
+                : forFilterData?.branches.find(
+                    (item: any) => item.blist_id === filterBy?.branch_code
+                  )?.b_name}
+              <ChevronDown className="opacity-50" />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-full p-0" align="start">
+            <Command>
+              <CommandInput
+                placeholder="Search branch code..."
+                className="h-9"
+              />
+              <CommandList>
+                <CommandEmpty>No branches found.</CommandEmpty>
+                <CommandGroup>
+                  <CommandItem onSelect={handleOnSelect("ALL")} value="ALL">
+                    ALL
+                  </CommandItem>
+                  {isLoading ? (
+                    <CommandItem disabled>Loading...</CommandItem>
+                  ) : (
+                    forFilterData?.branches.map((item: any, index: number) => (
+                      <CommandItem
+                        key={index}
+                        onSelect={handleOnSelect(item.blist_id)}
+                      >
+                        {item.b_name} ({item.b_code})
+                        <Check
+                          className={cn(
+                            "ml-auto",
+                            filterBy?.branch_code === item.blist_id
+                              ? "opacity-100"
+                              : "opacity-0"
+                          )}
+                        />
+                      </CommandItem>
+                    ))
+                  )}
+                </CommandGroup>
+              </CommandList>
+            </Command>
+          </PopoverContent>
+        </Popover>
       </div>
       <div className="flex flex-col gap-2 w-full">
         <Label htmlFor="ticket_category">Ticket Category</Label>
@@ -60,7 +113,11 @@ export default function SelectFilter({
                 Filter by ticket category
               </SelectItem>
               <SelectItem value="ALL">ALL</SelectItem>
-              {forFilterData?.ticket_categories?.length === 0 ? (
+              {isLoading ? (
+                <SelectItem value="Loading..." disabled>
+                  Loading...
+                </SelectItem>
+              ) : forFilterData?.ticket_categories?.length === 0 ? (
                 <SelectItem value="No ticket categories found">
                   No ticket categories found
                 </SelectItem>
@@ -95,7 +152,11 @@ export default function SelectFilter({
                 Filter by branch type
               </SelectItem>
               <SelectItem value="ALL">ALL</SelectItem>
-              {forFilterData?.branch_types?.length === 0 ? (
+              {isLoading ? (
+                <SelectItem value="Loading..." disabled>
+                  Loading...
+                </SelectItem>
+              ) : forFilterData?.branch_types?.length === 0 ? (
                 <SelectItem value="No branch type found">
                   No branch type found
                 </SelectItem>

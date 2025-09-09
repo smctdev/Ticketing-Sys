@@ -2,6 +2,7 @@ import TopCard from "./top-card";
 import BottomCard from "./bottom-card";
 import BranchSupplierCard from "./branch-supplier-card";
 import AdminDashboardLoader from "@/components/loaders/admin-dashboard";
+import AutomationRecords from "./automation-records";
 
 export default function AdminDashboard({
   data,
@@ -27,6 +28,10 @@ export default function AdminDashboard({
           <BottomCard data={data} totalTickets={totalTickets} />
         </>
       )}
+      <AutomationRecords
+        data={data?.automation_records?.original?.data}
+        loading={isLoading}
+      />
     </div>
   );
 }

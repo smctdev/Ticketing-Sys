@@ -3,9 +3,12 @@
 namespace App\Services;
 
 use App\Enums\TicketStatus;
+use App\Enums\UserRoles;
 use App\Models\AssignedBranch;
 use App\Models\Ticket;
 use App\Models\TicketDetail;
+use App\Models\UserDetail;
+use App\Models\UserLogin;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -98,19 +101,28 @@ class TicketService
     {
         $user = Auth::user();
 
+        $automationAdmin = UserLogin::query()
+            ->whereHas(
+                'userRole',
+                fn($query)
+                =>
+                $query->where('role_name', UserRoles::AUTOMATION_ADMIN)
+            )
+            ->first();
+
         $assignedAutomation = AssignedBranch::with('assignedAutomation', 'branch')
             ->where('blist_id', $user->blist_id)
             ->first();
 
 
         $data = DB::transaction(
-            function () use ($request, $user, $assignedAutomation) {
+            function () use ($request, $user, $assignedAutomation, $automationAdmin) {
                 $paths = [];
                 $file = $request->file('ticket_support');
 
                 foreach ($file as $f) {
-                    $fileName = $f->getClientOriginalName();
-                    $paths[] = $f->storeAs('', $fileName, 'public');
+                    $fileName =  time() . '-' . $f->getClientOriginalName();
+                    $paths[] = $f->storeAs('uploads', $fileName, 'public');
                 }
 
                 $ticketDetail = TicketDetail::create([
@@ -129,10 +141,6 @@ class TicketService
                     ->exists()
                 );
 
-                if (!$assignedAutomation) {
-                    throw new HttpException(404, 'Your current branch has no assigned automation.');
-                }
-
                 $ticket = $ticketDetail->ticket()->create(
                     [
                         'ticket_code'       => $code,
@@ -142,7 +150,7 @@ class TicketService
                         'status'            => TicketStatus::PENDING,
                         'isCounted'         => 1,
                         'isApproved'        => 0,
-                        'assigned_person'   => $assignedAutomation->assignedAutomation->login_id,
+                        'assigned_person'   => $assignedAutomation ? $assignedAutomation->assignedAutomation->login_id : $automationAdmin->login_id,
                     ]
                 );
 

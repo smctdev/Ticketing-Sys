@@ -8,4 +8,5 @@ export const ROLE = {
   ACCOUNTING_STAFF: "Accounting Staff",
   AREA_MANAGER: "Area Manager",
   AUTOMATION_MANAGER: "Automation Manager",
+  AUTOMATION_ADMIN: "Automation Admin",
 };

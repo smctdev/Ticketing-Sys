@@ -25,7 +25,7 @@ class RegisterRequest extends FormRequest
         return [
             'fname'         => ['required', 'max:255', 'min:2'],
             'lname'         => ['required', 'max:255', 'min:2'],
-            'user_contact'  => ['required', 'numeric', 'digits:11'],
+            'user_contact'  => ['nullable', 'numeric', 'digits:11'],
             'user_email'    => ['required', 'email', 'max:255', 'min:5', Rule::unique('user_details', 'user_email')],
             'username'      => ['required', 'min:4', 'max:50', Rule::unique('user_logins', 'username')],
             'password'      => ['required', 'min:6', 'max:15', 'confirmed'],

@@ -17,6 +17,8 @@ export default function DataTableComponent({
   searchTerm,
   conditionalRowStyles,
   currentPage,
+  isPaginated = true,
+  isFixedHeader = false,
 }: DataTableType) {
   const NoData = () => {
     return (
@@ -30,7 +32,7 @@ export default function DataTableComponent({
     <DataTable
       data={data}
       columns={columns}
-      pagination
+      pagination={isPaginated}
       paginationServer
       striped
       highlightOnHover
@@ -38,6 +40,7 @@ export default function DataTableComponent({
       progressComponent={<TableLoader colSpan={columns.length} />}
       sortServer
       onSort={handleShort}
+      fixedHeader={isFixedHeader}
       paginationTotalRows={pageTotal}
       defaultSortAsc={direction}
       defaultSortFieldId={column}
@@ -49,6 +52,7 @@ export default function DataTableComponent({
       paginationPerPage={perPage}
       conditionalRowStyles={conditionalRowStyles}
       paginationDefaultPage={currentPage}
+      responsive={true}
     />
   );
 }

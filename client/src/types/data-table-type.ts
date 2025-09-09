@@ -14,4 +14,6 @@ export interface DataTableType {
   searchTerm?: string;
   conditionalRowStyles?: ConditionalStyles<unknown>[] | undefined;
   currentPage?: any;
+  isPaginated?: boolean;
+  isFixedHeader?: boolean;
 }

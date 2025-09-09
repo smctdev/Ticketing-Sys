@@ -23,7 +23,7 @@ export const USER_DASHBOARD_TABLE_COLUMNS = [
   },
   {
     name: "Assigned Automation",
-    cell: (row: any) => row.assigned_ticket.full_name,
+    cell: (row: any) => row.assigned_person.full_name,
     sortable: false,
     sortField: "user_details.fname",
   },
