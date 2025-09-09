@@ -25,9 +25,9 @@ class TicketService
         return Ticket::with(
             'ticketDetail.ticketCategory',
             'ticketDetail.supplier',
-            'assignedTicket.userDetail',
-            'assignedTicket.userRole',
-            'assignedTicket.branch',
+            'assignedPerson.userDetail',
+            'assignedPerson.userRole',
+            'assignedPerson.branch',
             'approveAcctgStaff',
             'approveHead',
             'approveAutm',

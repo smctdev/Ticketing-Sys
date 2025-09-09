@@ -19,9 +19,9 @@ class NotificationController extends Controller
             'userLogin.branch',
             'ticketDetail.ticketCategory',
             'ticketDetail.supplier',
-            'assignedTicket.userDetail',
-            'assignedTicket.userRole',
-            'assignedTicket.branch',
+            'assignedPerson.userDetail',
+            'assignedPerson.userRole',
+            'assignedPerson.branch',
         )
             ->orderBy('ticket_id', 'asc')
             ->get();
@@ -80,12 +80,12 @@ class NotificationController extends Controller
                     "Category"                  => $ticket->ticketDetail?->ticketCategory,
                     "Supplier"                  => $ticket->ticketDetail?->supplier
                 ],
-                "AssignedTicket"                => [
-                    "login_id"                  => $ticket->assignedTicket?->login_id,
-                    "requesting_password"       => $ticket->assignedTicket?->requesting_password,
-                    "UserDetails"               => $ticket->assignedTicket?->userDetail,
-                    "UserRole"                  => $ticket->assignedTicket?->userRole,
-                    "Branch"                    => $ticket->assignedTicket?->branch
+                "AssignedPerson"                => [
+                    "login_id"                  => $ticket->assignedPerson?->login_id,
+                    "requesting_password"       => $ticket->assignedPerson?->requesting_password,
+                    "UserDetails"               => $ticket->assignedPerson?->userDetail,
+                    "UserRole"                  => $ticket->assignedPerson?->userRole,
+                    "Branch"                    => $ticket->assignedPerson?->branch
                 ],
             ];
         }), 200);

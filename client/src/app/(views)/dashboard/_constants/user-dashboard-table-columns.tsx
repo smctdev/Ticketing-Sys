@@ -10,12 +10,6 @@ export const USER_DASHBOARD_TABLE_COLUMNS = [
     sortField: "ticket_code",
   },
   {
-    name: "Requested By",
-    cell: (row: any) => row.user_login.full_name,
-    sortable: false,
-    sortField: "user_details.fname",
-  },
-  {
     name: "Category",
     cell: (row: any) => row.ticket_detail.ticket_category.category_name,
     sortable: false,
