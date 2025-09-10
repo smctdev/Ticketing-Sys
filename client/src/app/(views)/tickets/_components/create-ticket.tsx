@@ -294,7 +294,8 @@ export function CreateTicket({ setIsRefresh }: any) {
               />
               <Button
                 type="button"
-                className="w-full bg-blue-500 hover:bg-blue-600"
+                variant={"outline"}
+                className="w-full border-blue-500 hover:border-blue-600 text-blue-500 hover:text-blue-600"
                 onClick={() => inputRef?.current?.click()}
               >
                 {formInput.ticket_support.length > 0
@@ -377,7 +378,11 @@ export function CreateTicket({ setIsRefresh }: any) {
             <DialogClose asChild>
               <Button variant="outline">Close</Button>
             </DialogClose>
-            <Button type="submit" disabled={isLoading}>
+            <Button
+              type="submit"
+              className="bg-blue-500 hover:bg-blue-600"
+              disabled={isLoading}
+            >
               {isLoading ? (
                 <>
                   <Loader2 className="animate-spin" /> Submitting...

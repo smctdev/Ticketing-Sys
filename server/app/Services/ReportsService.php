@@ -110,10 +110,7 @@ class ReportsService
                 $query->where(function ($subQuery) use ($userRole, $assignedBranchCas, $assignedAreaManagers, $accountingHeadCodes, $user) {
                     switch ($userRole->role_name) {
                         case UserRoles::STAFF:
-                            $subQuery->whereAny([
-                                'login_id',
-                                'edited_by'
-                            ], Auth::id());
+                            $subQuery->where('login_id', Auth::id());
                             break;
                         case UserRoles::AUTOMATION:
                             $subQuery->where('assigned_person', $user->login_id);

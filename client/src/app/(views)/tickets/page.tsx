@@ -19,9 +19,8 @@ import { ViewTicketDetails } from "./_components/view-ticket-details";
 import withAuthPage from "@/lib/hoc/with-auth-page";
 import { TICKETS_FILTER } from "@/constants/filter-by";
 import { CreateTicket } from "./_components/create-ticket";
-import { useEffect } from "react";
 import { useAuth } from "@/context/auth-context";
-import { ROLE } from "@/constants/roles";
+import { canCreateTicket } from "@/constants/can-create-ticket";
 
 function Tickets() {
   const { user } = useAuth();
@@ -36,7 +35,7 @@ function Tickets() {
     pagination,
     handleSelectFilter,
     handleReset,
-    setIsRefresh
+    setIsRefresh,
   } = useFetch({
     url: "/tickets",
     isPaginated: true,
@@ -66,17 +65,6 @@ function Tickets() {
     },
   ];
 
-  const canCreateTicket = () => {
-    switch (user?.user_role?.role_name) {
-      case ROLE.USER:
-      case ROLE.ACCOUNTING_STAFF:
-      case ROLE.BRANCH_HEAD:
-        return true;
-      default:
-        return false;
-    }
-  };
-
   return (
     <div className="flex flex-col gap-3">
       <Card className="gap-0">
@@ -101,7 +89,6 @@ function Tickets() {
                     Filter by status
                   </SelectItem>
                   <SelectItem value="ALL">ALL</SelectItem>
-                  <SelectItem value="EDITED">EDITED</SelectItem>
                   <SelectItem value="REJECTED">REJECTED</SelectItem>
                   <SelectItem value="PENDING">PENDING</SelectItem>
                 </SelectGroup>
@@ -129,9 +116,11 @@ function Tickets() {
           <div className="flex items-center justify-between">
             <CardTitle className="font-bold text-lg text-gray-600 flex items-center gap-1">
               <Ticket size={18} />
-              <span>Tickets</span>
+              <span>Requested Tickets</span>
             </CardTitle>
-            {canCreateTicket() && <CreateTicket setIsRefresh={setIsRefresh} />}
+            {canCreateTicket(user?.user_role?.role_name) && (
+              <CreateTicket setIsRefresh={setIsRefresh} />
+            )}
           </div>
         </CardHeader>
         <CardContent>

@@ -18,18 +18,30 @@ export function ViewReportDetails({ data }: any) {
       name: "ACTION",
       cell: (row: any) => (
         <div className="flex gap-2">
-          <Button type="button" className="bg-blue-500 hover:bg-blue-600">
+          <Button
+            type="button"
+            className="bg-blue-500 hover:bg-blue-600"
+            size="xs"
+          >
             Return to automation
           </Button>
-          <Button type="button" className="bg-red-500 hover:bg-red-600">
+          <Button
+            type="button"
+            className="bg-red-500 hover:bg-red-600"
+            size="xs"
+          >
             Mark as not counted
           </Button>
-          <Button type="button" className="bg-indigo-500 hover:bg-indigo-600">
+          <Button
+            type="button"
+            className="bg-indigo-500 hover:bg-indigo-600"
+            size="xs"
+          >
             Edit note
           </Button>
         </div>
       ),
-      width: "500px"
+      width: "500px",
     },
   ];
   return (

@@ -40,12 +40,16 @@ export const AUTOMATION_RECORD_COLUMNS = [
     cell: (row: any) => (
       <div className="w-full">
         <p className="text-gray-800 font-semibold text-xs">
-          {row.roundedPercentage.toFixed(2)}%
+          {row.roundedPercentage.toFixed(2)}%{" "}
+          <span className="text-[10px] text-gray-600">
+            ({row.ticketsLastMonth} tickets edited last month)
+          </span>
         </p>
         <Progress
           value={row.ticketsThisMonth}
           max={row.ticketsLastMonth}
-          className={row.result === "Low" ? "bg-red-600" : "bg-green-600"}
+          valueColor={row.result === "Low" ? "bg-red-400" : "bg-green-400"}
+          className={row.result === "Low" ? "bg-red-200" : "bg-green-200"}
         />
       </div>
     ),

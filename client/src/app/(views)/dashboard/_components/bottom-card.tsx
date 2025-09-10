@@ -22,8 +22,8 @@ export default function BottomCard({ data, totalTickets }: any) {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <ScrollArea className="h-45">
+        <CardContent className="pr-2">
+          <ScrollArea className="h-45 pr-4">
             <div className="space-y-4">
               <div>
                 <div className="flex justify-between mb-1">
@@ -160,7 +160,8 @@ export default function BottomCard({ data, totalTickets }: any) {
               </div>
               <Progress
                 value={(data?.tickets?.tickets_pending / totalTickets) * 100}
-                className="h-2 bg-yellow-100"
+                className="h-2 bg-yellow-200"
+                valueColor="bg-yellow-400"
               />
             </div>
             <div>
@@ -172,7 +173,8 @@ export default function BottomCard({ data, totalTickets }: any) {
               </div>
               <Progress
                 value={(data?.tickets?.tickets_rejected / totalTickets) * 100}
-                className="h-2 bg-red-100"
+                className="h-2 bg-red-200"
+                valueColor="bg-red-400"
               />
             </div>
             <div>
@@ -182,7 +184,8 @@ export default function BottomCard({ data, totalTickets }: any) {
               </div>
               <Progress
                 value={(data?.tickets?.tickets_edited / totalTickets) * 100}
-                className="h-2 bg-green-100"
+                className="h-2 bg-green-200"
+                valueColor="bg-green-400"
               />
             </div>
           </div>
@@ -196,8 +199,8 @@ export default function BottomCard({ data, totalTickets }: any) {
             <Pointer className="h-4 w-4 text-muted-foreground" />
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <ScrollArea className="h-45">
+        <CardContent className="pr-2">
+          <ScrollArea className="h-45 pr-4">
             <div className="grid gap-2">
               <Link className="w-full" href="/admin/users">
                 <Button

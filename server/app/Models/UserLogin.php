@@ -167,6 +167,53 @@ class UserLogin extends Authenticatable
                         $sq->where('b_name', 'LIKE', "%$term%")
                             ->orWhere('b_code', 'LIKE', "%$term%")
                     )
+                    ->orWhereHas(
+                        'assignedBranches',
+                        fn($aq)
+                        =>
+                        $aq->whereHas(
+                            'branch',
+                            fn($sq)
+                            =>
+                            $sq->where('b_name', 'LIKE', "%$term%")
+                                ->orWhere('b_code', 'LIKE', "%$term%")
+                        )
+                    )
+                    ->orWhereHas(
+                        'assignedBranchCas',
+                        fn($aq)
+                        =>
+                        $aq->whereHas(
+                            'branch',
+                            fn($sq)
+                            =>
+                            $sq->where('b_name', 'LIKE', "%$term%")
+                                ->orWhere('b_code', 'LIKE', "%$term%")
+                        )
+                    )
+                    ->orWhereHas(
+                        'assignedAreaManagers',
+                        fn($aq)
+                        =>
+                        $aq->whereHas(
+                            'branch',
+                            fn($sq)
+                            =>
+                            $sq->where('b_name', 'LIKE', "%$term%")
+                                ->orWhere('b_code', 'LIKE', "%$term%")
+                        )
+                    )
+                    ->orWhereHas(
+                        'assignedCategories',
+                        fn($aq)
+                        =>
+                        $aq->whereHas(
+                            'categoryGroupCode',
+                            fn($sq)
+                            =>
+                            $sq->where('group_code', 'LIKE', "%$term%")
+                        )
+                    )
             )
         );
     }
