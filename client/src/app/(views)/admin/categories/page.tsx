@@ -4,14 +4,17 @@ import DataTableComponent from "@/components/data-table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import useFetch from "@/hooks/use-fetch";
 import withAuthPage from "@/lib/hoc/with-auth-page";
-import { FileStack, PenIcon, Trash } from "lucide-react";
+import { FileStack, PenIcon } from "lucide-react";
 import { TICKET_CATEGORIES_COLUMNS } from "../_constants/ticket-categories-columns";
 import { SEARCH_FILTER } from "@/constants/filter-by";
-import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
-import { AddCategory } from "../_components/add-category";
+import SearchInput from "@/components/ui/search-input";
+import { AddCategory } from "../_components/_category-dialogs/add-category";
+import { EditCategory } from "../_components/_category-dialogs/edit-category";
+import { useState } from "react";
+import { DeleteCategory } from "../_components/_category-dialogs/delete-category";
 
 function Categories() {
   const {
@@ -30,6 +33,13 @@ function Categories() {
     isPaginated: true,
     filters: SEARCH_FILTER,
   });
+  const { data: groupCategories, isLoading: isLoadingGroupCategories } =
+    useFetch({
+      url: "/group-categories",
+      canBeRefreshGlobal: isRefresh,
+    });
+  const [selectedData, setSelectedData] = useState<null | any>(null);
+  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
 
   const TICKET_CATEGORIES_COLUMNS_ACTIONS = [
     {
@@ -52,16 +62,12 @@ function Categories() {
         <div className="flex gap-2">
           <button
             type="button"
+            onClick={handleEdit(row)}
             className="text-blue-500 hover:text-blue-600 hover:scale-105 transition-all duration-300 ease-in-out"
           >
             <PenIcon size={18} />
           </button>
-          <button
-            type="button"
-            className="text-red-500 hover:text-red-600 hover:scale-105 transition-all duration-300 ease-in-out"
-          >
-            <Trash size={18} />
-          </button>
+          <DeleteCategory setIsRefresh={setIsRefresh} data={row} />
         </div>
       ),
       sortable: false,
@@ -86,6 +92,11 @@ function Categories() {
       setIsRefresh(false);
     }
   };
+
+  const handleEdit = (row: any) => () => {
+    setSelectedData(row);
+    setIsDialogOpen(true);
+  };
   return (
     <div className="flex flex-col gap-3">
       <Card className="gap-0">
@@ -95,12 +106,12 @@ function Categories() {
             <span>Categories</span>
           </CardTitle>
           <div className="flex gap-2 items-center">
-            <Input
-              type="search"
-              onChange={handleSearchTerm(1000)}
-              placeholder="Search..."
+            <SearchInput onChange={handleSearchTerm(1000)} />
+            <AddCategory
+              setIsRefresh={setIsRefresh}
+              groupCategories={groupCategories?.data}
+              isLoadingGroupCategories={isLoadingGroupCategories}
             />
-            <AddCategory />
           </div>
         </CardHeader>
         <CardContent>
@@ -123,6 +134,14 @@ function Categories() {
           />
         </CardContent>
       </Card>
+      <EditCategory
+        data={selectedData}
+        setIsRefresh={setIsRefresh}
+        groupCategories={groupCategories?.data}
+        isLoadingGroupCategories={isLoadingGroupCategories}
+        open={isDialogOpen}
+        setOpen={setIsDialogOpen}
+      />
     </div>
   );
 }

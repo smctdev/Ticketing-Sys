@@ -1,4 +1,5 @@
 import { PAGINATION } from "@/constants/pagination";
+import { useIsRefresh } from "@/context/is-refresh-context";
 import { api } from "@/lib/api";
 import { PaginationType } from "@/types/pagination-type";
 import { UseFetchDataType, UseFetchType } from "@/types/use-fetch-type";
@@ -9,6 +10,7 @@ export default function useFetch({
   url,
   isPaginated = false,
   filters = false,
+  canBeRefreshGlobal = false,
 }: UseFetchDataType): UseFetchType {
   const [data, setData] = useState<any>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
@@ -18,6 +20,7 @@ export default function useFetch({
   const [isFiltered, setIsFiltered] = useState<boolean>(false);
   const [isRefresh, setIsRefresh] = useState<boolean>(false);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
+  const { setIsRefresh: setRefresh } = useIsRefresh();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -45,12 +48,14 @@ export default function useFetch({
         setError(error.response.data);
       } finally {
         setIsLoading(false);
+        setIsRefresh(false);
         if (isPaginated) {
           setPagination((pagination) => ({
             ...pagination,
             isLoading: false,
           }));
         }
+        setRefresh(false);
       }
     };
 
@@ -74,6 +79,7 @@ export default function useFetch({
     filterBy.created_end_date,
     filterBy.created_start_date,
     isRefresh,
+    canBeRefreshGlobal,
   ]);
 
   const handleSearchTerm =

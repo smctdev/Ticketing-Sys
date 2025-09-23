@@ -3,7 +3,7 @@
 import DataTableComponent from "@/components/data-table";
 import useFetch from "@/hooks/use-fetch";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { File, FileOutput, Funnel, Loader2Icon } from "lucide-react";
+import { Eye, File, FileOutput, Funnel, Loader2Icon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import withAuthPage from "@/lib/hoc/with-auth-page";
 import { REPORTS_FILTER } from "@/constants/filter-by";
@@ -19,11 +19,13 @@ import formattedDate from "@/utils/format-date";
 import { formatDate } from "date-fns";
 import { useAuth } from "@/context/auth-context";
 import { toast } from "sonner";
+import { useIsRefresh } from "@/context/is-refresh-context";
 
 function Reports() {
   const [isLoadingToExport, setIsLoadingToExport] = useState<boolean>(false);
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const { user } = useAuth();
+  const { isRefresh } = useIsRefresh();
   const {
     data,
     isLoading,
@@ -39,8 +41,10 @@ function Reports() {
     url: "/reports",
     isPaginated: true,
     filters: REPORTS_FILTER,
+    canBeRefreshGlobal: isRefresh,
   });
-
+  const [isOpenDrawer, setIsOpenDrawer] = useState<boolean>(false);
+  const [selectedData, setSelectedData] = useState<null | any>(null);
   const { data: forFilterData, isLoading: isLoadingForFilter } = useFetch({
     url: "/for-filter-datas",
   });
@@ -50,7 +54,13 @@ function Reports() {
       name: "Action",
       cell: (row: any) => (
         <div className="flex items-center gap-3">
-          <ViewReportDetails data={row} />
+          <button
+            type="button"
+            onClick={handleOpenDrawer(row)}
+            className="border-none bg-transparent shadow-none hover:scale-105 w-fit"
+          >
+            <Eye className="h-4 w-4 text-green-500 hover:text-green-600" />
+          </button>
         </div>
       ),
     },
@@ -311,6 +321,11 @@ function Reports() {
     }
   };
 
+  const handleOpenDrawer = (data: any) => () => {
+    setSelectedData(data);
+    setIsOpenDrawer(true);
+  };
+
   return (
     <div className="flex flex-col gap-3">
       <Card className="gap-0">
@@ -392,6 +407,12 @@ function Reports() {
           />
         </CardContent>
       </Card>
+
+      <ViewReportDetails
+        data={selectedData}
+        open={isOpenDrawer}
+        setIsOpen={setIsOpenDrawer}
+      />
     </div>
   );
 }

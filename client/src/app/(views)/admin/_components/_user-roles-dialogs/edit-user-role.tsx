@@ -8,7 +8,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Loader2Icon, Pen } from "lucide-react";
+import { Loader2Icon, Pen, Save } from "lucide-react";
 import { useEffect, useState } from "react";
 import { USER_ROLES_DATA } from "../../_constants/form-data-inputs";
 import { toast } from "sonner";
@@ -116,7 +116,9 @@ export function EditUserRole({ data, setIsRefresh }: EditUserRoleProps) {
                   <Loader2Icon className="h-4 w-4 animate-spin" /> Updating...
                 </>
               ) : (
-                <>Update</>
+                <>
+                  <Save /> Update
+                </>
               )}
             </Button>
           </DialogFooter>

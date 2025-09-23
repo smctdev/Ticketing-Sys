@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\UserRoles;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -30,7 +31,8 @@ class UserRoleRequest extends FormRequest
                     'role_name'
                 )->ignore($this->id, 'user_role_id'),
                 'min:4',
-                'max:50'
+                'max:50',
+                Rule::enum(UserRoles::class)
             ]
         ];
     }

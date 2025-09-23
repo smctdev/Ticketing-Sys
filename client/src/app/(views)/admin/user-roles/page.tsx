@@ -6,12 +6,12 @@ import useFetch from "@/hooks/use-fetch";
 import withAuthPage from "@/lib/hoc/with-auth-page";
 import { UserLock } from "lucide-react";
 import { SEARCH_FILTER } from "@/constants/filter-by";
-import { Input } from "@/components/ui/input";
 import { AddUserRole } from "../_components/_user-roles-dialogs/add-user-role";
 import { USER_ROLES_COLUMNS } from "../_constants/user-roles-columns";
 import { EditUserRole } from "../_components/_user-roles-dialogs/edit-user-role";
 import { UserRoleDataType } from "../_types/user-roles-types";
 import { DeleteUserRole } from "../_components/_user-roles-dialogs/delete-user-role";
+import SearchInput from "@/components/ui/search-input";
 
 function UserRoles() {
   const {
@@ -52,11 +52,7 @@ function UserRoles() {
             <span>User Roles</span>
           </CardTitle>
           <div className="flex gap-2 items-center">
-            <Input
-              type="search"
-              onChange={handleSearchTerm(1000)}
-              placeholder="Search..."
-            />
+            <SearchInput onChange={handleSearchTerm(1000)} />
             <AddUserRole setIsRefresh={setIsRefresh} />
           </div>
         </CardHeader>

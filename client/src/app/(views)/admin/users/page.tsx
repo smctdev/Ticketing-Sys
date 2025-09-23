@@ -4,23 +4,18 @@ import DataTableComponent from "@/components/data-table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import useFetch from "@/hooks/use-fetch";
 import withAuthPage from "@/lib/hoc/with-auth-page";
-import { PenIcon, Trash, Users2 } from "lucide-react";
+import { Users2 } from "lucide-react";
 import { SEARCH_FILTER } from "@/constants/filter-by";
-import { Input } from "@/components/ui/input";
 import { USERS_COLUMNS } from "../_constants/users-columns";
 import { AddUser } from "../_components/_user-dialogs/add-user";
 import { EditUser } from "../_components/_user-dialogs/edit-user";
 import { useMemo } from "react";
 import { SelectItem } from "@/components/ui/select";
 import { DeleteUser } from "../_components/_user-dialogs/delete-user";
+import SearchInput from "@/components/ui/search-input";
 interface UserRoleTypes {
   user_role_id: string;
   role_name: string;
-}
-
-interface BranchCodeTypes {
-  blist_id: string;
-  b_code: string;
 }
 
 function Users() {
@@ -67,24 +62,22 @@ function Users() {
   ];
 
   const branchMemo = useMemo(() => {
-    return branchIsLoading ? (
-      <SelectItem value="Loading...">Loading...</SelectItem>
-    ) : branchData?.data?.length === 0 ? (
-      <SelectItem value="No branches yet.">No branches yet.</SelectItem>
-    ) : (
-      branchData?.data?.map((item: BranchCodeTypes, index: number) => (
-        <SelectItem key={index} value={String(item.blist_id)}>
-          {item.b_code}
-        </SelectItem>
-      ))
-    );
+    return branchIsLoading
+      ? "isLoading"
+      : branchData?.data?.length === 0
+      ? "isEmpty"
+      : branchData?.data;
   }, [branchData?.data]);
 
   const userRoleMemo = useMemo(() => {
     return userRoleIsLoading ? (
-      <SelectItem value="Loading...">Loading...</SelectItem>
+      <SelectItem disabled value="Loading...">
+        Loading...
+      </SelectItem>
     ) : userRoleData?.data?.length === 0 ? (
-      <SelectItem value="No roles yet.">No roles yet.</SelectItem>
+      <SelectItem disabled value="No roles yet.">
+        No roles yet.
+      </SelectItem>
     ) : (
       userRoleData?.data?.map((item: UserRoleTypes, index: number) => (
         <SelectItem key={index} value={String(item.user_role_id)}>
@@ -103,11 +96,7 @@ function Users() {
             <span>Users</span>
           </CardTitle>
           <div className="flex items-center gap-2">
-            <Input
-              type="search"
-              onChange={handleSearchTerm(1000)}
-              placeholder="Search..."
-            />
+            <SearchInput onChange={handleSearchTerm(1000)} />
             <AddUser
               setIsRefresh={setIsRefresh}
               userRoleMemo={userRoleMemo}

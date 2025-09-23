@@ -56,9 +56,19 @@ class CasController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(string $userId)
     {
-        //
+        $user = UserLogin::with('casAssignedBranches')->findOrFail($userId);
+
+        $branches = BranchList::query()
+            ->whereDoesntHave("branchAssignedBranchCas")
+            ->get();
+
+        $userBranches = $user->casAssignedBranches;
+
+        return response()->json([
+            'data' => $userBranches->merge($branches),
+        ]);
     }
 
     /**
@@ -74,7 +84,15 @@ class CasController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $user = UserLogin::findOrFail($id);
+
+        $user->casAssignedBranches()->sync($request->branch_codes);
+
+        $branch_counts = $user->casAssignedBranches()->count();
+
+        return response()->json([
+            'message' => "{$branch_counts} branche(s) assigned successfully",
+        ], 200);
     }
 
     /**
@@ -82,6 +100,15 @@ class CasController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $user = UserLogin::findOrFail($id);
+
+        $branch_counts = $user->casAssignedBranches()->count();
+
+        $user->casAssignedBranches()->detach();
+
+
+        return response()->json([
+            'message' => "{$branch_counts} branche(s) removed successfully",
+        ], 200);
     }
 }

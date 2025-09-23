@@ -106,8 +106,10 @@ class ReportsService
             ->when($branchCategory !== "ALL", fn($query) => $query->whereHas('branch', fn($subQuery) => $subQuery->where('category', $branchCategory)))
             ->whereHas('ticketDetail', fn($query) => $query->whereNotNull('date_completed')
                 ->where('date_completed', '!=', ''))
-            ->when($userRole->role_name !== UserRoles::ADMIN || $userRole->role_name !== UserRoles::AUTOMATION_ADMIN, function ($query) use ($userRole, $assignedBranchCas, $assignedAreaManagers, $accountingHeadCodes, $user) {
+            ->when(!$user->isAdmin() || !$user->isAutomationAdmin() || !$user->isAutomationManager(), function ($query) use ($userRole, $assignedBranchCas, $assignedAreaManagers, $accountingHeadCodes, $user) {
                 $query->where(function ($subQuery) use ($userRole, $assignedBranchCas, $assignedAreaManagers, $accountingHeadCodes, $user) {
+                    $userBranchIds = explode(',', $user->blist_id);
+
                     switch ($userRole->role_name) {
                         case UserRoles::STAFF:
                             $subQuery->where('login_id', Auth::id());
@@ -116,7 +118,7 @@ class ReportsService
                             $subQuery->where('assigned_person', $user->login_id);
                             break;
                         case UserRoles::BRANCH_HEAD:
-                            $subQuery->where('branch_id', $user->blist_id);
+                            $subQuery->whereIn('branch_id', $userBranchIds);
                             break;
                         case UserRoles::CAS:
                             $subQuery->whereIn('branch_id', $assignedBranchCas);
@@ -129,7 +131,7 @@ class ReportsService
                             break;
                         case UserRoles::ACCOUNTING_STAFF:
                             $subQuery->where('login_id', Auth::id())
-                                ->orWhere('branch_id', $user->blist_id);
+                                ->orWhereIn('branch_id', $userBranchIds);
                             break;
                     }
                 });
@@ -281,8 +283,9 @@ class ReportsService
             ->when($branchCategory !== "ALL", fn($query) => $query->whereHas('branch', fn($subQuery) => $subQuery->where('category', $branchCategory)))
             ->whereHas('ticketDetail', fn($query) => $query->whereNotNull('date_completed')
                 ->where('date_completed', '!=', ''))
-            ->when($userRole->role_name !== UserRoles::ADMIN || $userRole->role_name !== UserRoles::AUTOMATION_ADMIN, function ($query) use ($userRole, $assignedBranchCas, $assignedAreaManagers, $accountingHeadCodes, $user) {
+            ->when(!$user->isAdmin() || !$user->isAutomationAdmin() || !$user->isAutomationManager(), function ($query) use ($userRole, $assignedBranchCas, $assignedAreaManagers, $accountingHeadCodes, $user) {
                 $query->where(function ($subQuery) use ($userRole, $assignedBranchCas, $assignedAreaManagers, $accountingHeadCodes, $user) {
+                    $userBranchIds = explode(',', $user->blist_id);
                     switch ($userRole->role_name) {
                         case UserRoles::STAFF:
                             $subQuery->where('login_id', Auth::id());
@@ -297,7 +300,7 @@ class ReportsService
                             );
                             break;
                         case UserRoles::BRANCH_HEAD:
-                            $subQuery->where('branch_id', $user->blist_id);
+                            $subQuery->whereIn('branch_id', $userBranchIds);
                             break;
                         case UserRoles::CAS:
                             $subQuery->whereIn('branch_id', $assignedBranchCas);
@@ -310,7 +313,7 @@ class ReportsService
                             break;
                         case UserRoles::ACCOUNTING_STAFF:
                             $subQuery->where('login_id', Auth::id())
-                                ->orWhere('branch_id', $user->blist_id);
+                                ->orWhereIn('branch_id', $userBranchIds);
                             break;
                     }
                 });

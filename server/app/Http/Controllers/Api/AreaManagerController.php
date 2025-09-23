@@ -55,9 +55,19 @@ class AreaManagerController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(string $userId)
     {
-        //
+        $user = UserLogin::with('areaManagerAssignedBranches')->findOrFail($userId);
+
+        $branches = BranchList::query()
+            ->whereDoesntHave("branchAssignedAreaManagers")
+            ->get();
+
+        $userBranches = $user->areaManagerAssignedBranches;
+
+        return response()->json([
+            'data' => $userBranches->merge($branches),
+        ]);
     }
 
     /**
@@ -73,7 +83,15 @@ class AreaManagerController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $user = UserLogin::findOrFail($id);
+
+        $user->areaManagerAssignedBranches()->sync($request->branch_codes);
+
+        $branch_counts = $user->areaManagerAssignedBranches()->count();
+
+        return response()->json([
+            'message' => "{$branch_counts} branche(s) assigned successfully",
+        ], 200);
     }
 
     /**
@@ -81,6 +99,15 @@ class AreaManagerController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $user = UserLogin::findOrFail($id);
+
+        $branch_counts = $user->areaManagerAssignedBranches()->count();
+
+        $user->areaManagerAssignedBranches()->detach();
+
+
+        return response()->json([
+            'message' => "{$branch_counts} branche(s) removed successfully",
+        ], 200);
     }
 }

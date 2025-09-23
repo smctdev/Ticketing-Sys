@@ -4,11 +4,15 @@ import DataTableComponent from "@/components/data-table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import useFetch from "@/hooks/use-fetch";
 import withAuthPage from "@/lib/hoc/with-auth-page";
-import { Building, PenIcon, Trash } from "lucide-react";
+import { Building, PenIcon } from "lucide-react";
 import { BRANCHES_COLUMNS } from "../_constants/branches-columns";
 import { SEARCH_FILTER } from "@/constants/filter-by";
-import { Input } from "@/components/ui/input";
-import { AddBranch } from "../_components/add-branch";
+import SearchInput from "@/components/ui/search-input";
+import { AddBranch } from "../_components/_branch-dialogs/add-branch";
+import { useState } from "react";
+import { BranchDetailDataType } from "../_types/branch-types";
+import { EditBranch } from "../_components/_branch-dialogs/edit-branch";
+import { DeleteBranch } from "../_components/_branch-dialogs/delete-branch";
 
 function Branches() {
   const {
@@ -20,11 +24,16 @@ function Branches() {
     filterBy,
     pagination,
     handleShort,
+    setIsRefresh,
   } = useFetch({
     url: "/admin/branches",
     isPaginated: true,
     filters: SEARCH_FILTER,
   });
+  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+  const [selectedItem, setSelectedItem] = useState<BranchDetailDataType>(
+    {} as BranchDetailDataType
+  );
 
   const BRANCHES_COLUMNS_ACTIONS = [
     {
@@ -34,20 +43,22 @@ function Branches() {
           <button
             type="button"
             className="text-blue-500 hover:text-blue-600 hover:scale-105 transition-all duration-300 ease-in-out"
+            onClick={handleEdit(row)}
           >
             <PenIcon size={18} />
           </button>
-          <button
-            type="button"
-            className="text-red-500 hover:text-red-600 hover:scale-105 transition-all duration-300 ease-in-out"
-          >
-            <Trash size={18} />
-          </button>
+          <DeleteBranch data={row} setIsRefresh={setIsRefresh} />
         </div>
       ),
       sortable: false,
     },
   ];
+
+  const handleEdit = (data: BranchDetailDataType) => () => {
+    setSelectedItem(data);
+    setIsDialogOpen(true);
+  };
+
   return (
     <div className="flex flex-col gap-3">
       <Card className="gap-0">
@@ -57,12 +68,8 @@ function Branches() {
             <span>Branches</span>
           </CardTitle>
           <div className="flex items-center gap-2">
-            <Input
-              type="search"
-              onChange={handleSearchTerm(1000)}
-              placeholder="Search..."
-            />
-            <AddBranch />
+            <SearchInput onChange={handleSearchTerm(1000)} />
+            <AddBranch setIsRefresh={setIsRefresh} />
           </div>
         </CardHeader>
         <CardContent>
@@ -82,6 +89,12 @@ function Branches() {
           />
         </CardContent>
       </Card>
+      <EditBranch
+        setIsRefresh={setIsRefresh}
+        data={selectedItem}
+        open={isDialogOpen}
+        setOpen={setIsDialogOpen}
+      />
     </div>
   );
 }

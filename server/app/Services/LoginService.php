@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Models\UserLogin;
 use Illuminate\Support\Facades\Auth;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class LoginService
 {
@@ -18,7 +17,7 @@ class LoginService
             ->first();
 
         if (!$user) {
-            throw new HttpException(400, 'Username or email not found');
+            abort(400, 'Username or email not found');
         }
 
         $credentials = Auth::guard('web')->attempt([
@@ -31,9 +30,9 @@ class LoginService
 
             $user?->userDetail?->userLoginCode?->delete();
 
-            throw new HttpException(204, 'Login successfully');
+            abort(204, 'Login successfully');
         }
 
-        throw new HttpException(401, 'Invalid credentials');
+        abort(401, 'Invalid credentials');
     }
 }

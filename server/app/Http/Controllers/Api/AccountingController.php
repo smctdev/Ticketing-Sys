@@ -56,9 +56,14 @@ class AccountingController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show()
     {
-        //
+        $categories = GroupCategory::query()
+            ->get();
+
+        return response()->json([
+            'data' => $categories,
+        ]);
     }
 
     /**
@@ -74,7 +79,15 @@ class AccountingController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $user = UserLogin::findOrFail($id);
+
+        $user->accountingAssignedCategories()->sync($request->category_ids);
+
+        $categories_count = $user->accountingAssignedCategories()->count();
+
+        return response()->json([
+            'message' => "{$categories_count} categories assigned successfully",
+        ], 200);
     }
 
     /**
@@ -82,6 +95,15 @@ class AccountingController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $user = UserLogin::findOrFail($id);
+
+        $categories_count = $user->accountingAssignedCategories()->count();
+
+        $user->accountingAssignedCategories()->detach();
+
+
+        return response()->json([
+            'message' => "{$categories_count} categories removed successfully",
+        ], 200);
     }
 }

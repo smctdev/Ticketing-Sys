@@ -18,4 +18,8 @@ export interface AuthContextType {
   logout: () => Promise<void>;
   fetchUserProfile: () => Promise<void>;
   loginAsOtp: (code: string, email: string) => Promise<AxiosResponse<any, any>>;
+  setNotifications: Dispatch<SetStateAction<any | null>>;
+  notifications: any | null;
+  setTotalUnreadNotifications: Dispatch<SetStateAction<number>>;
+  totalUnreadNotifications: number;
 }

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreTicketCategoryRequest;
+use App\Http\Requests\UpdateTicketCategoryRequest;
 use App\Models\AssignedCategory;
 use App\Models\GroupCategory;
 use App\Models\TicketCategory;
@@ -29,7 +31,7 @@ class CategoryController extends Controller
 
     public function assignedCategories()
     {
-        $assignedCategories = AssignedCategory::with('categoryGroup')
+        $assignedCategories = AssignedCategory::with('categoryGroupCode')
             ->where('login_id', Auth::id())
             ->get();
 
@@ -37,7 +39,7 @@ class CategoryController extends Controller
     }
     public function assignedCategoryGroup($id)
     {
-        $assignedCategoryGroup = AssignedCategory::with('categoryGroup')
+        $assignedCategoryGroup = AssignedCategory::with('categoryGroupCode')
             ->where('login_id', $id)
             ->get();
 
@@ -96,9 +98,34 @@ class CategoryController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreTicketCategoryRequest $request)
     {
-        //
+        $request->validated();
+
+        $groupCodeId;
+
+        if ($request->group_code === "others") {
+            $groupCategory = GroupCategory::query()
+                ->create([
+                    'group_code' => $request->other_category
+                ]);
+
+            $groupCodeId = $groupCategory->id;
+        } else {
+            $groupCodeId = $request->group_code;
+        }
+
+        $category = TicketCategory::query()
+            ->create([
+                'category_shortcut' => $request->category_shortcut,
+                'category_name'     => $request->category_name,
+                'group_code'        => $groupCodeId,
+                'show_hide'         => $request->show_hide
+            ]);
+
+        return response()->json([
+            'message'       => "Category \"{$category->category_name}\" created successfully"
+        ], 201);
     }
 
     /**
@@ -120,9 +147,35 @@ class CategoryController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateTicketCategoryRequest $request, string $id)
     {
-        //
+        $request->validated();
+
+        $groupCodeId;
+
+        if ($request->group_code === "others") {
+            $groupCategory = GroupCategory::query()
+                ->create([
+                    'group_code' => $request->other_category
+                ]);
+
+            $groupCodeId = $groupCategory->id;
+        } else {
+            $groupCodeId = $request->group_code;
+        }
+
+        $ticketCategory = TicketCategory::findOrFail($id);
+
+        $ticketCategory->update([
+            'category_shortcut' => $request->category_shortcut,
+            'category_name'     => $request->category_name,
+            'group_code'        => $groupCodeId,
+            'show_hide'         => $request->show_hide
+        ]);
+
+        return response()->json([
+            'message'       => "Category \"{$ticketCategory->category_name}\" updated successfully"
+        ], 200);
     }
 
     public function showHide(Request $request, $id)
@@ -149,6 +202,12 @@ class CategoryController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $ticketCategory = TicketCategory::findOrFail($id);
+
+        $ticketCategory->delete();
+
+        return response()->json([
+            'message'   => "Category \"{$ticketCategory->category_name}\" deleted successfully"
+        ], 200);
     }
 }

@@ -10,6 +10,7 @@ export default function RecentEditedTicketTransactionsLoader() {
         >
           <div className="space-y-2">
             <Skeleton className="h-8 w-50"></Skeleton>
+            <Skeleton className="h-4 w-52"></Skeleton>
             <Skeleton className="h-4 w-32"></Skeleton>
           </div>
           <Skeleton className="h-9 w-24"></Skeleton>

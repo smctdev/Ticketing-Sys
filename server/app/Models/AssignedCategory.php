@@ -14,10 +14,6 @@ class AssignedCategory extends Model
     {
         return $this->belongsTo(UserLogin::class, 'login_id', 'login_id');
     }
-    public function categoryGroup()
-    {
-        return $this->belongsTo(GroupCategory::class, 'login_id', 'id');
-    }
 
     public function categoryGroupCode()
     {

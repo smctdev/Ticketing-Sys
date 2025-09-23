@@ -18,5 +18,5 @@ export interface UserFormItemsTypes {
   password: string;
   username: string;
   role: number | string;
-  branch_code: number | string;
+  branch_code: string[];
 }

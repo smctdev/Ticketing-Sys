@@ -38,7 +38,8 @@ export default function BottomCard({ data, totalTickets }: any) {
                       data?.total_users?.total_users) *
                     100
                   }
-                  className="h-2"
+                  valueColor="bg-blue-500"
+                  className="h-2 bg-blue-200"
                 />
               </div>
               <div>
@@ -54,7 +55,8 @@ export default function BottomCard({ data, totalTickets }: any) {
                       data?.total_users?.total_users) *
                     100
                   }
-                  className="h-2"
+                  valueColor="bg-blue-500"
+                  className="h-2 bg-blue-200"
                 />
               </div>
               <div>
@@ -70,7 +72,8 @@ export default function BottomCard({ data, totalTickets }: any) {
                       data?.total_users?.total_users) *
                     100
                   }
-                  className="h-2"
+                  valueColor="bg-blue-500"
+                  className="h-2 bg-blue-200"
                 />
               </div>
               <div>
@@ -86,7 +89,8 @@ export default function BottomCard({ data, totalTickets }: any) {
                       data?.total_users?.total_users) *
                     100
                   }
-                  className="h-2"
+                  valueColor="bg-blue-500"
+                  className="h-2 bg-blue-200"
                 />
               </div>
               <div>
@@ -102,7 +106,8 @@ export default function BottomCard({ data, totalTickets }: any) {
                       data?.total_users?.total_users) *
                     100
                   }
-                  className="h-2"
+                  valueColor="bg-blue-500"
+                  className="h-2 bg-blue-200"
                 />
               </div>
               <div>
@@ -118,7 +123,8 @@ export default function BottomCard({ data, totalTickets }: any) {
                       data?.total_users?.total_users) *
                     100
                   }
-                  className="h-2"
+                  valueColor="bg-blue-500"
+                  className="h-2 bg-blue-200"
                 />
               </div>
               <div>
@@ -134,7 +140,8 @@ export default function BottomCard({ data, totalTickets }: any) {
                       data?.total_users?.total_users) *
                     100
                   }
-                  className="h-2"
+                  valueColor="bg-blue-500"
+                  className="h-2 bg-blue-200"
                 />
               </div>
             </div>

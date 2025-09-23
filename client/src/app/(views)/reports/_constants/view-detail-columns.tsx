@@ -16,17 +16,6 @@ import CarouselLayout from "@/components/carousel-layout";
 
 export const VIEW_DETAIL_COMLUMNS = [
   {
-    name: "TICKET CODE",
-    cell: (row: any) => (
-      <button
-        type="button"
-        className="text-blue-500 hover:text-blue-600 hover:underline font-bold"
-      >
-        {row.ticket_code}
-      </button>
-    ),
-  },
-  {
     name: "ATTACHMENTS",
     cell: (row: any) =>
       row.ticket_detail.td_support.length > 0 && (

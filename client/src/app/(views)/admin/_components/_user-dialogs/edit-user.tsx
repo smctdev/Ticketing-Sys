@@ -31,6 +31,14 @@ import {
 } from "@/components/ui/select";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
+import {
+  MultiSelect,
+  MultiSelectContent,
+  MultiSelectGroup,
+  MultiSelectItem,
+  MultiSelectTrigger,
+  MultiSelectValue,
+} from "@/components/ui/multi-select";
 
 interface EditUserProps {
   setIsRefresh: Dispatch<SetStateAction<boolean>>;
@@ -60,7 +68,7 @@ export function EditUser({
       email: data.user_detail.user_email,
       username: data.username,
       role: data.user_role_id,
-      branch_code: data.blist_id,
+      branch_code: data.branches.map((branch: any) => String(branch.blist_id)) ?? "",
     }));
   }, [isOpenDialog]);
 
@@ -76,6 +84,13 @@ export function EditUser({
   const handleSelectChange = (title: string) => (value: string) => {
     setFormItems((formItems) => ({
       ...formItems,
+      [title]: value,
+    }));
+  };
+
+  const handleSelectValue = (title: string) => (value: string[]) => {
+    setFormItems((prev) => ({
+      ...prev,
       [title]: value,
     }));
   };
@@ -171,20 +186,37 @@ export function EditUser({
             <div className="flex flex-col gap-2">
               <Label htmlFor="branch_code">Branch code</Label>
               <div>
-                <Select
-                  onValueChange={handleSelectChange("branch_code")}
-                  value={String(formItems?.branch_code)}
+                <MultiSelect
+                  modal={true}
+                  onValuesChange={handleSelectValue("branch_code")}
+                  values={formItems?.branch_code ?? ""}
                 >
-                  <SelectTrigger className="w-full">
-                    <SelectValue placeholder="Select a branch code" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      <SelectLabel>Select a branch code</SelectLabel>
-                      {branchMemo}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
+                  <MultiSelectTrigger className="w-full max-w-[350px]">
+                    <MultiSelectValue placeholder="Select branch codes..." />
+                  </MultiSelectTrigger>
+                  <MultiSelectContent>
+                    <MultiSelectGroup>
+                      {branchMemo === "isLoading" ? (
+                        <MultiSelectItem value="Loading..." disabled>
+                          Loading...
+                        </MultiSelectItem>
+                      ) : branchMemo === "isEmpty" ? (
+                        <MultiSelectItem value="No branches yet." disabled>
+                          No branches yet.
+                        </MultiSelectItem>
+                      ) : (
+                        branchMemo?.map((branch: any, index: number) => (
+                          <MultiSelectItem
+                            key={index}
+                            value={`${branch.blist_id}`}
+                          >
+                            {branch.b_code}
+                          </MultiSelectItem>
+                        ))
+                      )}
+                    </MultiSelectGroup>
+                  </MultiSelectContent>
+                </MultiSelect>
                 {errors?.branch_code && (
                   <small className="text-red-500">{errors?.branch_code}</small>
                 )}

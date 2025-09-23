@@ -14,4 +14,9 @@ class GroupCategory extends Model
     {
         return $this->hasMany(TicketCategory::class, 'group_code', 'id');
     }
+
+    public function groupCategoryAssignedAccounting()
+    {
+        return $this->belongsToMany(UserLogin::class, 'assigned_categories', 'group_code', 'login_id');
+    }
 }

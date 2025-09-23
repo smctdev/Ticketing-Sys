@@ -20,6 +20,12 @@ class DashboardController extends Controller
     /**
      * Display a listing of the resource.
      */
+
+    public function __construct(protected $user = null)
+    {
+        $this->user = Auth::user();
+    }
+
     public function index()
     {
 
@@ -32,12 +38,14 @@ class DashboardController extends Controller
                 'editedByAutomationTickets as ticketsThisMonth' => function ($query) {
                     $query->whereHas('ticketDetail', function ($subQuery) {
                         $subQuery->whereMonth('date_created', now()->month);
-                    })->where('status', 'EDITED');
+                    })
+                        ->where('status', TicketStatus::EDITED);
                 },
                 'editedByAutomationTickets as ticketsLastMonth' => function ($query) {
                     $query->whereHas('ticketDetail', function ($subQuery) {
                         $subQuery->whereMonth('date_created', now()->subMonth()->month);
-                    })->where('status', 'EDITED');
+                    })
+                        ->where('status', TicketStatus::EDITED);
                 },
             ])
             ->get();
@@ -76,31 +84,66 @@ class DashboardController extends Controller
             ->count();
 
         $total_automation = UserLogin::where('login_id', '!=', Auth::id())
-            ->whereHas("userRole", fn($query) => $query->where('role_name', UserRoles::AUTOMATION))
+            ->whereHas(
+                "userRole",
+                fn($query)
+                =>
+                $query->where('role_name', UserRoles::AUTOMATION)
+            )
             ->count();
 
         $total_accounting_head = UserLogin::where('login_id', '!=', Auth::id())
-            ->whereHas("userRole", fn($query) => $query->where('role_name', UserRoles::ACCOUNTING_HEAD))
+            ->whereHas(
+                "userRole",
+                fn($query)
+                =>
+                $query->where('role_name', UserRoles::ACCOUNTING_HEAD)
+            )
             ->count();
 
         $total_branch_head = UserLogin::where('login_id', '!=', Auth::id())
-            ->whereHas("userRole", fn($query) => $query->where('role_name', UserRoles::BRANCH_HEAD))
+            ->whereHas(
+                "userRole",
+                fn($query)
+                =>
+                $query->where('role_name', UserRoles::BRANCH_HEAD)
+            )
             ->count();
 
         $total_staff = UserLogin::where('login_id', '!=', Auth::id())
-            ->whereHas("userRole", fn($query) => $query->where('role_name', UserRoles::STAFF))
+            ->whereHas(
+                "userRole",
+                fn($query)
+                =>
+                $query->where('role_name', UserRoles::STAFF)
+            )
             ->count();
 
         $total_cas = UserLogin::where('login_id', '!=', Auth::id())
-            ->whereHas("userRole", fn($query) => $query->where('role_name', UserRoles::CAS))
+            ->whereHas(
+                "userRole",
+                fn($query)
+                =>
+                $query->where('role_name', UserRoles::CAS)
+            )
             ->count();
 
         $total_accounting_staff = UserLogin::where('login_id', '!=', Auth::id())
-            ->whereHas("userRole", fn($query) => $query->where('role_name', UserRoles::ACCOUNTING_STAFF))
+            ->whereHas(
+                "userRole",
+                fn($query)
+                =>
+                $query->where('role_name', UserRoles::ACCOUNTING_STAFF)
+            )
             ->count();
 
         $total_area_manager = UserLogin::where('login_id', '!=', Auth::id())
-            ->whereHas("userRole", fn($query) => $query->where('role_name', UserRoles::AREA_MANAGER))
+            ->whereHas(
+                "userRole",
+                fn($query)
+                =>
+                $query->where('role_name', UserRoles::AREA_MANAGER)
+            )
             ->count();
 
         return [
@@ -117,10 +160,20 @@ class DashboardController extends Controller
 
     private function ticketCompletedCount()
     {
-        $ticketsThisMonth = Ticket::whereHas('ticketDetail', fn($query) => $query->whereMonth('date_completed', now()->month))
+        $ticketsThisMonth = Ticket::whereHas(
+            'ticketDetail',
+            fn($query)
+            =>
+            $query->whereMonth('date_completed', now()->month)
+        )
             ->count();
 
-        $ticketsLastMonth = Ticket::whereHas('ticketDetail', fn($query) => $query->whereMonth('date_completed', now()->subMonth()->month))
+        $ticketsLastMonth = Ticket::whereHas(
+            'ticketDetail',
+            fn($query)
+            =>
+            $query->whereMonth('date_completed', now()->subMonth()->month)
+        )
             ->count();
         $percentageThanLastMonth = $ticketsLastMonth === 0 ? 0 : ($ticketsThisMonth - $ticketsLastMonth) / $ticketsLastMonth * 100;
 
@@ -133,10 +186,20 @@ class DashboardController extends Controller
 
     private function ticketThisWeekCount()
     {
-        $ticketsThisWeek = Ticket::whereHas('ticketDetail', fn($query) => $query->whereBetween('date_completed', [now()->startOfWeek(), now()->endOfWeek()]))
+        $ticketsThisWeek = Ticket::whereHas(
+            'ticketDetail',
+            fn($query)
+            =>
+            $query->whereBetween('date_completed', [now()->startOfWeek(), now()->endOfWeek()])
+        )
             ->count();
 
-        $ticketsLastWeek = Ticket::whereHas('ticketDetail', fn($query) => $query->whereBetween('date_completed', [now()->subWeek()->startOfWeek(), now()->subWeek()->endOfWeek()]))
+        $ticketsLastWeek = Ticket::whereHas(
+            'ticketDetail',
+            fn($query)
+            =>
+            $query->whereBetween('date_completed', [now()->subWeek()->startOfWeek(), now()->subWeek()->endOfWeek()])
+        )
             ->count();
 
         $percentageThanLastWeek = $ticketsLastWeek === 0 ? 0 : ($ticketsThisWeek - $ticketsLastWeek) / $ticketsLastWeek * 100;
@@ -208,7 +271,7 @@ class DashboardController extends Controller
 
     public function dashboardData()
     {
-        if (Auth::user()->isAdmin()) {
+        if ($this->user->isAdmin() || $this->user->isAutomationAdmin()) {
             return $this->adminDashboardData();
         } else {
             return $this->userDashboardData(new TicketService());

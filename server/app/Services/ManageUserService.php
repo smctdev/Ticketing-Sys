@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\UserDetail;
 use App\Models\UserLogin;
+use App\Notifications\UserUpdatedNotification;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -24,7 +25,7 @@ class ManageUserService
                 'password'          => $request->password,
                 'username'          => Str::lower(Str::slug($request->username, '')),
                 'user_role_id'      => $request->role,
-                'blist_id'          => $request->branch_code
+                'blist_id'          => implode(',', $request->branch_code)
             ]);
 
             return $user;
@@ -49,7 +50,7 @@ class ManageUserService
                 'user_details_id'   => $user->user_details_id,
                 'username'          => Str::lower(Str::slug($request->username, '')),
                 'user_role_id'      => $request->role,
-                'blist_id'          => $request->branch_code
+                'blist_id'          => implode(',', $request->branch_code)
             ];
 
             if ($request->password) {
@@ -60,6 +61,22 @@ class ManageUserService
 
             return $user;
         });
+
+        $userData = UserLogin::query()
+            ->with(
+                'userDetail',
+                'userRole',
+                'branch',
+                'assignedCategories.categoryGroupCode',
+                'assignedBranches.branch:blist_id,b_code',
+                'assignedBranchCas.branch:blist_id,b_code',
+                'assignedAreaManagers.branch:blist_id,b_code',
+                'notifications'
+            )
+            ->where('user_details_id', $user->user_details_id)
+            ->first();
+
+        $userData->notify(new UserUpdatedNotification($userData));
 
         return $userCreated;
     }

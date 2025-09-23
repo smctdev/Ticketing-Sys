@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use App\Enums\TicketStatus;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Model;
 
 class Ticket extends Model
@@ -24,6 +25,7 @@ class Ticket extends Model
     {
         return $this->belongsTo(UserLogin::class,  'login_id', 'login_id');
     }
+
     public function userDetail()
     {
         return $this->belongsTo(UserDetail::class, 'user_details_id');
@@ -53,16 +55,85 @@ class Ticket extends Model
     {
         return $this->belongsTo(UserLogin::class, 'approveHead', 'login_id');
     }
+
+    public function lastApprover()
+    {
+        return $this->belongsTo(UserLogin::class, 'last_approver', 'login_id');
+    }
+
     public function approveAcctgStaff()
     {
         return $this->belongsTo(UserLogin::class, 'approveAcctgStaff', 'login_id');
     }
+
     public function approveAutm()
     {
         return $this->belongsTo(UserLogin::class, 'approveAutm', 'login_id');
     }
+
     public function approveAcctgSup()
     {
         return $this->belongsTo(UserLogin::class, 'approveAcctgSup', 'login_id');
+    }
+
+    public function pendingUser()
+    {
+        return $this->belongsTo(UserLogin::class, 'displayTicket', 'login_id');
+    }
+
+    #[Scope]
+    protected function search($query, $search)
+    {
+        $query->when(
+            $search,
+            fn($q)
+            =>
+            $q->where(
+                fn($q)
+                =>
+                $q->where('ticket_code', 'LIKE', "%{$search}%")
+                    ->orWhere('branch_name', 'LIKE', "%{$search}%")
+                    ->orWhereHas(
+                        'ticketDetail',
+                        fn($q)
+                        =>
+                        $q->whereHas(
+                            'ticketCategory',
+                            fn($q)
+                            =>
+                            $q->where('category_name', 'LIKE', "%{$search}%")
+                                ->orWhere('category_shortcut', 'LIKE', "%{$search}%")
+                        )
+                    )
+                    ->orWhereHas(
+                        'userLogin',
+                        fn($q)
+                        =>
+                        $q->whereHas(
+                            'userDetail',
+                            fn($q)
+                            =>
+                            $q->where('fname', 'LIKE', "%{$search}%")
+                                ->orWhere('lname', 'LIKE', "%{$search}%")
+                                ->orWhereRaw('CONCAT(fname, " ", lname) LIKE ?', ["%{$search}%"])
+                                ->orWhereRaw('CONCAT(lname, " ", fname) LIKE ?', ["%{$search}%"])
+                        )
+                    )
+                    ->orWhereHas(
+                        'assignedPerson',
+                        fn($q)
+                        =>
+                        $q->whereHas(
+                            'userDetail',
+                            fn($q)
+                            =>
+                            $q->where('fname', 'LIKE', "%{$search}%")
+                                ->orWhere('lname', 'LIKE', "%{$search}%")
+                                ->orWhereRaw('CONCAT(fname, " ", lname) LIKE ?', ["%{$search}%"])
+                                ->orWhereRaw('CONCAT(lname, " ", fname) LIKE ?', ["%{$search}%"])
+                        )
+                    )
+            )
+        );
     }
 }

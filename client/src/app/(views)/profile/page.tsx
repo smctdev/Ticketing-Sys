@@ -27,6 +27,7 @@ import AssignedAreaManager from "./_components/assigned-area-manager";
 import AssignedBranch from "./_components/assigned-branch";
 import AssignedBranchCas from "./_components/assigned-branch-cas";
 import AssignedCategory from "./_components/assigned-category";
+import Storage from "@/utils/storage";
 
 function Profile() {
   const { user } = useAuth();
@@ -61,33 +62,34 @@ function Profile() {
     },
   ];
 
+  const ROLES_CARD = {
+    [ROLE.AREA_MANAGER]: (
+      <AssignedAreaManager branches={user?.assigned_area_managers} />
+    ),
+    [ROLE.AUTOMATION]: <AssignedBranch branches={user?.assigned_branches} />,
+    [ROLE.CAS]: <AssignedBranchCas branches={user?.assigned_branch_cas} />,
+    [ROLE.ACCOUNTING_HEAD]: (
+      <AssignedCategory categories={user?.assigned_categories} />
+    ),
+    [ROLE.ACCOUNTING_STAFF]: (
+      <AssignedCategory categories={user?.assigned_categories} />
+    ),
+  };
+
   const CardDisplay = () => {
-    switch (user?.user_role?.role_name) {
-      case ROLE.AREA_MANAGER:
-        return <AssignedAreaManager branches={user?.assigned_area_managers} />;
-      case ROLE.AUTOMATION:
-        return <AssignedBranch branches={user?.assigned_branches} />;
-      case ROLE.CAS:
-        return <AssignedBranchCas branches={user?.assigned_branch_cas} />;
-      case ROLE.ACCOUNTING_HEAD:
-      case ROLE.ACCOUNTING_STAFF:
-        return <AssignedCategory branches={user?.assigned_categories} />;
-      default:
-        "";
-    }
+    return ROLES_CARD[user?.user_role?.role_name] || null;
   };
 
   const isDisplayCards = () => {
-    switch (user?.user_role?.role_name) {
-      case ROLE.AREA_MANAGER:
-      case ROLE.AUTOMATION:
-      case ROLE.CAS:
-      case ROLE.ACCOUNTING_HEAD:
-      case ROLE.ACCOUNTING_STAFF:
-        return true;
-      default:
-        return false;
-    }
+    const allowedRoles = [
+      ROLE.AREA_MANAGER,
+      ROLE.AUTOMATION,
+      ROLE.CAS,
+      ROLE.ACCOUNTING_HEAD,
+      ROLE.ACCOUNTING_STAFF,
+    ];
+
+    return allowedRoles.includes(user?.user_role?.role_name);
   };
 
   return (
@@ -98,7 +100,10 @@ function Profile() {
           <CardHeader className="pb-4">
             <div className="flex justify-between items-start">
               <Avatar className="h-24 w-24 border-4 border-white">
-                <AvatarImage src={user.profile_pic} alt={user.full_name} />
+                <AvatarImage
+                  src={Storage(user.profile_pic)}
+                  alt={user.full_name}
+                />
                 <AvatarFallback className="text-2xl bg-gradient-to-r from-blue-500 to-purple-600 text-white">
                   {nameShortHand(user.full_name)}
                 </AvatarFallback>
@@ -137,17 +142,47 @@ function Profile() {
             </div>
 
             <div className="flex flex-wrap items-center gap-4 mt-4 text-sm text-gray-500">
-              <div className="flex items-center">
+              <div className="flex items-center flex-wrap gap-1">
                 <Building className="h-4 w-4 mr-1" />
-                {user?.branch?.b_name} ({user?.branch?.b_code})
+                {user?.branch ? (
+                  <span
+                    className={`px-2 py-1 text-[10px] font-medium text-violet-800 bg-violet-100 rounded-full dark:bg-violet-700 dark:text-violet-300`}
+                  >
+                    {user?.branch?.b_name} ({user?.branch?.b_code})
+                  </span>
+                ) : (
+                  user?.branches?.map((branch: any, index: number) => (
+                    <span
+                      key={index}
+                      className={`px-2 py-1 text-[10px] font-medium text-violet-800 bg-violet-100 rounded-full dark:bg-violet-700 dark:text-violet-300`}
+                    >
+                      {branch?.b_name} ({branch?.b_code})
+                    </span>
+                  ))
+                )}
               </div>
               <div className="flex items-center">
                 <UserCog className="h-4 w-4 mr-1" />
                 {user?.user_role?.role_name}
               </div>
-              <div className="flex items-center">
+              <div className="flex items-center gap-1 flex-wrap">
                 <ChartBarStacked className="h-4 w-4 mr-1" />
-                {user?.branch?.category}
+                {user?.branch ? (
+                  <span
+                    className={`px-2 py-1 text-[10px] font-medium text-yellow-800 bg-yellow-100 rounded-full dark:bg-yellow-700 dark:text-yellow-300`}
+                  >
+                    {user?.branch?.category}
+                  </span>
+                ) : (
+                  user?.branches?.map((branch: any, index: number) => (
+                    <span
+                      key={index}
+                      className={`px-2 py-1 text-[10px] font-medium text-yellow-800 bg-yellow-100 rounded-full dark:bg-yellow-700 dark:text-yellow-300`}
+                    >
+                      {branch?.category}
+                    </span>
+                  ))
+                )}
               </div>
             </div>
           </CardHeader>
@@ -169,7 +204,7 @@ function Profile() {
                   <div className="flex justify-between">
                     <div className="flex items-center space-x-2">
                       <Avatar className="h-8 w-8">
-                        <AvatarImage src={user.avatar} />
+                        <AvatarImage src={Storage(user.avatar)} />
                         <AvatarFallback>AJ</AvatarFallback>
                       </Avatar>
                       <div>

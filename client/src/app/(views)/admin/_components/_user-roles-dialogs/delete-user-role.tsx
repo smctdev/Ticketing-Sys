@@ -1,6 +1,5 @@
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -17,10 +16,7 @@ import { api } from "@/lib/api";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { toast } from "sonner";
 
-export function DeleteUserRole({
-  data,
-  setIsRefresh,
-}: DeleteUserRoleProps) {
+export function DeleteUserRole({ data, setIsRefresh }: DeleteUserRoleProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -74,7 +70,6 @@ export function DeleteUserRole({
             <span className="font-bold">{data?.role_name}</span>"? This action
             cannot be undone.
           </AlertDialogDescription>
-          <AlertDialogDescription></AlertDialogDescription>
         </AlertDialogHeader>
         <form onSubmit={handleDeleteRole}>
           <AlertDialogFooter>
@@ -85,7 +80,9 @@ export function DeleteUserRole({
                   <Loader2 className="animate-spin" /> Deleting...
                 </>
               ) : (
-                "Yes, Delete"
+                <>
+                  <Trash /> Yes, Delete
+                </>
               )}
             </Button>
           </AlertDialogFooter>

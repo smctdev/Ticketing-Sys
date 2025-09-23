@@ -6,8 +6,13 @@ import useFetch from "@/hooks/use-fetch";
 import withAuthPage from "@/lib/hoc/with-auth-page";
 import { PenIcon, Trash, Users2 } from "lucide-react";
 import { SEARCH_FILTER } from "@/constants/filter-by";
-import { Input } from "@/components/ui/input";
 import { ACCOUNTINGS_COLUMNS } from "../_constants/accountings-columns";
+import SearchInput from "@/components/ui/search-input";
+import EditAccountingCategoryDialog from "../_components/_accounting-dialogs/edit-accounting-category";
+import { useState } from "react";
+import Swal from "sweetalert2";
+import { toast } from "sonner";
+import { api } from "@/lib/api";
 
 function Accountings() {
   const {
@@ -19,11 +24,14 @@ function Accountings() {
     filterBy,
     pagination,
     handleShort,
+    setIsRefresh,
   } = useFetch({
     url: "/accountings",
     isPaginated: true,
     filters: SEARCH_FILTER,
   });
+  const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+  const [user, setUser] = useState<any>(null);
 
   const ACCOUNTINGS_COLUMNS_ACTIONS = [
     {
@@ -32,12 +40,14 @@ function Accountings() {
         <div className="flex gap-2">
           <button
             type="button"
+            onClick={handleEdit(row)}
             className="text-blue-500 hover:text-blue-600 hover:scale-105 transition-all duration-300 ease-in-out"
           >
             <PenIcon size={18} />
           </button>
           <button
             type="button"
+            onClick={handleDeleteAllCategories(row.login_id)}
             className="text-red-500 hover:text-red-600 hover:scale-105 transition-all duration-300 ease-in-out"
           >
             <Trash size={18} />
@@ -47,6 +57,57 @@ function Accountings() {
       sortable: false,
     },
   ];
+
+  const handleEdit = (row: any) => () => {
+    setUser(row);
+    setIsDialogOpen(true);
+  };
+
+  const handleDeleteAllCategories = (id: string | number) => () => {
+    Swal.fire({
+      icon: "info",
+      title: "Are you sure?",
+      text: "You won't be able to revert this!",
+      showCancelButton: true,
+      confirmButtonText: "Yes, remove all categories!",
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: "Removing all categories...",
+          text: "Please wait while the categories are being removed...",
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+        });
+        setIsRefresh(true);
+        try {
+          const response = await api.delete(
+            `/accounting-category/${id}/delete`
+          );
+
+          if (response.status === 200) {
+            Swal.close();
+            toast.success("Success", {
+              description: response.data.message,
+              position: "bottom-center",
+            });
+          }
+        } catch (error: any) {
+          console.error(error);
+          Swal.fire({
+            icon: "error",
+            title: "Oops...",
+            text: error.response.data.message,
+            confirmButtonText: "Close",
+          });
+        } finally {
+          setIsRefresh(false);
+        }
+      }
+    });
+  };
+
   return (
     <div className="flex flex-col gap-3">
       <Card className="gap-0">
@@ -56,11 +117,7 @@ function Accountings() {
             <span>Accountings</span>
           </CardTitle>
           <div className="flex items-center gap-2">
-            <Input
-              type="search"
-              onChange={handleSearchTerm(1000)}
-              placeholder="Search..."
-            />
+            <SearchInput onChange={handleSearchTerm(1000)} />
           </div>
         </CardHeader>
         <CardContent>
@@ -80,6 +137,15 @@ function Accountings() {
           />
         </CardContent>
       </Card>
+
+      {isDialogOpen && (
+        <EditAccountingCategoryDialog
+          user={user}
+          open={isDialogOpen}
+          setOpen={setIsDialogOpen}
+          setIsRefresh={setIsRefresh}
+        />
+      )}
     </div>
   );
 }

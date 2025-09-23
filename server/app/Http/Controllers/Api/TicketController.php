@@ -6,6 +6,7 @@ use App\Enums\TicketStatus;
 use App\Enums\UserRoles;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\TicketRequest;
+use App\Http\Requests\UpdateTicketRequest;
 use App\Models\Ticket;
 use App\Services\ReportsService;
 use App\Services\TicketService;
@@ -39,6 +40,8 @@ class TicketController extends Controller
 
         $accountingHeadCodes = $user->assignedCategories->pluck('group_code');
 
+        $isAdmin = collect([UserRoles::ADMIN, UserRoles::AUTOMATION_ADMIN])->contains($userRole->role_name);
+
         $tickets = Ticket::with(
             'userLogin.userDetail',
             'userLogin.userRole',
@@ -60,6 +63,12 @@ class TicketController extends Controller
             'approveAcctgSup.userDetail',
             'approveAcctgSup.userRole',
             'approveAcctgSup.branch',
+            'pendingUser.userDetail',
+            'pendingUser.userRole',
+            'pendingUser.branch',
+            'lastApprover.userDetail',
+            'lastApprover.userRole',
+            'lastApprover.branch',
             'branch'
         )
             ->when(
@@ -68,61 +77,13 @@ class TicketController extends Controller
                 =>
                 $q->where('status', $status)
             )
-            ->when(
-                $search,
-                fn($q)
-                =>
-                $q->where(
-                    fn($q)
-                    =>
-                    $q->where('ticket_code', 'LIKE', "%{$search}%")
-                        ->orWhere('branch_name', 'LIKE', "%{$search}%")
-                        ->orWhereHas(
-                            'ticketDetail',
-                            fn($q)
-                            =>
-                            $q->whereHas(
-                                'ticketCategory',
-                                fn($q)
-                                =>
-                                $q->where('category_name', 'LIKE', "%{$search}%")
-                                    ->orWhere('category_shortcut', 'LIKE', "%{$search}%")
-                            )
-                        )
-                        ->orWhereHas(
-                            'userLogin',
-                            fn($q)
-                            =>
-                            $q->whereHas(
-                                'userDetail',
-                                fn($q)
-                                =>
-                                $q->where('fname', 'LIKE', "%{$search}%")
-                                    ->orWhere('lname', 'LIKE', "%{$search}%")
-                                    ->orWhereRaw('CONCAT(fname, " ", lname) LIKE ?', ["%{$search}%"])
-                                    ->orWhereRaw('CONCAT(lname, " ", fname) LIKE ?', ["%{$search}%"])
-                            )
-                        )
-                        ->orWhereHas(
-                            'assignedPerson',
-                            fn($q)
-                            =>
-                            $q->whereHas(
-                                'userDetail',
-                                fn($q)
-                                =>
-                                $q->where('fname', 'LIKE', "%{$search}%")
-                                    ->orWhere('lname', 'LIKE', "%{$search}%")
-                                    ->orWhereRaw('CONCAT(fname, " ", lname) LIKE ?', ["%{$search}%"])
-                                    ->orWhereRaw('CONCAT(lname, " ", fname) LIKE ?', ["%{$search}%"])
-                            )
-                        )
-                )
-            )
+            ->search($search)
             ->when($ticket_category, fn($query) => $query->whereHas('ticketDetail', fn($subQuery) => $subQuery->where('ticket_category_id', $ticket_category)))
             ->when($bcode, fn($query) => $query->where('branch_id', $bcode))
-            ->when($userRole->role_name !== UserRoles::ADMIN, function ($query) use ($userRole, $assignedBranchCas, $assignedAreaManagers, $accountingHeadCodes, $user) {
+            ->when(!$isAdmin, function ($query) use ($userRole, $assignedBranchCas, $assignedAreaManagers, $accountingHeadCodes, $user) {
                 $query->where(function ($subQuery) use ($userRole, $assignedBranchCas, $assignedAreaManagers, $accountingHeadCodes, $user) {
+                    $userBranchIds = explode(',', $user->blist_id);
+
                     switch ($userRole->role_name) {
                         case UserRoles::STAFF:
                             $subQuery->where('login_id', Auth::id())
@@ -133,9 +94,13 @@ class TicketController extends Controller
                             $subQuery->where('assigned_person', $user->login_id)
                                 ->where('status', TicketStatus::PENDING);
                             break;
+                        case UserRoles::AUTOMATION_MANAGER:
+                            $subQuery->whereNot('status', TicketStatus::EDITED)
+                                ->has('pendingUser');
+                            break;
                         case UserRoles::BRANCH_HEAD:
                             $subQuery->whereNot('status', TicketStatus::EDITED)
-                                ->where('branch_id', $user->blist_id);
+                                ->whereIn('branch_id', $userBranchIds);
                             break;
                         case UserRoles::CAS:
                             $subQuery->where('status', TicketStatus::PENDING)
@@ -147,16 +112,32 @@ class TicketController extends Controller
                             break;
                         case UserRoles::ACCOUNTING_HEAD:
                             $subQuery->where('status', TicketStatus::PENDING)
-                                ->whereHas('ticketDetail', fn($triQuery) => $triQuery->whereHas('ticketCategory', fn($ticketQuery) => $ticketQuery->whereIn('group_code', $accountingHeadCodes)));
+                                ->whereHas(
+                                    'ticketDetail',
+                                    fn($triQuery)
+                                    =>
+                                    $triQuery->whereHas(
+                                        'ticketCategory',
+                                        fn($ticketQuery)
+                                        =>
+                                        $ticketQuery->whereIn('group_code', $accountingHeadCodes)
+                                    )
+                                );
                             break;
                         case UserRoles::ACCOUNTING_STAFF:
                             $subQuery->whereNot('status', TicketStatus::EDITED)
                                 ->where('login_id', Auth::id())
-                                ->orWhere('branch_id', $user->blist_id);
+                                ->orWhereIn('branch_id', $userBranchIds);
                             break;
                     }
                 });
             })
+            ->when(
+                $isAdmin,
+                fn($query)
+                =>
+                $query->whereNot('status', TicketStatus::EDITED)
+            )
             ->orderBy('ticket_id', 'desc')
             ->paginate($take);
 
@@ -233,7 +214,42 @@ class TicketController extends Controller
      */
     public function show(string $id)
     {
-        //
+        $ticket = Ticket::query()
+            ->with(
+                'userLogin.userDetail',
+                'userLogin.userRole',
+                'userLogin.branch',
+                'ticketDetail.ticketCategory',
+                'ticketDetail.supplier',
+                'assignedPerson.userDetail',
+                'assignedPerson.userRole',
+                'assignedPerson.branch',
+                'approveAcctgStaff.userDetail',
+                'approveAcctgStaff.userRole',
+                'approveAcctgStaff.branch',
+                'approveHead.userDetail',
+                'approveHead.userRole',
+                'approveHead.branch',
+                'approveAutm.userDetail',
+                'approveAutm.userRole',
+                'approveAutm.branch',
+                'approveAcctgSup.userDetail',
+                'approveAcctgSup.userRole',
+                'approveAcctgSup.branch',
+                'pendingUser.userDetail',
+                'pendingUser.userRole',
+                'pendingUser.branch',
+                'lastApprover.userDetail',
+                'lastApprover.userRole',
+                'lastApprover.branch',
+                'branch'
+            )
+            ->where('ticket_code', $id)->first();
+
+        return response()->json([
+            "message"   => "Ticket fetched successfully",
+            "data"      => $ticket
+        ], 200);
     }
 
     /**
@@ -247,9 +263,15 @@ class TicketController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateTicketRequest $request, TicketService $ticketService, string $id)
     {
-        //
+        $request->validated();
+
+        $data = $ticketService->updateTicket($request, $id);
+
+        return response()->json([
+            "message"   => "Ticket with ticket code of {$data->ticket_code} updated successfully",
+        ], 200);
     }
 
     public function updateNotif(Request $request, $id)
@@ -285,8 +307,133 @@ class TicketController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(TicketService $ticketService, string $id)
     {
-        //
+        $data = $ticketService->deleteTicket($id);
+
+        return response()->json([
+            'message'           => "Ticket with ticket code of {$data->ticket->ticket_code} deleted successfully",
+        ], 200);
+    }
+
+    public function revise(Request $request, TicketService $ticketService, string $id)
+    {
+        $user = Auth::user();
+
+        if ($user->isBranchHead()) {
+            $validateData = [
+                'td_note_bh'            => ['required', 'max:255', 'min:1']
+            ];
+            $validateDataMessage = [
+                'td_note_bh.required'   => 'Note is required',
+                'td_note_bh.max'        => 'Note must be less than 255 characters',
+                'td_note_bh.min'        => 'Note must be at least 1 character',
+            ];
+        } else {
+            $validateData = [
+                'td_note'               => ['required', 'max:255', 'min:1']
+            ];
+            $validateDataMessage = [
+                'td_note.required'      => 'Note is required',
+                'td_note.max'           => 'Note must be less than 255 characters',
+                'td_note.min'           => 'Note must be at least 1 character',
+            ];
+        }
+
+        $request->validate($validateData, $validateDataMessage);
+
+        $data = $ticketService->reviseTicket($id, $request);
+
+        return response()->json([
+            'message'           => "Ticket with ticket code of {$data->ticket->ticket_code} revised successfully",
+        ], 200);
+    }
+
+    public function approve(Request $request, TicketService $ticketService, string $id)
+    {
+        $user = Auth::user();
+
+        if ($user->isBranchHead()) {
+            $validateData = [
+                'td_note_bh'            => ['required', 'max:255', 'min:1']
+            ];
+            $validateDataMessage = [
+                'td_note_bh.required'   => 'Note is required',
+                'td_note_bh.max'        => 'Note must be less than 255 characters',
+                'td_note_bh.min'        => 'Note must be at least 1 character',
+            ];
+        } else {
+            $validateData = [
+                'td_note'               => ['required', 'max:255', 'min:1']
+            ];
+            $validateDataMessage = [
+                'td_note.required'      => 'Note is required',
+                'td_note.max'           => 'Note must be less than 255 characters',
+                'td_note.min'           => 'Note must be at least 1 character',
+            ];
+        }
+
+        $request->validate($validateData, $validateDataMessage);
+
+        $data = $ticketService->approveTicket($id, $request);
+
+        return response()->json([
+            'message'           => "Ticket with ticket code of {$data->ticket->ticket_code} approved successfully",
+        ], 200);
+    }
+
+    public function markAsEdited(Request $request, TicketService $ticketService, string $id)
+    {
+        $validateData = [
+            'td_note'               => ['required', 'max:255', 'min:1'],
+            'is_counted'            => ['required']
+        ];
+
+        $validateDataMessage = [
+            'td_note.required'      => 'Note is required',
+            'td_note.max'           => 'Note must be less than 255 characters',
+            'td_note.min'           => 'Note must be at least 1 character',
+        ];
+
+        $request->validate($validateData, $validateDataMessage);
+
+        $data = $ticketService->markAsEdited($id, $request);
+
+        return response()->json([
+            'message'           => "Ticket with ticket code of {$data->ticket->ticket_code} has been marked as edited successfully",
+        ], 200);
+    }
+
+    public function returnToAutomation(TicketService $ticketService, $ticketCode)
+    {
+        $data = $ticketService->returnToAutomation($ticketCode);
+
+        return response()->json([
+            'message'           => "Ticket with ticket code of {$data->ticket_code} has been returned to Automation successfully",
+        ], 200);
+    }
+
+    public function markAsCountedOrNotCounted(TicketService $ticketService, $ticketCode)
+    {
+        $data = $ticketService->markedAsNotCountedOrCounted($ticketCode);
+
+        $msg = $data->isCounted === 1 ? 'not counted' : 'counted';
+
+        return response()->json([
+            'message'           => "Ticket with ticket code of {$data->ticket_code} has been marked as {$msg} successfully",
+        ], 200);
+    }
+
+    public function editNote(Request $request, TicketService $ticketService, $ticketCode)
+    {
+        $request->validate([
+            'note'          => ['required', 'max:255', 'min:1']
+        ]);
+
+        [$old_data, $new_data, $ticket_code] = $ticketService->editNote($request, $ticketCode);
+
+        return response()->json([
+            'message'           => "Ticket with ticket code of {$ticket_code} note has been changed from {$old_data} to {$new_data} successfully",
+        ], 200);
     }
 }

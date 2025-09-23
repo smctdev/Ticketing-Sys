@@ -1,6 +1,5 @@
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
@@ -70,7 +69,6 @@ export function DeleteUser({ data, setIsRefresh }: any) {
             <span className="font-bold">{data?.full_name}</span>"? This action
             cannot be undone.
           </AlertDialogDescription>
-          <AlertDialogDescription></AlertDialogDescription>
         </AlertDialogHeader>
         <form onSubmit={handleDeleteUser}>
           <AlertDialogFooter>

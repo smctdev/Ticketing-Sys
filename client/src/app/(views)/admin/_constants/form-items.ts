@@ -6,5 +6,5 @@ export const USER_FORM_ITEMS = {
   password: "",
   username: "",
   role: 0,
-  branch_code: 0,
+  branch_code: [],
 };

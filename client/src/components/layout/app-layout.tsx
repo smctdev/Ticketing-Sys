@@ -8,16 +8,11 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { usePathname } from "next/navigation";
-import { BellDotIcon, BellOffIcon } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { useAuth } from "@/context/auth-context";
+import Notification from "../notification";
 
 const AppLayout = ({ children }: { children: ReactNode }) => {
+  const { notifications, totalUnreadNotifications } = useAuth();
   const { open } = useSidebar();
   const pathname = usePathname();
   const path: any =
@@ -52,25 +47,10 @@ const AppLayout = ({ children }: { children: ReactNode }) => {
                   </Breadcrumb>
                 ))}
               </div>
-              <div className="mr-3">
-                <DropdownMenu>
-                  <DropdownMenuTrigger>
-                    <BellDotIcon />
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent className="min-w-[300px]">
-                    <DropdownMenuLabel className="text-gray-600 font-bold text-md">
-                      Notifications
-                    </DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <div className="text-center p-10 space-y-3">
-                      <BellOffIcon className="mx-auto size-10 text-gray-500" />
-                      <h3 className="text-lg font-bold text-gray-500">
-                        No new notifications
-                      </h3>
-                    </div>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
+              <Notification
+                totalUnreadNotifications={totalUnreadNotifications}
+                notifications={notifications}
+              />
             </div>
           </div>
           <div className="p-7 h-[calc(100vh-60px)] overflow-y-auto">

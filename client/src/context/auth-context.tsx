@@ -15,6 +15,7 @@ import {
 } from "@/lib/sanctum";
 import { api } from "@/lib/api";
 import { ROLE } from "@/constants/roles";
+import echo from "@/lib/echo";
 
 export const AuthContext = createContext<AuthContextType | undefined>(
   undefined
@@ -29,10 +30,38 @@ export default function AuthContextProvider({
   const [user, setUser] = useState<any | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [isAdmin, setIsAdmin] = useState<boolean>(false);
+  const [notifications, setNotifications] = useState<any | null>(null);
+  const [totalUnreadNotifications, setTotalUnreadNotifications] =
+    useState<number>(0);
+  const isAdminOrAutomationAdmin = [ROLE.ADMIN, ROLE.AUTOMATION_ADMIN];
 
   useEffect(() => {
     fetchUserProfile();
   }, []);
+
+  useEffect(() => {
+    if (!echo || !user) return;
+
+    echo
+      .private(`updated-user-${user?.login_id}`)
+      .notification((notification: any) => {
+        setUser(notification.data);
+
+        if (
+          isAdminOrAutomationAdmin.includes(
+            notification.data.user_role.role_name
+          )
+        ) {
+          setIsAdmin(true);
+        } else {
+          setIsAdmin(false);
+        }
+      });
+
+    return () => {
+      echo.leave(`updated-user-${user?.id}`);
+    };
+  }, [echo, user]);
 
   async function login(credentials: CredentialType) {
     const response = await sanctumLogin(credentials);
@@ -44,13 +73,11 @@ export default function AuthContextProvider({
     if (profile.status !== 200) return response;
 
     setUser(profile.data);
+    setNotifications(profile.data.unread_notifications);
+    setTotalUnreadNotifications(profile.data.unread_notifications_count);
     setIsAuthenticated(true);
 
-    if (
-      [ROLE.ADMIN, ROLE.AUTOMATION_ADMIN].includes(
-        profile.data.user_role.role_name
-      )
-    ) {
+    if (isAdminOrAutomationAdmin.includes(profile.data.user_role.role_name)) {
       setIsAdmin(true);
     }
 
@@ -64,12 +91,12 @@ export default function AuthContextProvider({
       if (response.status !== 200) return;
 
       setUser(response.data);
+      setNotifications(response.data.unread_notifications);
+      setTotalUnreadNotifications(response.data.unread_notifications_count);
       setIsAuthenticated(true);
 
       if (
-        [ROLE.ADMIN, ROLE.AUTOMATION_ADMIN].includes(
-          response.data.user_role.role_name
-        )
+        isAdminOrAutomationAdmin.includes(response.data.user_role.role_name)
       ) {
         setIsAdmin(true);
       }
@@ -90,6 +117,8 @@ export default function AuthContextProvider({
       const response = await sanctumLogout();
       if (response.status === 204) {
         setUser(null);
+        setNotifications(null);
+        setTotalUnreadNotifications(0);
         setIsAuthenticated(false);
         setIsAdmin(false);
       }
@@ -107,13 +136,11 @@ export default function AuthContextProvider({
     if (profile.status !== 200) return response;
 
     setUser(profile.data);
+    setNotifications(profile.data.unread_notifications);
+    setTotalUnreadNotifications(profile.data.unread_notifications_count);
     setIsAuthenticated(true);
 
-    if (
-      [ROLE.ADMIN, ROLE.AUTOMATION_ADMIN].includes(
-        profile.data.user_role.role_name
-      )
-    ) {
+    if (isAdminOrAutomationAdmin.includes(profile.data.user_role.role_name)) {
       setIsAdmin(true);
     }
 
@@ -131,6 +158,10 @@ export default function AuthContextProvider({
         logout,
         fetchUserProfile,
         loginAsOtp,
+        notifications,
+        setNotifications,
+        setTotalUnreadNotifications,
+        totalUnreadNotifications,
       }}
     >
       {children}

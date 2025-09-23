@@ -4,8 +4,7 @@ import DataTableComponent from "@/components/data-table";
 import useFetch from "@/hooks/use-fetch";
 import { TICKETS_COLUMNS } from "../dashboard/_constants/tickets-columns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Funnel, Pencil, Ticket, Trash } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { Eye, Funnel, Pencil, Ticket, Trash } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -21,9 +20,21 @@ import { TICKETS_FILTER } from "@/constants/filter-by";
 import { CreateTicket } from "./_components/create-ticket";
 import { useAuth } from "@/context/auth-context";
 import { canCreateTicket } from "@/constants/can-create-ticket";
+import SearchInput from "@/components/ui/search-input";
+import { useEffect, useState } from "react";
+import echo from "@/lib/echo";
+import { EditTicket } from "./_components/edit-ticket";
+import { TICKET_STATUS } from "@/constants/ticket-status";
+import { ROLE } from "@/constants/roles";
+import { DelteTicket } from "./_components/delete-ticket";
+import { toast } from "sonner";
+import { Tooltip, TooltipContent } from "@/components/ui/tooltip";
+import { TooltipArrow, TooltipTrigger } from "@radix-ui/react-tooltip";
+import { useIsRefresh } from "@/context/is-refresh-context";
 
 function Tickets() {
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
+  const { isRefresh } = useIsRefresh();
   const {
     data,
     isLoading,
@@ -40,30 +51,97 @@ function Tickets() {
     url: "/tickets",
     isPaginated: true,
     filters: TICKETS_FILTER,
+    canBeRefreshGlobal: isRefresh,
   });
+  const { data: categories, isLoading: isLoadingCategories } = useFetch({
+    url: "/categories",
+  });
+  const [selectedTicketData, setSelectedTicketData] = useState<null | any>(
+    null
+  );
+  const [isOpenDialog, setIsOpenDialog] = useState<boolean>(false);
+  const [isOpenView, setIsOpenView] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (!echo || !user) return;
+
+    echo
+      .private(`approver-of-ticket-${user?.login_id}`)
+      .notification((notification: any) => {
+        setIsRefresh(true);
+      });
+
+    echo.channel("ticket-deleted").listen("DeleteTicketEvent", (event: any) => {
+      if (selectedTicketData?.ticket_code === event.ticket_code) {
+        toast.info("Ticket Deleted", {
+          description: "Ops! This ticket was deleted by user.",
+          position: "top-center",
+        });
+        setIsOpenDialog(false);
+        setIsOpenView(false);
+      }
+      setIsRefresh(true);
+    });
+
+    return () => {
+      echo.leave(`private-approver-of-ticket-${user?.login_id}`);
+      echo.leave("ticket-deleted");
+    };
+  }, [echo, user, selectedTicketData]);
 
   const TICKET_COLUMNS_ACTIONS = [
     {
       name: "Action",
       cell: (row: any) => (
         <div className="flex items-center gap-3">
-          <ViewTicketDetails data={row} />
-          <button
-            type="button"
-            className="border-none bg-transparent shadow-none hover:scale-105"
-          >
-            <Pencil className="h-4 w-4 text-blue-500 hover:text-blue-600" />
-          </button>
-          <button
-            type="button"
-            className="border-none bg-transparent shadow-none hover:scale-105"
-          >
-            <Trash className="h-4 w-4 text-red-500 hover:text-red-600" />
-          </button>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <button
+                type="button"
+                onClick={handleDialogOpen(row, "view")}
+                className="border-none bg-transparent shadow-none hover:scale-105"
+              >
+                <Eye className="h-4 w-4 text-green-500 hover:text-green-600" />
+              </button>
+            </TooltipTrigger>
+            <TooltipContent>
+              <TooltipArrow />
+              View Ticket
+            </TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              {user?.login_id === row?.login_id && (
+                <button
+                  type="button"
+                  className="border-none bg-transparent shadow-none hover:scale-105"
+                  onClick={handleDialogOpen(row, "edit")}
+                >
+                  <Pencil className="h-4 w-4 text-blue-500 hover:text-blue-600" />
+                </button>
+              )}
+            </TooltipTrigger>
+            <TooltipContent>
+              <TooltipArrow />
+              Edit Ticket
+            </TooltipContent>
+          </Tooltip>
+          {(user?.login_id === row?.login_id || isAdmin) && (
+            <DelteTicket data={row} />
+          )}
         </div>
       ),
     },
   ];
+
+  const handleDialogOpen = (data: any, type: string) => () => {
+    setSelectedTicketData(data);
+    if (type === "view") {
+      setIsOpenView(true);
+    } else {
+      setIsOpenDialog(true);
+    }
+  };
 
   return (
     <div className="flex flex-col gap-3">
@@ -94,11 +172,9 @@ function Tickets() {
                 </SelectGroup>
               </SelectContent>
             </Select>
-            <Input
+            <SearchInput
               onChange={handleSearchTerm(1000)}
               value={filterBy.defaultSearchValue}
-              type="search"
-              placeholder="Search..."
             />
             <Button
               type="button"
@@ -119,7 +195,11 @@ function Tickets() {
               <span>Requested Tickets</span>
             </CardTitle>
             {canCreateTicket(user?.user_role?.role_name) && (
-              <CreateTicket setIsRefresh={setIsRefresh} />
+              <CreateTicket
+                setIsRefresh={setIsRefresh}
+                categories={categories}
+                user={user}
+              />
             )}
           </div>
         </CardHeader>
@@ -140,6 +220,21 @@ function Tickets() {
           />
         </CardContent>
       </Card>
+
+      <EditTicket
+        setIsRefresh={setIsRefresh}
+        ticketData={selectedTicketData}
+        categories={categories}
+        user={user}
+        setIsOpenDialog={setIsOpenDialog}
+        open={isOpenDialog}
+      />
+
+      <ViewTicketDetails
+        data={selectedTicketData}
+        open={isOpenView}
+        setOpen={setIsOpenView}
+      />
     </div>
   );
 }

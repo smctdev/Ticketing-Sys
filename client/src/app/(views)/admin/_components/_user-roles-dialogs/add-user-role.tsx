@@ -109,7 +109,9 @@ export function AddUserRole({ setIsRefresh }: AddUserRoleProps) {
                   <Loader2Icon className="h-4 w-4 animate-spin" /> Adding...
                 </>
               ) : (
-                <>Add</>
+                <>
+                  <Plus /> Add
+                </>
               )}
             </Button>
           </DialogFooter>

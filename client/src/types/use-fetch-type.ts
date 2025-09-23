@@ -30,4 +30,5 @@ export interface UseFetchDataType {
   url: string;
   isPaginated?: boolean;
   filters?: any;
+  canBeRefreshGlobal?: boolean;
 }

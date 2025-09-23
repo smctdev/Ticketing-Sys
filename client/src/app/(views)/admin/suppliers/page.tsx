@@ -4,11 +4,13 @@ import DataTableComponent from "@/components/data-table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import useFetch from "@/hooks/use-fetch";
 import withAuthPage from "@/lib/hoc/with-auth-page";
-import { PenIcon, Trash, Truck } from "lucide-react";
+import { Truck } from "lucide-react";
 import { SEARCH_FILTER } from "@/constants/filter-by";
-import { Input } from "@/components/ui/input";
 import { SUPPLIERS_COLUMNS } from "../_constants/suppliers-columns";
-import { AddSupplier } from "../_components/add-supplier";
+import SearchInput from "@/components/ui/search-input";
+import { AddSupplier } from "../_components/_supplier-dialogs/add-supplier";
+import { EditSupplier } from "../_components/_supplier-dialogs/edit-supplier";
+import { DeleteSupplier } from "../_components/_supplier-dialogs/delete-supplier";
 
 function Suppliers() {
   const {
@@ -20,6 +22,7 @@ function Suppliers() {
     filterBy,
     pagination,
     handleShort,
+    setIsRefresh,
   } = useFetch({
     url: "/suppliers",
     isPaginated: true,
@@ -31,18 +34,8 @@ function Suppliers() {
       name: "Action",
       cell: (row: any) => (
         <div className="flex gap-2">
-          <button
-            type="button"
-            className="text-blue-500 hover:text-blue-600 hover:scale-105 transition-all duration-300 ease-in-out"
-          >
-            <PenIcon size={18} />
-          </button>
-          <button
-            type="button"
-            className="text-red-500 hover:text-red-600 hover:scale-105 transition-all duration-300 ease-in-out"
-          >
-            <Trash size={18} />
-          </button>
+          <EditSupplier setIsRefresh={setIsRefresh} data={row} />
+          <DeleteSupplier setIsRefresh={setIsRefresh} data={row} />
         </div>
       ),
       sortable: false,
@@ -57,12 +50,8 @@ function Suppliers() {
             <span>Suppliers</span>
           </CardTitle>
           <div className="flex items-center gap-2">
-            <Input
-              type="search"
-              onChange={handleSearchTerm(1000)}
-              placeholder="Search..."
-            />
-            <AddSupplier />
+            <SearchInput onChange={handleSearchTerm(1000)} />
+            <AddSupplier setIsRefresh={setIsRefresh} />
           </div>
         </CardHeader>
         <CardContent>

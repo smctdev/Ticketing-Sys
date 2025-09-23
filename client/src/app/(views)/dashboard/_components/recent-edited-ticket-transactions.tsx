@@ -30,10 +30,13 @@ export default function RecentEditedTicketTransactions({
                 key={index}
                 className="flex items-center justify-between border-b pb-2 last:border-0 last:pb-0"
               >
-                <div>
+                <div className="space-y-2">
                   <p className="font-medium">
                     {ticket.ticket_code} -{" "}
                     {ticket.ticket_detail.ticket_category.category_name}
+                  </p>
+                  <p className="flex gap-1 items-center text-xs">
+                    <span className="font-bold text-gray-600">Edited by: </span> <span>{ticket?.edited_by?.full_name}</span>
                   </p>
                   <p className="text-sm text-gray-500">
                     {formatDateAndTime(

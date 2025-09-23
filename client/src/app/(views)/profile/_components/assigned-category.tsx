@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-export default function AssignedCategory({ branches }: any) {
+export default function AssignedCategory({ categories }: any) {
   return (
     <div className="lg:col-span-1 space-y-6 w-full sticky top-0">
       <Card>
@@ -9,10 +9,10 @@ export default function AssignedCategory({ branches }: any) {
           <CardTitle>Assigned Categories</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-wrap gap-2">
-          {branches?.length > 0 ? (
-            branches?.map((branch: any, index: number) => (
+          {categories?.length > 0 ? (
+            categories?.map((category: any, index: number) => (
               <Badge variant="secondary" key={index}>
-                {branch?.branch?.b_code}
+                {category?.category_group_code?.group_code}
               </Badge>
             ))
           ) : (

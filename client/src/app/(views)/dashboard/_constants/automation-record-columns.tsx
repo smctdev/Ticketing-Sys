@@ -1,6 +1,7 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Progress } from "@/components/ui/progress";
 import nameShortHand from "@/utils/name-short-hand";
+import Storage from "@/utils/storage";
 
 const resultColor = (result: string) => {
   return result === "High" ? "text-green-600" : "text-red-600";
@@ -12,7 +13,7 @@ export const AUTOMATION_RECORD_COLUMNS = [
     cell: (row: any) => (
       <>
         <Avatar>
-          <AvatarImage src={row.profile_picture} alt={row.full_name} />
+          <AvatarImage src={Storage(row.profile_picture)} alt={row.full_name} />
           <AvatarFallback className="font-bold text-gray-600">
             {nameShortHand(row.full_name)}
           </AvatarFallback>
@@ -46,8 +47,8 @@ export const AUTOMATION_RECORD_COLUMNS = [
           </span>
         </p>
         <Progress
-          value={row.ticketsThisMonth}
-          max={row.ticketsLastMonth}
+          value={row?.ticketsThisMonth}
+          max={row?.ticketsLastMonth || 100}
           valueColor={row.result === "Low" ? "bg-red-400" : "bg-green-400"}
           className={row.result === "Low" ? "bg-red-200" : "bg-green-200"}
         />

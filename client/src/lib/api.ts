@@ -1,7 +1,8 @@
+import { CONFIG } from "@/config";
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_BASE_URL,
+  baseURL: CONFIG.API_URL,
   withCredentials: true,
   withXSRFToken: true,
   headers: {
@@ -23,7 +24,7 @@ api.interceptors.response.use(
 );
 
 const sanctum = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_SANCTUM_BASE_URL,
+  baseURL: CONFIG.SANCTUM_URL,
   withCredentials: true,
 });
 

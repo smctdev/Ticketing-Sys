@@ -3,12 +3,14 @@
 namespace App\Models;
 
 use App\Enums\UserRoles;
+use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
 class UserLogin extends Authenticatable
 {
-    use HasApiTokens;
+    use HasApiTokens, Notifiable;
 
     protected $primaryKey = 'login_id';
 
@@ -21,7 +23,8 @@ class UserLogin extends Authenticatable
     ];
 
     protected $appends = [
-        "full_name"
+        "full_name",
+        "branches"
     ];
 
     protected function casts(): array
@@ -44,6 +47,22 @@ class UserLogin extends Authenticatable
     public function branch()
     {
         return $this->belongsTo(BranchList::class, 'blist_id');
+    }
+
+    public function getBranchesAttribute()
+    {
+        return BranchList::query()
+            ->whereIn('blist_id', explode(',', $this->blist_id))
+            ->get();
+    }
+
+    public function hasMultipleBranches()
+    {
+        $branches = BranchList::query()
+            ->whereIn('blist_id', explode(',', $this->blist_id))
+            ->get();
+
+        return $branches->count() > 1;
     }
 
     public function tickets()
@@ -131,7 +150,8 @@ class UserLogin extends Authenticatable
         return $this->userRole->role_name === UserRoles::CAS;
     }
 
-    public function scopeSearch($query, $term)
+    #[Scope]
+    protected function search($query, $term)
     {
         $query->when(
             $term,
@@ -216,5 +236,25 @@ class UserLogin extends Authenticatable
                     )
             )
         );
+    }
+
+    public function automationAssignedBranches()
+    {
+        return $this->belongsToMany(BranchList::class, 'assigned_branches', 'login_id', 'blist_id');
+    }
+
+    public function areaManagerAssignedBranches()
+    {
+        return $this->belongsToMany(BranchList::class, 'assigned_area_managers', 'login_id', 'blist_id');
+    }
+
+    public function casAssignedBranches()
+    {
+        return $this->belongsToMany(BranchList::class, 'assigned_branch_cas', 'login_id', 'blist_id');
+    }
+
+    public function accountingAssignedCategories()
+    {
+        return $this->belongsToMany(GroupCategory::class, 'assigned_categories', 'login_id', 'group_code');
     }
 }

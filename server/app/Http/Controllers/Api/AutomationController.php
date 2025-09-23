@@ -56,9 +56,19 @@ class AutomationController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show(string $userId)
     {
-        //
+        $user = UserLogin::with('automationAssignedBranches')->findOrFail($userId);
+
+        $branches = BranchList::query()
+            ->whereDoesntHave("branchAssignedAutomations")
+            ->get();
+
+        $userBranches = $user->automationAssignedBranches;
+
+        return response()->json([
+            'data' => $userBranches->merge($branches),
+        ]);
     }
 
     /**
@@ -74,7 +84,15 @@ class AutomationController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        $user = UserLogin::findOrFail($id);
+
+        $user->automationAssignedBranches()->sync($request->branch_codes);
+
+        $branch_counts = $user->automationAssignedBranches()->count();
+
+        return response()->json([
+            'message' => "{$branch_counts} branche(s) assigned successfully",
+        ], 200);
     }
 
     /**
@@ -82,6 +100,15 @@ class AutomationController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $user = UserLogin::findOrFail($id);
+
+        $branch_counts = $user->automationAssignedBranches()->count();
+
+        $user->automationAssignedBranches()->detach();
+
+
+        return response()->json([
+            'message' => "{$branch_counts} branche(s) removed successfully",
+        ], 200);
     }
 }

@@ -47,6 +47,7 @@ import {
   COLLAPSABLE_SIDEBAR_ITEMS,
 } from "@/constants/sidebar-items";
 import { usePathname } from "next/navigation";
+import Storage from "@/utils/storage";
 
 export function AppSidebar() {
   const { open } = useSidebar();
@@ -195,16 +196,24 @@ export function AppSidebar() {
           <DropdownMenuTrigger asChild>
             <div className="flex items-center gap-2 cursor-pointer">
               <Avatar className="h-10 w-10">
-                <AvatarImage src={user?.user_detail?.profile_pic} alt="User" />
+                <AvatarImage
+                  src={Storage(user?.user_detail?.profile_pic)}
+                  alt="User"
+                />
                 <AvatarFallback className="border font-bold">
                   {nameShortHand(user?.full_name)}
                 </AvatarFallback>
               </Avatar>
               {open && (
                 <div className="flex flex-col">
-                  <span className="text-sm font-medium capitalize">
-                    {user?.full_name}
-                  </span>
+                  <Tooltip>
+                    <TooltipTrigger className="text-sm font-medium capitalize w-45 truncate text-start">
+                      {user?.full_name}
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>{user?.full_name}</p>
+                    </TooltipContent>
+                  </Tooltip>
                   <Tooltip>
                     <TooltipTrigger className="text-xs w-45 text-muted-foreground truncate text-start">
                       {user?.user_detail?.user_email}

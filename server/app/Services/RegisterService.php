@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Models\UserDetail;
 use App\Models\UserLogin;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class RegisterService
 {
@@ -26,6 +25,6 @@ class RegisterService
             'blist_id'          => $request->branch_code
         ]);
 
-        throw new HttpException(200, 'Registered successfully');
+        abort(200, 'Registered successfully');
     }
 }

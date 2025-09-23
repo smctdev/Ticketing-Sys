@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Models\UserRole;
 use Illuminate\Support\Str;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class UserRoleService
 {
@@ -43,7 +42,7 @@ class UserRoleService
         $hasUser = $userRole->users()->exists();
 
         if ($hasUser) {
-            throw new HttpException(400, 'Cannot update user role that has users');
+            abort(400, 'Cannot update user role that has users');
         }
 
         $userRole->update([
@@ -60,7 +59,7 @@ class UserRoleService
         $hasUser = $userRole->users()->exists();
 
         if ($hasUser) {
-            throw new HttpException(400, 'Cannot delete user role that has users');
+            abort(400, 'Cannot delete user role that has users');
         }
 
         $userRole->delete();

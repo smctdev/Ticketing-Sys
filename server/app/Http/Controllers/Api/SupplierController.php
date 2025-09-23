@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreSupplierRequest;
+use App\Http\Requests\UpdateSupplierRequest;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
 
@@ -41,9 +43,18 @@ class SupplierController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreSupplierRequest $request)
     {
-        //
+        $request->validated();
+
+        $supplier = Supplier::query()
+            ->create([
+                'suppliers'    => $request->suppliers
+            ]);
+
+        return response()->json([
+            "message"           => "Supplier \"{$supplier->suppliers}\" created successfully",
+        ], 201);
     }
 
     /**
@@ -65,9 +76,19 @@ class SupplierController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateSupplierRequest $request, string $id)
     {
-        //
+        $request->validated();
+
+        $supplier = Supplier::findOrFail($id);
+
+        $supplier->update([
+            'suppliers'    => $request->suppliers
+        ]);
+
+        return response()->json([
+            "message"           => "Supplier \"{$supplier->suppliers}\" updated successfully",
+        ], 200);
     }
 
     /**
@@ -75,6 +96,12 @@ class SupplierController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $supplier = Supplier::findOrFail($id);
+
+        $supplier->delete();
+
+        return response()->json([
+            "message"           => "Supplier \"{$supplier->suppliers}\" deleted successfully",
+        ], 200);
     }
 }

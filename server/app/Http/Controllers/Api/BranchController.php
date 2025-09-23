@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreBranchRequest;
+use App\Http\Requests\UpdateBranchRequest;
 use App\Models\BranchDetail;
 use App\Models\BranchList;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class BranchController extends Controller
 {
@@ -131,9 +134,30 @@ class BranchController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreBranchRequest $request)
     {
-        //
+        $request->validated();
+
+        $data = DB::transaction(function () use ($request) {
+            $branch = BranchList::query()
+                ->create([
+                    'b_code'       => $request->branch_code,
+                    'b_name'       => $request->branch_name,
+                    'category'     => $request->category,
+                ]);
+
+            $branch->branchDetail()->create([
+                'b_address'        => $request->branch_address,
+                'b_contact'        => $request->branch_contact_number,
+                'b_email'          => $request->branch_email,
+            ]);
+
+            return $branch;
+        });
+
+        return response()->json([
+            'message'   => "Branch \"{$data->b_name}\" created successfully",
+        ], 201);
     }
 
     /**
@@ -155,9 +179,31 @@ class BranchController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(UpdateBranchRequest $request, string $id)
     {
-        //
+        $request->validated();
+
+        $data = DB::transaction(function () use ($request, $id) {
+            $branch = BranchList::findOrFail($id);
+
+            $branch->update([
+                'b_code'       => $request->branch_code,
+                'b_name'       => $request->branch_name,
+                'category'     => $request->category,
+            ]);
+
+            $branch->branchDetail->update([
+                'b_address'    => $request->branch_address,
+                'b_contact'    => $request->branch_contact_number,
+                'b_email'      => $request->branch_email,
+            ]);
+
+            return $branch;
+        });
+
+        return response()->json([
+            'message'   => "Branch \"{$data->b_name}\" updated successfully",
+        ], 200);
     }
 
     /**
@@ -165,6 +211,14 @@ class BranchController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $ticket = BranchList::findOrFail($id);
+
+        $ticket->delete();
+
+        $ticket->branchDetail()->delete();
+
+        return response()->json([
+            'message'   => "Branch \"{$ticket->b_name}\" deleted successfully"
+        ], 200);
     }
 }

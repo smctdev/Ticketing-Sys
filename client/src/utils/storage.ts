@@ -1,5 +1,7 @@
+import { CONFIG } from "@/config";
+
 export default function Storage(url: string | undefined) {
   return !url?.startsWith("uploads/")
-    ? `${process.env.NEXT_PUBLIC_NETSUITE_STORAGE_BASE_URL}/${url}`
-    : `${process.env.NEXT_PUBLIC_STORAGE_BASE_URL}/${url}`;
+    ? `${CONFIG.NETSUITE_STORAGE_URL}/${url}`
+    : `${CONFIG.STORAGE_URL}/${url}`;
 }

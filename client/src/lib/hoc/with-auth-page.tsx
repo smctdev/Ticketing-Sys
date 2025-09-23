@@ -7,12 +7,15 @@ import { useEffect } from "react";
 
 export default function withAuthPage(
   WrappedComponent: any,
-  isAdminPage?: boolean
+  isProtected = false
 ) {
   function AppWrappedComponent(props: any) {
     const { isAuthenticated, user, isLoading } = useAuth();
     const router = useRouter();
     const isAlreadyAuthenticated = isAuthenticated && user;
+    const noAccess =
+      isProtected &&
+      ![ROLE.ADMIN, ROLE.AUTOMATION_ADMIN].includes(user?.user_role?.role_name);
 
     useEffect(() => {
       if (isLoading) return;
@@ -24,7 +27,7 @@ export default function withAuthPage(
       return <PreLoader />;
     }
 
-    if (isAdminPage && user.user_role.role_name !== ROLE.ADMIN) {
+    if (noAccess) {
       return <Unauthorized />;
     }
 

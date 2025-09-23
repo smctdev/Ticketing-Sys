@@ -89,7 +89,8 @@ export default function TopCard({ data, totalTickets }: any) {
               value={
                 data?.tickets_completed_this_month_data?.tickets_this_month
               }
-              className="h-2"
+              valueColor="bg-pink-500"
+              className="h-2 bg-pink-200"
             />
           </div>
         </CardContent>
@@ -122,7 +123,8 @@ export default function TopCard({ data, totalTickets }: any) {
           <div className="mt-4">
             <Progress
               value={data?.tickets_completed_this_week_data?.tickets_this_week}
-              className="h-2"
+              valueColor="bg-violet-500"
+              className="h-2 bg-violet-200"
             />
           </div>
         </CardContent>

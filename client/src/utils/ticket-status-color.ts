@@ -1,14 +1,12 @@
 import { TICKET_STATUS } from "@/constants/ticket-status";
 
-export default function statusColor(status: any) {
-  switch (status) {
-    case TICKET_STATUS.EDITED:
-      return "text-blue-600 bg-blue-100";
-    case TICKET_STATUS.REJECTED:
-      return "text-red-600 bg-red-100";
-    case TICKET_STATUS.PENDING:
-      return "text-yellow-600 bg-yellow-100";
-    default:
-      return "text-gray-600 bg-gray-100";
-  }
+const COLORS: Record<string, string> = {
+  [TICKET_STATUS.EDITED]: "text-blue-600 bg-blue-100",
+  [TICKET_STATUS.REJECTED]: "text-red-600 bg-red-100",
+  [TICKET_STATUS.PENDING]: "text-yellow-600 bg-yellow-100",
+  DEFAULT: "text-gray-600 bg-gray-100",
+};
+
+export default function statusColor(status: string) {
+  return COLORS[status] || COLORS.DEFAULT;
 }

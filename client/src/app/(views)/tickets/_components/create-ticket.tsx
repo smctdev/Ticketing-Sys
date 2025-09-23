@@ -24,12 +24,12 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { ChangeEvent, FormEvent, useRef, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react";
 import { TICKET_FORM_DATA } from "@/constants/ticket-form-data";
 import { TicketFormDataType } from "@/types/ticket-form-data-type";
 import formattedDateFull from "@/utils/format-date-full";
 import { api } from "@/lib/api";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
 import {
   Select,
@@ -39,21 +39,26 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import useFetch from "@/hooks/use-fetch";
 import Image from "next/image";
 import { formatFileSize } from "@/utils/formatFileSize";
 
-export function CreateTicket({ setIsRefresh }: any) {
+export function CreateTicket({ setIsRefresh, categories, user }: any) {
   const [formInput, setFormInput] =
     useState<TicketFormDataType>(TICKET_FORM_DATA);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [errors, setErrors] = useState<any>({});
   const [error, setError] = useState<string | null>(null);
   const [open, setOpen] = useState<boolean>(false);
-  const { data, isLoading: isLoadingCategories } = useFetch({
-    url: "/categories",
-  });
   const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (!user) return;
+
+    setFormInput((formData) => ({
+      ...formData,
+      ticket_for: user?.branches[0]?.blist_id,
+    }));
+  }, [user]);
 
   const handleInputChange =
     (title: string) => (e: ChangeEvent<HTMLInputElement>) => {
@@ -93,12 +98,20 @@ export function CreateTicket({ setIsRefresh }: any) {
         formData.append("ticket_support[]", support);
       });
 
+      if (formInput?.ticket_for) {
+        formData.append("ticket_for", formInput.ticket_for);
+      }
+
       const response = await api.post("/submit-ticket", formData);
       if (response.status === 201) {
+        const { ticket_for, ...ONLY_RESET } = TICKET_FORM_DATA;
         setError(null);
         setErrors({});
         setOpen(false);
-        setFormInput(TICKET_FORM_DATA);
+        setFormInput((prev) => ({
+          ...prev,
+          ...ONLY_RESET,
+        }));
         toast.success("Success", {
           description: response.data.message,
           position: "bottom-center",
@@ -244,33 +257,35 @@ export function CreateTicket({ setIsRefresh }: any) {
             </div>
             <div className="flex flex-col gap-3">
               <Label htmlFor="date" className="px-1">
-                Transaction date
+                Ticket category
               </Label>
               <Select
                 onValueChange={handleChange("ticket_category")}
                 value={String(formInput.ticket_category)}
               >
                 <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Filter by ticket category" />
+                  <SelectValue placeholder="Select ticket category" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    <SelectItem value="Filter by ticket category" disabled>
-                      Filter by ticket category
+                    <SelectItem value="Select ticket category" disabled>
+                      Select ticket category
                     </SelectItem>
-                    {data?.data?.length === 0 ? (
+                    {categories?.data?.length === 0 ? (
                       <SelectItem value="No ticket categories found">
                         No ticket categories found
                       </SelectItem>
                     ) : (
-                      data?.data?.map((ticket_category: any, index: number) => (
-                        <SelectItem
-                          key={index}
-                          value={String(ticket_category.ticket_category_id)}
-                        >
-                          {ticket_category.category_name}
-                        </SelectItem>
-                      ))
+                      categories?.data?.map(
+                        (ticket_category: any, index: number) => (
+                          <SelectItem
+                            key={index}
+                            value={String(ticket_category.ticket_category_id)}
+                          >
+                            {ticket_category.category_name}
+                          </SelectItem>
+                        )
+                      )
                     )}
                   </SelectGroup>
                 </SelectContent>
@@ -281,6 +296,42 @@ export function CreateTicket({ setIsRefresh }: any) {
                 </small>
               )}
             </div>
+            {user?.branches?.length > 1 && (
+              <div className="flex flex-col gap-3">
+                <Label htmlFor="date" className="px-1">
+                  Ticket For
+                </Label>
+                <Select
+                  onValueChange={handleChange("ticket_for")}
+                  value={String(formInput.ticket_for)}
+                >
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select ticket for" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem value="Select ticket for" disabled>
+                        Selec ticket for
+                      </SelectItem>
+                      {user?.branches?.length === 0 ? (
+                        <SelectItem value="No branches found">
+                          No branches found
+                        </SelectItem>
+                      ) : (
+                        user?.branches?.map((branch: any, index: number) => (
+                          <SelectItem
+                            key={index}
+                            value={String(branch.blist_id)}
+                          >
+                            {branch.b_name}
+                          </SelectItem>
+                        ))
+                      )}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
             <div className="flex flex-col gap-3">
               <Label htmlFor="date" className="px-1">
                 Ticket support

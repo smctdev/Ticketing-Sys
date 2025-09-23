@@ -5,7 +5,6 @@ namespace App\Services;
 use App\Mail\LoginAsCodeMail;
 use App\Models\UserDetail;
 use Illuminate\Support\Facades\Mail;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class SendLoginCodeService
 {
@@ -16,7 +15,7 @@ class SendLoginCodeService
             ->first();
 
         if (!$user) {
-            throw new HttpException(404, 'The email you entered does not exist in our system.');
+            abort(404, 'The email you entered does not exist in our system.');
         }
 
         $random_code = random_int(100000, 999999);
@@ -33,6 +32,6 @@ class SendLoginCodeService
 
         Mail::to($user->user_email)->queue(new LoginAsCodeMail($random_code, $name));
 
-        throw new HttpException(200, 'Login code sent successfully');
+        abort(200, 'Login code sent successfully');
     }
 }
