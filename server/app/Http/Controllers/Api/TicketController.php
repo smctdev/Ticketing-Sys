@@ -160,6 +160,7 @@ class TicketController extends Controller
         $ticketCategory = request('ticket_category');
         $branchCategory = request('branch_type');
         $currentPage = request('page');
+        $search = request('search');
 
         $user = Auth::user();
 
@@ -178,7 +179,8 @@ class TicketController extends Controller
             $branchCode,
             $ticketCategory,
             $branchCategory,
-            $currentPage
+            $currentPage,
+            $search
         );
 
         return response()->json([

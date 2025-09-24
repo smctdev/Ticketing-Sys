@@ -257,4 +257,14 @@ class UserLogin extends Authenticatable
     {
         return $this->belongsToMany(GroupCategory::class, 'assigned_categories', 'login_id', 'group_code');
     }
+
+    public function posts()
+    {
+        return $this->hasMany(Post::class, 'login_id', 'user_id');
+    }
+
+    public function postLikes()
+    {
+        return $this->belongsToMany(Post::class, 'likes', 'user_id', 'post_id');
+    }
 }

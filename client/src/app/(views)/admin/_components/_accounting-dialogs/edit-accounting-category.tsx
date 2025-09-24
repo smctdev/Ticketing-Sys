@@ -46,7 +46,6 @@ export default function EditAccountingCategoryDialog({
   }, [user?.assigned_categories]);
 
   const handleSelectValue = (e: string[]) => {
-    console.log(e);
     setFormInputs(e);
   };
 

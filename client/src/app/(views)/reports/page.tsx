@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Eye, File, FileOutput, Funnel, Loader2Icon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import withAuthPage from "@/lib/hoc/with-auth-page";
-import { REPORTS_FILTER } from "@/constants/filter-by";
+import { REPORTS_FILTER, SEARCH_FILTER } from "@/constants/filter-by";
 import { REPORTS_COLUMNS } from "../dashboard/_constants/reports-columns";
 import { ViewReportDetails } from "./_components/view-report-details";
 import DateFilter from "./_components/date-filter";
@@ -37,10 +37,11 @@ function Reports() {
     handleSelectFilter,
     handleDateFilter,
     handleReset,
+    handleSearchTerm,
   } = useFetch({
     url: "/reports",
     isPaginated: true,
-    filters: REPORTS_FILTER,
+    filters: { ...REPORTS_FILTER, ...SEARCH_FILTER },
     canBeRefreshGlobal: isRefresh,
   });
   const [isOpenDrawer, setIsOpenDrawer] = useState<boolean>(false);
@@ -284,7 +285,7 @@ function Reports() {
       });
       saveAs(
         blob,
-        `${
+        `${filterBy.search && `${filterBy.search}-`}${
           filterBy?.edited_transaction_start_date &&
           filterBy?.edited_transaction_end_date &&
           `Transaction-Date-${formatDate(
@@ -342,6 +343,7 @@ function Reports() {
               isLoading={isLoadingForFilter}
               handleSelectFilter={handleSelectFilter}
               filterBy={filterBy}
+              handleSearchTerm={handleSearchTerm}
             />
             <DateFilter
               filterBy={filterBy}

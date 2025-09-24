@@ -46,7 +46,6 @@ export default function EditAutomationDialog({
   }, [user?.assigned_branches]);
 
   const handleSelectValue = (e: string[]) => {
-    console.log(e);
     setFormInputs(e);
   };
 

@@ -125,7 +125,7 @@ export default function Notification({
         setIsOpenView(true);
       }
     } catch (error) {
-      console.log(error);
+      console.error(error);
     }
   };
 

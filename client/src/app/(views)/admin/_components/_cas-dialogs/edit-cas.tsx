@@ -46,7 +46,6 @@ export default function EditCasDialog({
   }, [user?.assigned_branch_cas]);
 
   const handleSelectValue = (e: string[]) => {
-    console.log(e);
     setFormInputs(e);
   };
 

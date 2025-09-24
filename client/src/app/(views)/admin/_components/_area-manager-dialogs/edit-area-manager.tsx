@@ -46,7 +46,6 @@ export default function EditAreaManagerDialog({
   }, [user?.assigned_area_managers]);
 
   const handleSelectValue = (e: string[]) => {
-    console.log(e);
     setFormInputs(e);
   };
 

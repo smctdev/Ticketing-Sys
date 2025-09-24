@@ -20,4 +20,5 @@ export const REPORTS_FILTER = {
 
 export const SEARCH_FILTER = {
   search: "",
+  defaultSearchValue: "",
 };

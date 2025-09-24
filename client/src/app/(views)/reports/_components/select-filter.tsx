@@ -24,14 +24,18 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
+import SearchInput from "@/components/ui/search-input";
+import { useAuth } from "@/context/auth-context";
 
 export default function SelectFilter({
   isLoading,
   forFilterData,
   handleSelectFilter,
   filterBy,
+  handleSearchTerm,
 }: any) {
   const [open, setOpen] = useState(false);
+  const { isAdmin } = useAuth();
 
   const handleOnSelect = (value: string) => () => {
     handleSelectFilter("branch_code")(value);
@@ -39,7 +43,11 @@ export default function SelectFilter({
   };
 
   return (
-    <div className="flex gap-2">
+    <div
+      className={`${
+        isAdmin ? "grid grid-cols-2 lg:grid-cols-4" : "flex"
+      } gap-2`}
+    >
       <div className="flex flex-col gap-2 w-full">
         <Label htmlFor="branch_code">Branch Code</Label>
         <Popover open={open} onOpenChange={setOpen}>
@@ -173,6 +181,15 @@ export default function SelectFilter({
           </SelectContent>
         </Select>
       </div>
+      {isAdmin && (
+        <div className="flex flex-col gap-2 w-full">
+          <Label htmlFor="search">Search</Label>
+          <SearchInput
+            value={filterBy.defaultSearchValue}
+            onChange={handleSearchTerm()}
+          />
+        </div>
+      )}
     </div>
   );
 }

@@ -16,3 +16,7 @@ export const logout = () => {
 export const fetchProfile = () => {
   return api.get("/profile");
 };
+
+export const updateProfile = (data: any) => {
+  return api.post("/profile/update", data);
+};

@@ -11,6 +11,7 @@ use App\Models\UserLogin;
 use App\Models\UserRole;
 use App\Services\ManageUserService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class UserController extends Controller
 {
@@ -24,6 +25,7 @@ class UserController extends Controller
 
         $users = UserLogin::search($search)
             ->with('userDetail', 'branch', 'userRole')
+            ->whereNot('login_id', Auth::id())
             ->orderByDesc(
                 UserRole::select('role_name')
                     ->whereColumn('user_logins.user_role_id', 'user_roles.user_role_id')
