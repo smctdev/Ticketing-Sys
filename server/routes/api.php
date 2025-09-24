@@ -7,12 +7,16 @@ use App\Http\Controllers\Api\BranchController;
 use App\Http\Controllers\Api\BranchListController;
 use App\Http\Controllers\Api\CasController;
 use App\Http\Controllers\Api\CategoryController;
+use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\ExportReportsController;
 use App\Http\Controllers\Api\ForFilterDataController;
+use App\Http\Controllers\Api\LikeController;
 use App\Http\Controllers\Api\LoginController;
 use App\Http\Controllers\Api\LogoutController;
 use App\Http\Controllers\Api\NotificationController;
+use App\Http\Controllers\Api\PostController;
+use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\RegisterController;
 use App\Http\Controllers\Api\SupplierController;
 use App\Http\Controllers\Api\TicketController;
@@ -45,6 +49,10 @@ Route::middleware([
         )
             ->loadCount('unreadNotifications')
     );
+
+    Route::controller(ProfileController::class)->group(function () {
+        Route::post('/profile/update', 'update');
+    });
 
     Route::controller(BranchController::class)->group(function () {
         Route::get('/get-top-branches', 'getTopBranches');
@@ -160,6 +168,21 @@ Route::middleware([
         Route::patch('notifications/{id}/mark-as-read', 'markedAsRead');
         Route::patch('notifications/mark-all-as-read', 'markedAllAsRead');
     });
+
+    Route::controller(PostController::class)->group(function () {
+        Route::get('/posts', 'index');
+        Route::post('/posts', 'store');
+        Route::patch('/posts/{id}/update', 'update');
+        Route::delete('/posts/{id}/delete', 'destroy');
+    });
+
+    Route::controller(CommentController::class)->group(function () {
+        Route::post('/comments', 'store');
+        Route::patch('/comments/{id}/update', 'update');
+        Route::delete('/comments/{id}/delete', 'destroy');
+    });
+
+    Route::post('/posts/{id}/like-unline', LikeController::class);
 });
 
 // GUEST ROUTES

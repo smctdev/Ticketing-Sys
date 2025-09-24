@@ -24,7 +24,8 @@ class ReportsService
         $branchCode,
         $ticketCategory,
         $branchCategory,
-        $currentPage
+        $currentPage,
+        $search
     ) {
 
         $assignedBranchCas = $user->assignedBranchCas->pluck('blist_id');
@@ -59,6 +60,17 @@ class ReportsService
             'editedBy.branch',
             'branch'
         )
+            ->when(
+                $search,
+                fn($query)
+                =>
+                $query->whereHas(
+                    'userLogin',
+                    fn($user)
+                    =>
+                    $user->search($search)
+                )
+            )
             ->when(
                 $edited_start_date
                     &&
@@ -202,6 +214,7 @@ class ReportsService
         $branchCode,
         $ticketCategory,
         $branchCategory,
+        $search
     ) {
 
         $assignedBranchCas = $user->assignedBranchCas->pluck('blist_id');
@@ -236,6 +249,17 @@ class ReportsService
             'editedBy.branch',
             'branch',
         )
+            ->when(
+                $search,
+                fn($query)
+                =>
+                $query->whereHas(
+                    'userLogin',
+                    fn($user)
+                    =>
+                    $user->search($search)
+                )
+            )
             ->when(
                 $edited_start_date
                     &&

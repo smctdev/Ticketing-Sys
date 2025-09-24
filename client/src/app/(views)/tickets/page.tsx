@@ -4,7 +4,7 @@ import DataTableComponent from "@/components/data-table";
 import useFetch from "@/hooks/use-fetch";
 import { TICKETS_COLUMNS } from "../dashboard/_constants/tickets-columns";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Eye, Funnel, Pencil, Ticket, Trash } from "lucide-react";
+import { ArrowLeftRight, Eye, Funnel, Pencil, Ticket } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -24,9 +24,7 @@ import SearchInput from "@/components/ui/search-input";
 import { useEffect, useState } from "react";
 import echo from "@/lib/echo";
 import { EditTicket } from "./_components/edit-ticket";
-import { TICKET_STATUS } from "@/constants/ticket-status";
-import { ROLE } from "@/constants/roles";
-import { DelteTicket } from "./_components/delete-ticket";
+import { DeleteTicket } from "./_components/delete-ticket";
 import { toast } from "sonner";
 import { Tooltip, TooltipContent } from "@/components/ui/tooltip";
 import { TooltipArrow, TooltipTrigger } from "@radix-ui/react-tooltip";
@@ -127,7 +125,24 @@ function Tickets() {
             </TooltipContent>
           </Tooltip>
           {(user?.login_id === row?.login_id || isAdmin) && (
-            <DelteTicket data={row} />
+            <DeleteTicket data={row} />
+          )}
+          {isAdmin && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  className="border-none bg-transparent shadow-none hover:scale-105"
+                  onClick={handleDialogOpen(row, "delete")}
+                >
+                  <ArrowLeftRight className="h-4 w-4 text-green-500 hover:text-green-600" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <TooltipArrow />
+                Transfer Ticket
+              </TooltipContent>
+            </Tooltip>
           )}
         </div>
       ),

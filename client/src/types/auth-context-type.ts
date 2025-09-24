@@ -22,4 +22,5 @@ export interface AuthContextType {
   notifications: any | null;
   setTotalUnreadNotifications: Dispatch<SetStateAction<number>>;
   totalUnreadNotifications: number;
+  handleUpdateProfile: (data: any) => Promise<AxiosResponse<any, any>>;
 }

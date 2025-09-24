@@ -205,8 +205,6 @@ export function ViewTicketDetails({ data, open, setOpen }: any) {
     });
   };
 
-  console.log(isCounted);
-
   const handleApproveTicket = () => {
     setOpen(false);
     Swal.fire({

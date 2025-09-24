@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/tooltip";
 import { TooltipArrow } from "@radix-ui/react-tooltip";
 
-export function DelteTicket({ data }: any) {
+export function DeleteTicket({ data }: any) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -49,26 +49,24 @@ export function DelteTicket({ data }: any) {
     }
   };
 
-  if (!isOpen) return null;
-
   return (
     <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
-      <AlertDialogTrigger asChild>
-        <Tooltip>
-          <TooltipTrigger asChild>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <AlertDialogTrigger asChild>
             <button
               type="button"
               className="text-red-500 hover:text-red-600 hover:scale-105 transition-all duration-300 ease-in-out"
             >
               <Trash size={18} />
             </button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <TooltipArrow />
-            Delete Ticket
-          </TooltipContent>
-        </Tooltip>
-      </AlertDialogTrigger>
+          </AlertDialogTrigger>
+        </TooltipTrigger>
+        <TooltipContent>
+          <TooltipArrow />
+          Delete Ticket
+        </TooltipContent>
+      </Tooltip>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>

@@ -12,6 +12,7 @@ import {
   login as sanctumLogin,
   logout as sanctumLogout,
   fetchProfile,
+  updateProfile,
 } from "@/lib/sanctum";
 import { api } from "@/lib/api";
 import { ROLE } from "@/constants/roles";
@@ -147,6 +148,27 @@ export default function AuthContextProvider({
     return response;
   }
 
+  const handleUpdateProfile = async (data: any) => {
+    const response = await updateProfile(data);
+    if (response.status === 201) {
+      setUser(response.data.data);
+      setNotifications(response.data.data.unread_notifications);
+      setTotalUnreadNotifications(
+        response.data.data.unread_notifications_count
+      );
+      setIsAuthenticated(true);
+
+      if (
+        isAdminOrAutomationAdmin.includes(
+          response.data.data.user_role.role_name
+        )
+      ) {
+        setIsAdmin(true);
+      }
+    }
+    return response;
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -162,6 +184,7 @@ export default function AuthContextProvider({
         setNotifications,
         setTotalUnreadNotifications,
         totalUnreadNotifications,
+        handleUpdateProfile,
       }}
     >
       {children}
