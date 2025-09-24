@@ -22,7 +22,7 @@ services:
 
   ticketing-netsuite-server-v2-nginx:
     image: nginx:alpine
-    container_name: ticketing-netsuite-server-v2nginx
+    container_name: ticketing-netsuite-server-v2-nginx
     restart: unless-stopped
     ports:
       - 7040:7040
@@ -34,7 +34,7 @@ services:
     networks:
       - ticketing-netsuite-server-v2
 
-  ticketing-netsuite-server-v2reverb:
+  ticketing-netsuite-server-v2-reverb:
     build:
       context: ./
       dockerfile: Dockerfile-reverb
@@ -47,7 +47,7 @@ services:
     depends_on:
     - ticketing-netsuite-server-v2
     restart: unless-stopped
-    container_name: ticketing-netsuite-server-v2reverb
+    container_name: ticketing-netsuite-server-v2-reverb
 
     networks:
       - ticketing-netsuite-server-v2
