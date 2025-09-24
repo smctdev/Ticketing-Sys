@@ -1,0 +1,54 @@
+services:
+  ticketing-netsuite-server-v2:
+    build:
+      context: ./
+      dockerfile: Dockerfile
+    image: ticketing-netsuite-server-v2
+    container_name: ticketing-netsuite-server-v2
+    restart: unless-stopped
+    environment:
+      DB_CONNECTION: mysql
+      DB_HOST: 172.17.0.1
+      DB_PORT: 3306
+      DB_DATABASE: ticketing_netsuite_v2
+      DB_USERNAME: smct
+      DB_PASSWORD: smct
+    volumes:
+      - /mnt/nvme0n1/ticketing_netsuite_uploads:/app/uploads
+    networks:
+      - ticketing-netsuite-server-v2
+
+#   ticketing-netsuite-server-v2-nginx:
+#     image: nginx:alpine
+#     container_name: ticketing-netsuite-server-v2nginx
+#     restart: unless-stopped
+#     ports:
+#       - 7040:7040
+#     volumes:
+#       - ./docker-compose/nginx/default.conf:/etc/nginx/nginx.conf
+#       - ./:/var/www
+
+#     networks:
+#       - netsuite
+
+  ticketing-netsuite-server-v2reverb:
+    build:
+      context: ./
+      dockerfile: Dockerfile-reverb
+    ports:
+    - "8084:8084" # expose Reverb server
+    environment:
+    - APP_URL=${APP_URL}
+    - LARAVEL_REVERB_APP_KEY=${REVERB_APP_KEY}
+    - LARAVEL_REVERB_APP_SECRET=${REVERB_APP_SECRET}
+    depends_on:
+    - ticketing-netsuite-server-v2
+    restart: unless-stopped
+    container_name: ticketing-netsuite-server-v2reverb
+
+    networks:
+      - ticketing-netsuite-server-v2
+
+networks:
+  ticketing-netsuite-server-v2:
+    driver: bridge
