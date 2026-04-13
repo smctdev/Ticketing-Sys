@@ -237,7 +237,7 @@ Route::middleware([
                         $query->search($request->search);
                     });
                 })
-                ->paginate($request->per_page, ['id', 'description', 'causer_id', 'causer_type', 'created_at'])
+                ->paginate($request->limit, ['id', 'description', 'causer_id', 'causer_type', 'created_at'])
                 ->through(function ($activity) {
                     return [
                         'id' => $activity->id,

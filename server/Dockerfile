@@ -24,8 +24,6 @@ RUN apt-get update && apt-get install -y \
 RUN pecl install redis \
     && docker-php-ext-enable redis
 
-RUN echo "upload_max_filesize=100M" > /usr/local/etc/php/conf.d/uploads.ini && \
-echo "post_max_size=100M" >> /usr/local/etc/php/conf.d/uploads.ini
 # Set working directory
 WORKDIR /var/www
 
@@ -44,9 +42,8 @@ RUN npm install && npm run build
 # Install PHP dependencies (prod only)
 RUN composer install --no-dev --optimize-autoloader
 
-# Set PHP upload limits
-RUN echo "upload_max_filesize=100M" > /usr/local/etc/php/conf.d/uploads.ini && \
-    echo "post_max_size=100M" >> /usr/local/etc/php/conf.d/uploads.ini
+# Set PHP upload limits and execution time
+COPY php.ini /usr/local/etc/php/conf.d/custom.ini
 
 # Set correct permissions
 RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
