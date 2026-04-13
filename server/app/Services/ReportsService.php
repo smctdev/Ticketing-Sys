@@ -404,7 +404,6 @@ class ReportsService
 
         activity()
             ->causedBy(Auth::user())
-            ->performedOn($tickets)
             ->log("Exported a ticket");
 
         return [
