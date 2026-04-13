@@ -50,7 +50,7 @@ class ManageUserService
                 'fname'             => Str::title($request->first_name),
                 'lname'             => Str::title($request->last_name),
                 'user_contact'      => $request->contact_number,
-                'user_email'        => Str::lower(Str::replace(' ', '', $request->user_email)),
+                'user_email'        => Str::lower(Str::replace(' ', '', $request->email)),
             ]);
 
             $data = [
