@@ -354,9 +354,9 @@ function Reports() {
       });
     } catch (error: any) {
       console.error(error);
-      if (error.reponse.status === 500) {
+      if (error.code === "ERR_NETWORK") {
         toast.error("Ops! Something went wrong in exporting", {
-          description: error.reponse.data.message,
+          description: error.message,
           position: "bottom-center",
         });
       }
