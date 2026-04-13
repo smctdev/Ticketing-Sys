@@ -83,7 +83,7 @@ class ProfileController extends Controller
             $profile_picture = $request->file('profile_picture');
             $file_name = time() . '-' . $profile_picture->getClientOriginalName();
             $path = $profile_picture->storeAs('uploads', $file_name, 'public');
-            if ($user->userDetail->profile_pic &&Storage::disk('public')->exists($user->userDetail->profile_pic)) {
+            if ($user->userDetail->profile_pic && Storage::disk('public')->exists($user->userDetail->profile_pic)) {
                 Storage::disk('public')->delete($user->userDetail->profile_pic);
             }
 
