@@ -39,7 +39,7 @@ import { useIsRefresh } from "@/context/is-refresh-context";
 import { TransferTicketToAutomation } from "./_components/transfer-ticket-to-automation";
 import { Label } from "@/components/ui/label";
 import Swal from "sweetalert2";
-import { isAutomation } from "@/utils/is-approvers";
+import { isAccountingStaff, isAutomation } from "@/utils/is-approvers";
 import { api } from "@/lib/api";
 import { TICKET_STATUS } from "@/constants/ticket-status";
 import ButtonLoader from "@/components/ui/button-loader";
@@ -385,9 +385,13 @@ function Tickets() {
             ? {
                 td_note_bh: note,
               }
-            : {
-                td_note: note,
-              };
+            : isAccountingStaff(role)
+              ? {
+                  td_note_accounting: note,
+                }
+              : {
+                  td_note: note,
+                };
 
           try {
             const response = await api.patch(

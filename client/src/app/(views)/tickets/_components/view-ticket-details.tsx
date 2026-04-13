@@ -24,7 +24,8 @@ import { useAuth } from "@/context/auth-context";
 import formattedDateFull from "@/utils/format-date-full";
 import { isImage } from "@/utils/image-format";
 import {
-  isAccountingStaffApprover,
+  isAccountingApprover,
+  isAccountingStaff,
   isApprovers,
   isAutomation,
   isAutomationManager,
@@ -50,6 +51,7 @@ import { InfoField, NoteCard } from "./view-ticket-details-items";
 import { Spinner } from "@/components/ui/spinner";
 import { CONFIG } from "@/config/config";
 import Link from "next/link";
+import statusColor from "@/utils/ticket-status-color";
 
 export function ViewTicketDetails({
   data,
@@ -75,15 +77,18 @@ export function ViewTicketDetails({
     user?.user_role?.role_name === ROLE.AUTOMATION_MANAGER;
   const debounceRef = useRef<NodeJS.Timeout>(null);
   const [defaultNote, setDefaultNote] = useState<string>("");
+  const [showNotes, setShowNotes] = useState<boolean>(false);
 
   useEffect(() => {
     if (!open) return;
     setDefaultNote(
       isAutomationManager(role)
         ? (data?.ticket_detail?.td_note ?? "")
-        : (data?.ticket_detail?.td_note_bh ?? ""),
+        : isAccountingStaff(role)
+          ? (data?.ticket_detail?.td_note_accounting ?? "")
+          : (data?.ticket_detail?.td_note_bh ?? ""),
     );
-  }, [open]);
+  }, [open, data]);
 
   const handleSelectImage = (specificItem: any, items: any[]) => () => {
     setImages(items);
@@ -150,11 +155,9 @@ export function ViewTicketDetails({
                 <span className="text-base font-extrabold">
                   {data?.ticket_code}
                 </span>
-                {TICKET_REJECTED && (
-                  <span className="text-xs font-semibold bg-red-100 text-red-500 px-2 py-0.5 rounded-full">
-                    Rejected
-                  </span>
-                )}
+                <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${statusColor(data?.status)}`}>
+                  {data?.status}
+                </span>
               </div>
               <p className="text-sm dark:text-white text-gray-500 font-normal">
                 Submitted by{" "}
@@ -165,26 +168,50 @@ export function ViewTicketDetails({
               </p>
             </DialogTitle>
           </DialogHeader>
-          <div className="max-h-[62vh] overflow-y-auto px-6 py-5 space-y-5">
-            {data?.ticket_detail?.td_note && (
-              <NoteCard
-                label="Automation Manager Note"
-                content={data.ticket_detail.td_note}
-              />
+          <div className="max-h-[62vh] overflow-y-auto px-6 py-2 space-y-5">
+            {(data?.ticket_detail?.td_note_accounting ||
+              data?.ticket_detail?.td_note ||
+              data?.ticket_detail?.td_note_bh) && (
+              <Button
+                className="w-full"
+                onClick={() => setShowNotes(!showNotes)}
+              >
+                {showNotes ? "Hide" : "Show"} notes
+              </Button>
             )}
 
-            {data?.ticket_detail?.td_note_bh && (
-              <NoteCard
-                label="Automation Note"
-                content={data.ticket_detail.td_note_bh}
-              />
+            {showNotes && (
+              <>
+                {data?.ticket_detail?.td_note_accounting && (
+                  <NoteCard
+                    label="Accounting Note"
+                    content={data.ticket_detail.td_note_accounting}
+                  />
+                )}
+
+                {data?.ticket_detail?.td_note && (
+                  <NoteCard
+                    label="Automation Manager Note"
+                    content={data.ticket_detail.td_note}
+                  />
+                )}
+
+                {data?.ticket_detail?.td_note_bh && (
+                  <NoteCard
+                    label="Automation Note"
+                    content={data.ticket_detail.td_note_bh}
+                  />
+                )}
+              </>
             )}
 
-            {(isApprovers(role) || !isAccountingStaffApprover(role)) &&
+            {(isApprovers(role) || !isAccountingApprover(role)) &&
               isYourPendingTicket &&
               !TICKET_REJECTED && (
                 <div className="space-y-4">
-                  {(isAutomationManager(role) || isAutomation(role)) && (
+                  {(isAutomationManager(role) ||
+                    isAutomation(role) ||
+                    isAccountingStaff(role)) && (
                     <div className="rounded-xl border border-gray-200 p-4 flex flex-col gap-2 shadow-sm">
                       <span className="text-xs font-semibold dark:text-white text-gray-400 uppercase tracking-wide">
                         Add Note
@@ -195,11 +222,15 @@ export function ViewTicketDetails({
                         value={defaultNote}
                         onChange={handleChange}
                       />
-                      {(error?.td_note ?? error?.td_note_bh) && (
+                      {(error?.td_note ??
+                        error?.td_note_bh ??
+                        error?.td_note_accounting) && (
                         <small className="text-red-500">
                           {error?.td_note
                             ? error.td_note[0]
-                            : error.td_note_bh[0]}
+                            : error.td_note_bh
+                              ? error.td_note_bh[0]
+                              : error.td_note_accounting[0]}
                         </small>
                       )}
                     </div>
@@ -404,7 +435,7 @@ export function ViewTicketDetails({
             </DialogClose>
             {(isYourTicket || isYourPendingTicket) && (
               <Link
-                href={`/chats/${isYourTicket ? data?.pending_user?.login_id : data?.pending_user?.login_id}?ticket_code=${data?.ticket_code}`}
+                href={`/chats/${isYourTicket ? data?.pending_user?.login_id : data?.user_login?.login_id}?ticket_code=${data?.ticket_code}`}
                 className="flex gap-1 text-blue-500 hover:text-blue-600"
               >
                 <Button
@@ -415,7 +446,7 @@ export function ViewTicketDetails({
                 </Button>
               </Link>
             )}
-            {(isApprovers(role) || isAccountingStaffApprover(role)) &&
+            {(isApprovers(role) || isAccountingApprover(role)) &&
               isYourPendingTicket &&
               !TICKET_REJECTED && (
                 <>

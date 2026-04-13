@@ -379,10 +379,15 @@ class TicketService
                     'td_ref_number'             => $request->ticket_reference_number,
                 ]);
 
-                $ticketDetail->ticket->update([
+                $to_update = [
                     'status'                    => TicketStatus::PENDING,
-                    'displayTicket'             => $this->branchHeads() > 1 ? $request->branch_head_id : $assignedBranchHead->login_id
-                ]);
+                ];
+
+                if ($ticketDetail->ticket->pendingUser->isBranchHead()) {
+                    $to_update['displayTicket'] = $this->branchHeads() > 1 ? $request->branch_head_id : $assignedBranchHead->login_id;
+                }
+
+                $ticketDetail->ticket->update($to_update);
 
                 $ticketDetail->ticket->pendingUser->notify(new TicketNotification(
                     "Ticket from {$ticketDetail->ticket->branch->b_name} - ({$ticketDetail->ticket->branch->b_code}) has been updated",
@@ -440,17 +445,13 @@ class TicketService
     {
         $ticketDetail = TicketDetail::findOrFail($id);
 
-        if ($this->user->isAutomation()) {
-            $requestData = [
-                'td_note_bh'    => $request->td_note_bh
-            ];
-        } else {
-            $requestData = [
-                'td_note'       => $request->td_note
-            ];
-        }
+        $note_data = match (true) {
+            $this->user->isAutomation()        => ['td_note_bh'         => $request->td_note_bh],
+            $this->user->isAutomationManager() => ['td_note'            => $request->td_note],
+            $this->user->isAccountingStaff()   => ['td_note_accounting' => $request->td_note_accounting],
+        };
 
-        $ticketDetail->update($requestData);
+        $ticketDetail->update($note_data);
 
         $ticketDetail->ticket->update([
             'status'        => TicketStatus::REJECTED
@@ -543,17 +544,17 @@ class TicketService
             $requestData = [];
 
             if ($this->user->isBranchHead() && $directToAccounting) {
-                $ticketApprovedData['approveHead'] = $this->user->login_id;
+                $ticketApprovedData['approveHead'] = $this->user?->login_id;
                 $ticketApprovedData['displayTicket'] = $accountingStaff->login_id;
                 $ticketApprovedData['appTBranchHead'] = now()->format('n/j/Y, h:i:s A');
             } elseif ($this->user->isBranchHead()) {
-                $ticketApprovedData['approveHead'] = $this->user->login_id;
-                $ticketApprovedData['displayTicket'] = $automationManager->login_id;
+                $ticketApprovedData['approveHead'] = $this->user?->login_id;
+                $ticketApprovedData['displayTicket'] = $automationManager?->login_id;
                 $ticketApprovedData['appTBranchHead'] = now()->format('n/j/Y, h:i:s A');
             } elseif ($this->user->isAccountingStaff()) {
-                $ticketApprovedData['displayTicket'] = $accountingHead->login_id;
+                $ticketApprovedData['displayTicket'] = $accountingHead?->login_id ?? $automationManager?->login_id;
             } elseif ($this->user->isAccountingHead()) {
-                $ticketApprovedData['displayTicket'] = $automationManager->login_id;
+                $ticketApprovedData['displayTicket'] = $automationManager?->login_id;
             } else {
                 if ($this->user->isAutomation()) {
                     $requestData = [
@@ -565,7 +566,7 @@ class TicketService
                         'td_note'    => $request->td_note,
                     ];
                 }
-                $ticketApprovedData['displayTicket'] = $ticketDetail->ticket->assignedPerson->login_id;
+                $ticketApprovedData['displayTicket'] = $ticketDetail->ticket->assignedPerson?->login_id;
             }
 
             $ticketDetail->update($requestData);

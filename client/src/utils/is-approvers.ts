@@ -7,12 +7,20 @@ export const isApprovers = (role: string) => {
     ROLE.AUTOMATION_ADMIN,
     ROLE.ADMIN,
     ROLE.BRANCH_HEAD,
+    ROLE.ACCOUNTING_HEAD,
+    ROLE.ACCOUNTING_STAFF,
   ];
   return approverRoles.includes(role);
 };
 
-export const isAccountingStaffApprover = (role: string) => {
+export const isAccountingApprover = (role: string) => {
   const approverRoles = [ROLE.ACCOUNTING_HEAD, ROLE.ACCOUNTING_STAFF];
+
+  return approverRoles.includes(role);
+};
+
+export const isAccountingStaff = (role: string) => {
+  const approverRoles = [ROLE.ACCOUNTING_STAFF];
 
   return approverRoles.includes(role);
 };

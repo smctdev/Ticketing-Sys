@@ -400,10 +400,14 @@ class TicketController extends Controller
     {
         $user = Auth::user();
 
-        $field = $user->isAutomation() ? 'td_note_bh' : 'td_note';
+        $field = match (true) {
+            $user->isAutomation()        => 'td_note_bh',
+            $user->isAutomationManager() => 'td_note',
+            $user->isAccountingStaff()   => 'td_note_accounting',
+        };
 
         $validateData = [
-            $field              => ["nullable", Rule::requiredIf(!$user->isAccountingHead() && !$user->isAccountingStaff() && !$user->isBranchHead()), 'max:5000', 'min:1']
+            $field              => ["nullable", Rule::requiredIf(!$user->isAccountingHead() && !$user->isBranchHead()), 'max:5000', 'min:1']
         ];
 
         $validateDataMessage = [

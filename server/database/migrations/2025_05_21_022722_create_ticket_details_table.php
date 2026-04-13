@@ -23,6 +23,7 @@ return new class extends Migration
             $table->string('td_to')->nullable();
             $table->string('td_note')->nullable();
             $table->string('td_note_bh')->nullable();
+            $table->string('td_note_accounting')->nullable();
             $table->string('td_support')->nullable();
             $table->foreignId('suppliers')->constrained('suppliers')->onDelete('cascade');
             $table->string('date_created')->nullable();
