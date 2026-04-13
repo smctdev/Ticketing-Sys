@@ -51,7 +51,7 @@ export const TICKETS_COLUMNS = [
     sortable: false,
     sortField: "user_details.fname",
     grow: 0,
-    minWidth: "270px",
+    width: "270px",
   },
   {
     name: "Category",

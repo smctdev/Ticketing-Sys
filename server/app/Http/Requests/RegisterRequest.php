@@ -26,8 +26,8 @@ class RegisterRequest extends FormRequest
             'fname'         => ['required', 'max:255', 'min:2'],
             'lname'         => ['required', 'max:255', 'min:2'],
             'user_contact'  => ['nullable', 'numeric', 'digits:11'],
-            'user_email'    => ['required', 'email', 'max:100', 'min:5', Rule::unique('user_details', 'user_email')],
-            'username'      => ['required', 'min:4', 'max:100', Rule::unique('user_logins', 'username')],
+            'user_email'    => ['required', 'email', 'max:100', 'min:5', Rule::unique('user_details', 'user_email'), 'lowercase'],
+            'username'      => ['required', 'min:4', 'max:100', Rule::unique('user_logins', 'username'), 'lowercase', 'alpha_dash'],
             'password'      => ['required', 'min:6', 'max:15', 'confirmed'],
             'blist_id'      => ['required', Rule::exists('branch_lists', 'blist_id')]
         ];
