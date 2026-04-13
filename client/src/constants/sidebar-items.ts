@@ -18,6 +18,7 @@ import {
 export const SIDEBAR_ITEMS = [
   { title: "Dashboard", url: "/dashboard", icon: Home, isAudit: false },
   { title: "Tickets", url: "/tickets", icon: TicketCheck, isAudit: false },
+  { title: "Tickets", url: "/tickets", icon: TicketCheck, isAudit: true },
   { title: "Chats", url: "/chats", icon: MessageCircleMore, isAudit: false },
   { title: "Chats", url: "/chats", icon: MessageCircleMore, isAudit: true },
   { title: "Reports", url: "/reports", icon: Home, isAudit: true },

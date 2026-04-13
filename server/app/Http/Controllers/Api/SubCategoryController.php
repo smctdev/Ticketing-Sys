@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\SubCategory;
 use App\Models\TicketCategory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
 
@@ -66,6 +67,11 @@ class SubCategoryController extends Controller
             'sub_category_name'             => Str::title($request->sub_category_name)
         ]);
 
+        activity()
+            ->causedBy(Auth::user())
+            ->performedOn($sub_category)
+            ->log("Added a sub category to category {$sub_category->ticketCategory->category_name}");
+
         return response()->json([
             'message'                       => "Sub category added to {$sub_category->ticketCategory->category_name} successfully"
         ], 201);
@@ -103,6 +109,11 @@ class SubCategoryController extends Controller
             'sub_category_name'             => Str::title($request->sub_category_name)
         ]);
 
+        activity()
+            ->causedBy(Auth::user())
+            ->performedOn($sub_category)
+            ->log("Updated a sub category to category {$sub_category->ticketCategory->category_name}");
+
         return response()->json([
             'message'           => "Sub category of {$sub_category->ticketCategory->category_name} updated successfully"
         ], 200);
@@ -117,6 +128,11 @@ class SubCategoryController extends Controller
             ->findOrFail($id);
 
         $sub_category->delete();
+
+        activity()
+            ->causedBy(Auth::user())
+            ->performedOn($sub_category)
+            ->log("Deleted a sub category to category {$sub_category->ticketCategory->category_name}");
 
         return response()->json([
             'message'           => "Sub category of {$sub_category->ticketCategory->category_name} deleted successfully"

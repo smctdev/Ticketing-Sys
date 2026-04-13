@@ -43,6 +43,7 @@ import { isAutomation } from "@/utils/is-approvers";
 import { api } from "@/lib/api";
 import { TICKET_STATUS } from "@/constants/ticket-status";
 import ButtonLoader from "@/components/ui/button-loader";
+import { CAN_ACCESS_ALL } from "@/constants/roles";
 
 function Tickets() {
   const { user, isAdmin } = useAuth();
@@ -602,4 +603,4 @@ function Tickets() {
   );
 }
 
-export default withAuthPage(Tickets);
+export default withAuthPage(Tickets, CAN_ACCESS_ALL);

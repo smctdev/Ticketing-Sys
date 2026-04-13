@@ -294,7 +294,7 @@ class DashboardController extends Controller
 
     public function dashboardData()
     {
-        if ($this->user->isAdmin() || $this->user->isAutomationAdmin()) {
+        if ($this->user->isAdmin() || $this->user->isAutomationAdmin() || $this->user->isSuperAdmin()) {
             return $this->adminDashboardData();
         } elseif ($this->user->isAutomation()) {
             return $this->automationDashboardData(new AutomationDashboardService($this->user, $this->tickets));

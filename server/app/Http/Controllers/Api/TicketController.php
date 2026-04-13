@@ -46,7 +46,7 @@ class TicketController extends Controller
 
         $accountingHeadCodes = $user->assignedCategories->pluck('group_code');
 
-        $isAdmin = collect([UserRoles::ADMIN, UserRoles::AUTOMATION_ADMIN])->contains($userRole->role_name);
+        $isAdmin = collect([UserRoles::ADMIN, UserRoles::AUTOMATION_ADMIN, UserRoles::SUPER_ADMIN])->contains($userRole->role_name);
 
         $tickets = Ticket::with(
             'userLogin.userDetail',
@@ -214,7 +214,6 @@ class TicketController extends Controller
             ->when($ticket_type !== 'ALL', fn($query) => $query->whereRelation('ticketDetail', 'ticket_type', $ticket_type))
             ->when($ticket_category, fn($query) => $query->whereHas('ticketDetail', fn($subQuery) => $subQuery->where('ticket_category_id', $ticket_category)))
             ->when($bcode, fn($query) => $query->where('branch_id', $bcode))
-            ->where('status', TicketStatus::EDITED)
             ->orderBy('ticket_id', 'desc')
             ->paginate($take);
 
