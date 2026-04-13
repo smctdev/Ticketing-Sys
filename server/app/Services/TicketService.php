@@ -296,6 +296,11 @@ class TicketService
             }
         );
 
+        activity()
+            ->causedBy(Auth::user())
+            ->performedOn($data)
+            ->log("Created a ticket");
+
         return $data;
     }
 
@@ -390,6 +395,11 @@ class TicketService
                 return $ticketDetail->ticket;
             }
         );
+
+        activity()
+            ->causedBy(Auth::user())
+            ->performedOn($data)
+            ->log("Updated a ticket");
 
         return $data;
     }

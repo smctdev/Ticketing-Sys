@@ -553,6 +553,7 @@ class TicketController extends Controller
     public function downloadZip(TicketDetail $ticket_detail, TicketService $ticketService)
     {
         $zipPath = $ticketService->downloadZip($ticket_detail->ticket_details_id);
+
         return response()->download($zipPath)->deleteFileAfterSend(true);
     }
 }
