@@ -177,7 +177,7 @@ export default function EditProfile({
                 />
                 {errors?.first_name && (
                   <small className="text-red-500 text-sm">
-                    {errors.first_name}
+                    {errors.first_name[0]}
                   </small>
                 )}
               </div>
@@ -189,7 +189,7 @@ export default function EditProfile({
                 />
                 {errors?.last_name && (
                   <small className="text-red-500 text-sm">
-                    {errors.last_name}
+                    {errors.last_name[0]}
                   </small>
                 )}
               </div>
@@ -202,7 +202,7 @@ export default function EditProfile({
                 />
                 {errors?.contact_number && (
                   <small className="text-red-500 text-sm">
-                    {errors.contact_number}
+                    {errors.contact_number[0]}
                   </small>
                 )}
               </div>
@@ -214,7 +214,7 @@ export default function EditProfile({
                   onChange={handleChange("email")}
                 />
                 {errors?.email && (
-                  <small className="text-red-500 text-sm">{errors.email}</small>
+                  <small className="text-red-500 text-sm">{errors.email[0]}</small>
                 )}
               </div>
             </div>
@@ -233,7 +233,7 @@ export default function EditProfile({
                 />
                 {errors?.current_password && (
                   <small className="text-red-500 text-sm">
-                    {errors.current_password}
+                    {errors.current_password[0]}
                   </small>
                 )}
               </div>
@@ -246,7 +246,7 @@ export default function EditProfile({
                 />
                 {errors?.password && (
                   <small className="text-red-500 text-sm">
-                    {errors.password}
+                    {errors.password[0]}
                   </small>
                 )}
               </div>
