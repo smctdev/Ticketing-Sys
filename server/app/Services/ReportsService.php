@@ -79,6 +79,12 @@ class ReportsService
                     =>
                     $user->search($search)
                 )
+                    ->orWhereHas(
+                        'assignedPerson',
+                        fn($user)
+                        =>
+                        $user->search($search)
+                    )
                     ->orWhere('ticket_code', 'LIKE', "%{$search}%")
             )
             ->when(
