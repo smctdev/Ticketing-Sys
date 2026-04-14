@@ -467,6 +467,11 @@ class TicketService
             $ticketDetail->ticket->userLogin->login_id
         ));
 
+        activity()
+            ->causedBy(Auth::user())
+            ->performedOn($ticketDetail->ticket)
+            ->log("Revised a ticket");
+
         return $ticketDetail;
     }
 
@@ -594,6 +599,11 @@ class TicketService
             return $ticketDetail;
         });
 
+        activity()
+            ->causedBy(Auth::user())
+            ->performedOn($data->ticket)
+            ->log("Approved a ticket");
+
         return $data;
     }
 
@@ -634,6 +644,11 @@ class TicketService
 
             return $ticketDetail;
         });
+
+        activity()
+            ->causedBy(Auth::user())
+            ->performedOn($data->ticket)
+            ->log("Mark as edited a ticket");
 
         return $data;
     }
