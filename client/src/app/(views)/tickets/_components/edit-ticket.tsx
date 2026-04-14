@@ -15,9 +15,8 @@ import formattedDateFull from "@/utils/format-date-full";
 import { api } from "@/lib/api";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import BasicForm from "./basic-form";
-import SqlForm from "./sql-form";
 
 export function EditTicket({
   setIsRefresh,

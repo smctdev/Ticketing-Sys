@@ -265,11 +265,24 @@ function Tickets() {
               setError(error.response.data.errors);
               Swal.close();
               setIsOpenView(true);
+            } else if (
+              error.response &&
+              [404, 500, 502, 503, 504].includes(error.response.status)
+            ) {
+              const message =
+                error.response.data.message ||
+                "Something went wrong marking as edit the ticket!";
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: message,
+              });
+              setError(null);
             } else {
               Swal.fire({
                 icon: "error",
                 title: "Oops...",
-                text: "Something went wrong revising the ticket!",
+                text: "Something went wrong marking as edit the ticket!",
               });
               setError(null);
             }
@@ -339,6 +352,19 @@ function Tickets() {
                 icon: "error",
                 title: "Oops...",
                 text: error.response.data.message,
+              });
+              setError(null);
+            } else if (
+              error.response &&
+              [404, 500, 502, 503, 504].includes(error.response.status)
+            ) {
+              const message =
+                error.response.data.message ||
+                "Something went wrong approving the ticket!";
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: message,
               });
               setError(null);
             } else {
@@ -414,6 +440,19 @@ function Tickets() {
               setError(error.response.data.errors);
               Swal.close();
               setIsOpenView(true);
+            } else if (
+              error.response &&
+              [404, 500, 502, 503, 504].includes(error.response.status)
+            ) {
+              const message =
+                error.response.data.message ||
+                "Something went wrong revising the ticket!";
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: message,
+              });
+              setError(null);
             } else {
               Swal.fire({
                 icon: "error",
