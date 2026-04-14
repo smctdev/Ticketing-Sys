@@ -27,9 +27,8 @@ export default function SelectFilter({
   filterBy,
   handleSearchTerm,
 }: any) {
-  const { isAdmin, user } = useAuth();
-  const isAudit = user?.user_role?.role_name === ROLE.AUDIT;
-  const canView = isAdmin || isAudit;
+  const { user } = useAuth();
+  const canView = ![ROLE.USER, ROLE.CAS].includes(user?.user_role?.role_name);
 
   const handleMultipleSelect = (values: string[]) => {
     handleSelectFilter("branch_code")(
