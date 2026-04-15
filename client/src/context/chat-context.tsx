@@ -13,7 +13,7 @@ import {
 import { useAuth } from "./auth-context";
 import { MessageType } from "@/app/(views)/chats/[id]/page";
 import { usePathname, useRouter } from "next/navigation";
-import Swal from "sweetalert2";
+import { toast } from "sonner";
 
 type MessageRecordType = {
   login_id: number;
@@ -91,19 +91,18 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 
     echo.join(`poked`).listenForWhisper("poked", (e: any) => {
       if (e.target_id !== user?.login_id) return;
-      Swal.fire({
-        icon: "info",
-        title: "Poked!",
-        text: e.poked,
-        confirmButtonText: "Chat Now",
-        showCancelButton: true,
-        cancelButtonText: "Maybe Later",
-        allowOutsideClick: false,
-        allowEscapeKey: false,
-      }).then((result) => {
-        if (result.isConfirmed) {
-          router.replace(`/chats/${e.target_id}`);
-        }
+
+      toast.info("Poked!", {
+        description: e.poked,
+        position: "top-right",
+        action: {
+          label: "Chat Now",
+          onClick: () => {
+            router.replace(`/chats/${e.target_id}`);
+          },
+        },
+        duration: 10000,
+        closeButton: true,
       });
     });
 

@@ -11,12 +11,14 @@ import { useChat } from "@/context/chat-context";
 import useFetch from "@/hooks/use-fetch";
 import { api } from "@/lib/api";
 import withAuthPage from "@/lib/hoc/with-auth-page";
-import { MessageCircleMore, Pointer, Users2 } from "lucide-react";
+import { Check, MessageCircleMore, Pointer, Users2 } from "lucide-react";
 import Link from "next/link";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { toast } from "sonner";
 
 function ChatsPage() {
   const { setMessageReceivedCount, messageRecords, handlePoked } = useChat();
+  const [poked, setPoked] = useState<{ [key: number]: boolean }>({});
   const {
     data,
     isLoading,
@@ -80,10 +82,30 @@ function ChatsPage() {
           </Link>
           <Button
             type="button"
-            onClick={handlePoked(row.login_id)}
+            onClick={() => {
+              handlePoked(row.login_id)();
+              setPoked((prev) => ({ ...prev, [row.login_id]: true }));
+              setTimeout(() => {
+                setPoked((prev) => ({ ...prev, [row.login_id]: false }));
+              }, 10000);
+              toast.success("Poked!", {
+                position: "bottom-center",
+                description: "Successfully poked!",
+              });
+            }}
             variant={"link"}
+            disabled={poked[row.login_id]}
+            className={`${poked[row.login_id] && "text-green-500"}`}
           >
-            <Pointer /> Poked
+            {poked[row.login_id] ? (
+              <>
+                <Check /> Poked
+              </>
+            ) : (
+              <>
+                <Pointer /> Poke
+              </>
+            )}
           </Button>
         </div>
       ),
