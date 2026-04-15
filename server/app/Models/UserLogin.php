@@ -299,6 +299,7 @@ class UserLogin extends Authenticatable
 
     public function unreadMessages()
     {
-        return $this->hasMany(UserUnreadMessage::class, 'user_id', 'login_id');
+        return $this->hasMany(UserUnreadMessage::class, 'user_id', 'login_id')
+            ->latest();
     }
 }

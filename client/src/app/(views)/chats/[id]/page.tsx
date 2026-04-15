@@ -127,6 +127,7 @@ function ChatsPage() {
   ) => {
     e.preventDefault();
     setIsSubmitting(true);
+    textAreaRef.current?.focus();
     try {
       const response = await api.post(`/chats`, {
         body: message,
@@ -136,7 +137,6 @@ function ChatsPage() {
       if (response.status === 201) {
         setMessage("");
         setMessages((prev) => [response.data.data, ...prev]);
-        textAreaRef.current?.focus();
       }
     } catch (error: any) {
       console.error(error);

@@ -25,6 +25,7 @@ function ChatsPage() {
     filterBy,
     pagination,
     handleShort,
+    setIsRefresh,
   } = useFetch({
     url: "/chats",
     isPaginated: true,
@@ -34,6 +35,10 @@ function ChatsPage() {
   useEffect(() => {
     setMessageReceivedCount(0);
   }, []);
+
+  useEffect(() => {
+    setIsRefresh(true);
+  }, [messageRecords]);
 
   const USERS_COLUMNS = [
     {

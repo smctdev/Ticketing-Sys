@@ -43,6 +43,8 @@ class ChatController extends Controller
 
         ChatEvent::dispatch($message->receiver_id, $message);
 
+        $this->flushUnseenMessage($message->receiver_id);
+
         return response()->json([
             'message' => 'Message Sent Successfully',
             'data'    => $message

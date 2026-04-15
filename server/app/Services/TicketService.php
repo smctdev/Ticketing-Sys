@@ -696,7 +696,9 @@ class TicketService
 
     public function editNote($request, $ticketCode)
     {
-        $ticket = Ticket::where('ticket_code', $ticketCode)->first();
+        $ticket = Ticket::query()
+            ->where('ticket_code', $ticketCode)
+            ->first();
 
         $old_note = $ticket->ticketDetail->td_note_bh;
 

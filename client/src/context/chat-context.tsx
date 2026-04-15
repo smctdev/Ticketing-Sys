@@ -53,6 +53,9 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 
       setMessageRecords((prev) => {
         const id = e.message.sender_id;
+        const splitted = pathname.split("/");
+
+        if (id === Number(splitted.pop())) return prev;
 
         const existingItem = prev.findIndex((record) => record.login_id === id);
 
@@ -77,16 +80,16 @@ export function ChatProvider({ children }: { children: ReactNode }) {
           },
         ];
       });
-
-      if (!pathname.startsWith("/chats")) {
-        setMessageReceivedCount((prev) => prev + 1);
-      }
     });
 
     return () => {
       echo.leave(`private-${channelName}`);
     };
   }, [echo, user, pathname]);
+
+  useEffect(() => {
+    setMessageReceivedCount(messageRecords?.length);
+  }, [messageRecords]);
 
   return (
     <ChatContext.Provider
