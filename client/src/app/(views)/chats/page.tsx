@@ -2,6 +2,7 @@
 
 import DataTableComponent from "@/components/data-table";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import SearchInput from "@/components/ui/search-input";
 import { SEARCH_FILTER } from "@/constants/filter-by";
@@ -10,12 +11,12 @@ import { useChat } from "@/context/chat-context";
 import useFetch from "@/hooks/use-fetch";
 import { api } from "@/lib/api";
 import withAuthPage from "@/lib/hoc/with-auth-page";
-import { MessageCircleMore, Users2 } from "lucide-react";
+import { MessageCircleMore, Pointer, Users2 } from "lucide-react";
 import Link from "next/link";
 import { useEffect } from "react";
 
 function ChatsPage() {
-  const { setMessageReceivedCount, messageRecords } = useChat();
+  const { setMessageReceivedCount, messageRecords, handlePoked } = useChat();
   const {
     data,
     isLoading,
@@ -64,18 +65,27 @@ function ChatsPage() {
     {
       name: "Action",
       cell: (row: any) => (
-        <Link
-          href={`/chats/${row.login_id}`}
-          className="flex gap-1 text-blue-500 hover:text-blue-600"
-          onClick={
-            (messageRecords.find((record) => record.login_id === row.login_id)
-              ?.message_count ?? 0) > 0
-              ? handleFlushUnseenMessages(row.login_id)
-              : undefined
-          }
-        >
-          <MessageCircleMore /> <span>Chat Now</span>
-        </Link>
+        <div className="flex gap-1 items-center">
+          <Link
+            href={`/chats/${row.login_id}`}
+            className="flex gap-1 text-blue-500 hover:text-blue-600"
+            onClick={
+              (messageRecords.find((record) => record.login_id === row.login_id)
+                ?.message_count ?? 0) > 0
+                ? handleFlushUnseenMessages(row.login_id)
+                : undefined
+            }
+          >
+            <MessageCircleMore /> <span>Chat Now</span>
+          </Link>
+          <Button
+            type="button"
+            onClick={handlePoked(row.login_id)}
+            variant={"link"}
+          >
+            <Pointer /> Poked
+          </Button>
+        </div>
       ),
       sortable: false,
     },

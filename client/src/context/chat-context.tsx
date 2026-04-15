@@ -12,7 +12,8 @@ import {
 } from "react";
 import { useAuth } from "./auth-context";
 import { MessageType } from "@/app/(views)/chats/[id]/page";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import Swal from "sweetalert2";
 
 type MessageRecordType = {
   login_id: number;
@@ -26,6 +27,7 @@ type ChatContextType = {
   messageReceivedCount: number;
   setMessageReceivedCount: Dispatch<SetStateAction<number>>;
   newMessage: MessageType | null;
+  handlePoked: (id: number) => () => void;
 };
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
@@ -35,6 +37,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const [messageReceivedCount, setMessageReceivedCount] = useState<number>(0);
   const [newMessage, setNewMessage] = useState<MessageType | null>(null);
   const pathname = usePathname();
+  const router = useRouter();
   const { user } = useAuth();
 
   useEffect(() => {
@@ -86,14 +89,40 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       });
     });
 
+    echo.join(`poked`).listenForWhisper("poked", (e: any) => {
+      if (e.target_id !== user?.login_id) return;
+      Swal.fire({
+        icon: "info",
+        title: "Poked",
+        text: e.poked,
+        confirmButtonText: "Chat Now",
+        showCancelButton: true,
+        cancelButtonText: "Maybe Later",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          router.replace(`/chats/${e.target_id}`);
+        }
+      });
+    });
+
     return () => {
       echo.leave(`private-${channelName}`);
+      echo.leave(`presence-poked`);
     };
   }, [echo, user, pathname, messageRecords]);
 
   useEffect(() => {
     setMessageReceivedCount(messageRecords?.length);
   }, [messageRecords]);
+
+  const handlePoked = (id: number) => () => {
+    if (!id) return;
+
+    echo.join(`poked`).whisper("poked", {
+      poked: `${user?.full_name} poked you and want to chat with you!`,
+      target_id: id,
+    });
+  };
 
   return (
     <ChatContext.Provider
@@ -103,6 +132,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         messageReceivedCount,
         setMessageReceivedCount,
         newMessage,
+        handlePoked,
       }}
     >
       {children}
