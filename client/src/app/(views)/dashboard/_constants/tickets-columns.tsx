@@ -15,7 +15,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { TooltipArrow } from "@radix-ui/react-tooltip";
-import { FileQuestionMark } from "lucide-react";
+import { CircleQuestionMark } from "lucide-react";
 
 export const TICKETS_COLUMNS = [
   {
@@ -57,16 +57,18 @@ export const TICKETS_COLUMNS = [
     name: "Category",
     cell: (row: any) => (
       <div
-        className={`grid ${
+        className={`grid items-center ${
           row.ticket_detail.sub_category ? "grid-cols-[80%_20%]" : "grid-cols-1"
         } gap-1`}
       >
-        <span>{row.ticket_detail.ticket_category.category_name}</span>
+        <span className="wrap-break-word">
+          {row.ticket_detail.ticket_category.category_name}
+        </span>
         {row.ticket_detail.sub_category && (
           <Tooltip>
             <TooltipTrigger asChild className="cursor-help">
               <div className="w-12">
-                <FileQuestionMark />
+                <CircleQuestionMark size={17} />
               </div>
             </TooltipTrigger>
             <TooltipContent>
@@ -82,8 +84,6 @@ export const TICKETS_COLUMNS = [
     ),
     sortable: false,
     sortField: "ticket_categories.category_name",
-    grow: 0,
-    width: "250px",
   },
   {
     name: "Assigned Automation",
