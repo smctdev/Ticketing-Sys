@@ -93,11 +93,13 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       if (e.target_id !== user?.login_id) return;
       Swal.fire({
         icon: "info",
-        title: "Poked",
+        title: "Poked!",
         text: e.poked,
         confirmButtonText: "Chat Now",
         showCancelButton: true,
         cancelButtonText: "Maybe Later",
+        allowOutsideClick: false,
+        allowEscapeKey: false,
       }).then((result) => {
         if (result.isConfirmed) {
           router.replace(`/chats/${e.target_id}`);

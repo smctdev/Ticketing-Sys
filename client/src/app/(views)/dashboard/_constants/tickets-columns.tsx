@@ -56,12 +56,16 @@ export const TICKETS_COLUMNS = [
   {
     name: "Category",
     cell: (row: any) => (
-      <div className="flex gap-1">
+      <div
+        className={`grid grid-cols-${row.ticket_detail.sub_category ? "[80%_20%]" : "1"} gap-1`}
+      >
         <span>{row.ticket_detail.ticket_category.category_name}</span>
         {row.ticket_detail.sub_category && (
           <Tooltip>
             <TooltipTrigger asChild className="cursor-help">
-              <FileQuestionMark />
+              <div className="w-12">
+                <FileQuestionMark />
+              </div>
             </TooltipTrigger>
             <TooltipContent>
               <TooltipArrow />
@@ -76,6 +80,8 @@ export const TICKETS_COLUMNS = [
     ),
     sortable: false,
     sortField: "ticket_categories.category_name",
+    grow: 0,
+    width: "250px",
   },
   {
     name: "Assigned Automation",
