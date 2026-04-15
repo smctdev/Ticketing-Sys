@@ -2,6 +2,7 @@
 
 import DataTableComponent from "@/components/data-table";
 import { Badge } from "@/components/ui/badge";
+import ButtonLoader from "@/components/ui/button-loader";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import SearchInput from "@/components/ui/search-input";
 import { ROLE } from "@/constants/roles";
@@ -19,6 +20,8 @@ function ActivityPage() {
     isLoading,
     filterBy,
     handleSearchTerm,
+    setIsRefresh,
+    isRefresh
   } = useFetch({ url: "/super-admin/activities", isPaginated: true });
 
   const ACTIVITIES_COLUMNS = [
@@ -61,11 +64,18 @@ function ActivityPage() {
             <ActivityIcon size={18} />
             <span>Activities</span>
           </CardTitle>
-          <div>
+          <div className="flex gap-1 items-center">
             <SearchInput
               onChange={handleSearchTerm(500)}
               placeholder="Search..."
             />
+            <ButtonLoader
+              type="button"
+              onClick={() => setIsRefresh(true)}
+              isLoading={isRefresh}
+            >
+              Refresh
+            </ButtonLoader>
           </div>
         </CardHeader>
         <CardContent>
