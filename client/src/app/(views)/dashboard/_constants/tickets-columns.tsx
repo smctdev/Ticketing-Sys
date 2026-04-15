@@ -57,7 +57,9 @@ export const TICKETS_COLUMNS = [
     name: "Category",
     cell: (row: any) => (
       <div
-        className={`grid grid-cols-${row.ticket_detail.sub_category ? "[80%_20%]" : "1"} gap-1`}
+        className={`grid ${
+          row.ticket_detail.sub_category ? "grid-cols-[80%_20%]" : "grid-cols-1"
+        } gap-1`}
       >
         <span>{row.ticket_detail.ticket_category.category_name}</span>
         {row.ticket_detail.sub_category && (
