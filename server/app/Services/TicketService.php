@@ -299,7 +299,7 @@ class TicketService
         activity()
             ->causedBy(Auth::user())
             ->performedOn($data)
-            ->log("Created a ticket");
+            ->log("Created a ticket with a ticket code of {$data?->ticket_code}");
 
         return $data;
     }
@@ -404,7 +404,7 @@ class TicketService
         activity()
             ->causedBy(Auth::user())
             ->performedOn($data)
-            ->log("Updated a ticket");
+            ->log("Updated a ticket with a ticket code of {$data?->ticket_code}");
 
         return $data;
     }
@@ -436,7 +436,7 @@ class TicketService
         activity()
             ->causedBy(Auth::user())
             ->performedOn($ticketDetail->ticket)
-            ->log("Deleted a ticket");
+            ->log("Deleted a ticket with a ticket code of {$ticketDetail?->ticket->ticket_code}");
 
         return $ticketDetail;
     }
@@ -470,7 +470,7 @@ class TicketService
         activity()
             ->causedBy(Auth::user())
             ->performedOn($ticketDetail->ticket)
-            ->log("Revised a ticket");
+            ->log("Revised a ticket with a ticket code of {$ticketDetail?->ticket?->ticket_code}");
 
         return $ticketDetail;
     }
@@ -602,7 +602,7 @@ class TicketService
         activity()
             ->causedBy(Auth::user())
             ->performedOn($data->ticket)
-            ->log("Approved a ticket");
+            ->log("Approved a ticket with a ticket code of {$data?->ticket?->ticket_code}");
 
         return $data;
     }
@@ -648,7 +648,7 @@ class TicketService
         activity()
             ->causedBy(Auth::user())
             ->performedOn($data->ticket)
-            ->log("Mark as edited a ticket");
+            ->log("Mark as edited a ticket with a ticket code of {$data?->ticket?->ticket_code}");
 
         return $data;
     }
@@ -673,7 +673,7 @@ class TicketService
         activity()
             ->causedBy(Auth::user())
             ->performedOn($ticket)
-            ->log("Returned a ticket to automation on reports");
+            ->log("Returned a ticket to automation on reports with a ticket code of {$ticket?->ticket_code}");
 
         return $ticket;
     }
@@ -689,7 +689,7 @@ class TicketService
         activity()
             ->causedBy(Auth::user())
             ->performedOn($ticket)
-            ->log("Marked a ticket to counted or not counted on reports");
+            ->log("Marked a ticket to counted or not counted on reports with a ticket code of {$ticket?->ticket_code}");
 
         return $ticket;
     }
@@ -711,7 +711,7 @@ class TicketService
         activity()
             ->causedBy(Auth::user())
             ->performedOn($ticket)
-            ->log("Edited a note ticket on reports");
+            ->log("Edited a note ticket on reports with a ticket code of {$ticket?->ticket_code}");
 
         return [
             $old_note,
