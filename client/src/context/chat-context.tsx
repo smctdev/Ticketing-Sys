@@ -51,6 +51,10 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     echo.private(channelName).listen("ChatEvent", (e: any) => {
       setNewMessage(e.message);
 
+      if (e.message) {
+        document.title = `(${messageRecords?.length}) New message(s) arrived`;
+      }
+
       setMessageRecords((prev) => {
         const id = e.message.sender_id;
         const splitted = pathname.split("/");
@@ -85,7 +89,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     return () => {
       echo.leave(`private-${channelName}`);
     };
-  }, [echo, user, pathname]);
+  }, [echo, user, pathname, messageRecords]);
 
   useEffect(() => {
     setMessageReceivedCount(messageRecords?.length);
