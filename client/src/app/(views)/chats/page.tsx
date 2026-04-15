@@ -87,7 +87,7 @@ function ChatsPage() {
               setPoked((prev) => ({ ...prev, [row.login_id]: true }));
               setTimeout(() => {
                 setPoked((prev) => ({ ...prev, [row.login_id]: false }));
-              }, 10000);
+              }, 5000);
               toast.success("Poked!", {
                 position: "bottom-center",
                 description: "Successfully poked!",
