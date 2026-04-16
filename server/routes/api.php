@@ -278,7 +278,7 @@ Route::middleware(["throttle:20,1"])->group(function () {
     });
 
     Route::controller(LogoutController::class)->group(function () {
-        Route::post('/logout', 'store');
+        Route::post('/logout', 'store')->withoutMiddleware('throttle:20,1');
     });
 
     Route::controller(SendLoginCodeController::class)->group(function () {

@@ -64,7 +64,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
 
         if (id === Number(splitted.pop())) return prev;
 
-        const existingItem = prev.findIndex((record) => record.login_id === id);
+        const existingItem = prev?.findIndex((record) => record.login_id === id);
 
         if (existingItem !== -1) {
           return prev.map((record, index) =>
