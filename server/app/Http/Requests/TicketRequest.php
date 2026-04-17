@@ -52,7 +52,7 @@ class TicketRequest extends FormRequest
             'purpose'                             => ['required', 'max:1000', 'min:2'],
             'from'                                => ['required', 'max:255', 'min:2'],
             'to'                                  => ['required', 'max:255', 'min:2'],
-            'ticket_reference_number'             => ['required_if:ticket_type,sql_ticket', 'max:255', 'min:2'],
+            'ticket_reference_number'             => ['required', 'max:255', 'min:2'],
             'branch_head_id'                      => [Rule::requiredIf($this->branchHeads() > 1)]
         ];
     }
@@ -72,7 +72,7 @@ class TicketRequest extends FormRequest
             'to.required_if'                      => 'To is required.',
             'to.max'                              => 'To must be less than 255 characters.',
             'to.min'                              => 'To must be at least 2 characters.',
-            'ticket_reference_number.required_if' => 'Ticket reference number is required.',
+            'ticket_reference_number.required'    => 'Ticket reference number is required.',
             'ticket_reference_number.max'         => 'Ticket reference number must be less than 255 characters.',
             'ticket_reference_number.min'         => 'Ticket reference number must be at least 2 characters.',
             'branch_head_id.required_if'          => 'Branch head is required.',

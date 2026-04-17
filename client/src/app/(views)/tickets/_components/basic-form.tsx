@@ -230,24 +230,22 @@ export default function BasicForm({
         errors={errors}
         handleInputChange={handleInputChange}
       />
-      {formInput?.ticket_type === "sql_ticket" && (
-        <div className="flex flex-col gap-3">
-          <Label htmlFor="ticket_reference_number" className="px-1">
-            Ticket Reference #
-          </Label>
-          <Input
-            value={formInput.ticket_reference_number ?? ""}
-            className="w-full"
-            placeholder="Ticket Reference #"
-            onChange={handleInputChange("ticket_reference_number")}
-          />
-          {errors?.ticket_reference_number && (
-            <small className="text-red-500">
-              {errors?.ticket_reference_number[0]}
-            </small>
-          )}
-        </div>
-      )}
+      <div className="flex flex-col gap-3">
+        <Label htmlFor="ticket_reference_number" className="px-1">
+          Ticket Reference #
+        </Label>
+        <Input
+          value={formInput.ticket_reference_number ?? ""}
+          className="w-full"
+          placeholder="Ticket Reference #"
+          onChange={handleInputChange("ticket_reference_number")}
+        />
+        {errors?.ticket_reference_number && (
+          <small className="text-red-500">
+            {errors?.ticket_reference_number[0]}
+          </small>
+        )}
+      </div>
       {user?.branches?.length > 1 && (
         <div className="flex flex-col gap-3">
           <Label htmlFor="ticket_for" className="px-1">
@@ -319,7 +317,10 @@ export default function BasicForm({
             <div className="flex gap-2 overflow-x-auto overflow-y-hidden h-32">
               {oldFilesLength > 0 &&
                 oldFiles?.map((item: any, index: number) => (
-                  <div key={index} className="group relative rounded-md border shrink-0 w-20 h-full">
+                  <div
+                    key={index}
+                    className="group relative rounded-md border shrink-0 w-20 h-full"
+                  >
                     <div className="p-2 w-20 h-20 rounded-md">
                       {isImage(item) ? (
                         <Image
@@ -347,7 +348,10 @@ export default function BasicForm({
                   </div>
                 ))}
               {formInput.ticket_support.map((file: any, index: number) => (
-                <div key={index} className="group relative rounded-md border shrink-0 w-20 h-full">
+                <div
+                  key={index}
+                  className="group relative rounded-md border shrink-0 w-20 h-full"
+                >
                   <div className="p-2 w-20 h-20 rounded-md">
                     {file?.type?.startsWith("image") ? (
                       <Image
