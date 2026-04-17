@@ -8,6 +8,7 @@ import {
   SetStateAction,
   useContext,
   useEffect,
+  useRef,
   useState,
 } from "react";
 import { useAuth } from "./auth-context";
@@ -39,6 +40,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const { user } = useAuth();
+  const newData = useRef<MessageRecordType[]>([]);
 
   useEffect(() => {
     if (!user) return;
@@ -54,20 +56,18 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     echo.private(channelName).listen("ChatEvent", (e: any) => {
       setNewMessage(e.message);
 
-      if (e.message) {
-        document.title = `(${messageRecords?.length}) New message(s) arrived`;
-      }
-
       setMessageRecords((prev) => {
         const id = e.message.sender_id;
         const splitted = pathname.split("/");
 
+        const existingItem = prev?.findIndex(
+          (record) => record.login_id === id,
+        );
+
         if (id === Number(splitted.pop())) return prev;
 
-        const existingItem = prev?.findIndex((record) => record.login_id === id);
-
         if (existingItem !== -1) {
-          return prev.map((record, index) =>
+          newData.current = prev.map((record, index) =>
             index === existingItem
               ? {
                   ...record,
@@ -76,16 +76,20 @@ export function ChatProvider({ children }: { children: ReactNode }) {
                 }
               : record,
           );
+        } else {
+          newData.current = [
+            ...prev,
+            {
+              login_id: id,
+              last_message: e.message.body,
+              message_count: 1,
+            },
+          ];
         }
 
-        return [
-          ...prev,
-          {
-            login_id: id,
-            last_message: e.message.body,
-            message_count: 1,
-          },
-        ];
+        document.title = `(${newData.current?.length}) New message(s) arrived`;
+
+        return newData.current;
       });
     });
 
@@ -110,7 +114,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       echo.leave(`private-${channelName}`);
       echo.leave(`presence-poked`);
     };
-  }, [echo, user, pathname, messageRecords]);
+  }, [echo, user, pathname]);
 
   useEffect(() => {
     setMessageReceivedCount(messageRecords?.length);
