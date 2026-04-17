@@ -21,6 +21,7 @@ import {
 } from "@/components/ui/tooltip";
 import { TooltipArrow } from "@radix-ui/react-tooltip";
 import { ADMIN_ACCESS } from "@/constants/roles";
+import { useEffect, useRef } from "react";
 
 type idParamstype = {
   id: string[];
@@ -46,6 +47,13 @@ function SubCategories() {
     isPaginated: true,
     filters: SEARCH_FILTER,
   });
+  const categoryRef = useRef<string>(document.title);
+
+  useEffect(() => {
+    if (!data?.category_name) return;
+
+    document.title = `${categoryRef.current} | ${data?.category_name}`;
+  }, [data?.category_name]);
 
   if (!validLength || !isNumber || !isSubCategories) {
     return <NotFound />;
