@@ -29,6 +29,7 @@ type ChatContextType = {
   setMessageReceivedCount: Dispatch<SetStateAction<number>>;
   newMessage: MessageType | null;
   handlePoked: (id: number) => () => void;
+  usersOnlineCount: number;
 };
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
@@ -37,6 +38,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const [messageRecords, setMessageRecords] = useState<MessageRecordType[]>([]);
   const [messageReceivedCount, setMessageReceivedCount] = useState<number>(0);
   const [newMessage, setNewMessage] = useState<MessageType | null>(null);
+  const [usersOnlineCount, setUsersOnlineCount] = useState<number>(0);
   const pathname = usePathname();
   const router = useRouter();
   const { user } = useAuth();
@@ -93,22 +95,33 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       });
     });
 
-    echo.join(`poked`).listenForWhisper("poked", (e: any) => {
-      if (e.target_id !== user?.login_id) return;
+    echo
+      .join(`poked`)
+      .listenForWhisper("poked", (e: any) => {
+        if (e.target_id !== user?.login_id) return;
 
-      toast.info("Poked!", {
-        description: e.poked,
-        position: "top-right",
-        action: {
-          label: "Chat Now",
-          onClick: () => {
-            router.replace(`/chats/${e.target_id}`);
+        toast.info("Poked!", {
+          description: e.poked,
+          position: "top-right",
+          action: {
+            label: "Chat Now",
+            onClick: () => {
+              router.replace(`/chats/${e.target_id}`);
+            },
           },
-        },
-        duration: 10000,
-        closeButton: true,
+          duration: 10000,
+          closeButton: true,
+        });
+      })
+      .here((e: any) => {
+        setUsersOnlineCount(e.length);
+      })
+      .joining(() => {
+        setUsersOnlineCount((prev) => prev + 1);
+      })
+      .leaving(() => {
+        setUsersOnlineCount((prev) => prev - 1);
       });
-    });
 
     return () => {
       echo.leave(`private-${channelName}`);
@@ -138,6 +151,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         setMessageReceivedCount,
         newMessage,
         handlePoked,
+        usersOnlineCount,
       }}
     >
       {children}

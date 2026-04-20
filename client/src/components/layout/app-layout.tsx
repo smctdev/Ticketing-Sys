@@ -11,9 +11,12 @@ import { usePathname } from "next/navigation";
 import Notification from "../notification";
 import ProfileDropdown from "../profile-dropdown";
 import SettingsSheet from "../settings-sheet";
+import { Badge } from "../ui/badge";
+import { useChat } from "@/context/chat-context";
 
 const AppLayout = ({ children }: { children: ReactNode }) => {
   const { open } = useSidebar();
+  const { usersOnlineCount } = useChat();
   const pathname = usePathname();
   const path: any =
     pathname === "/"
@@ -49,6 +52,14 @@ const AppLayout = ({ children }: { children: ReactNode }) => {
                 ))}
               </div>
               <div className="flex items-center gap-3">
+                {usersOnlineCount > 0 && (
+                  <Badge
+                    variant={"outline"}
+                    className="bg-green-600 text-green-100 py-1 font-bold"
+                  >
+                    Total online: {usersOnlineCount}
+                  </Badge>
+                )}
                 <Notification />
                 <ProfileDropdown />
               </div>
