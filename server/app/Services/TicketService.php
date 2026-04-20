@@ -324,6 +324,10 @@ class TicketService
 
                 $ticketDetail = TicketDetail::findOrFail($id);
 
+                if (!$ticketDetail->ticket->pendingUser->isBranchHead()) {
+                    return abort(400, 'You can not update this ticket because it has been already approved by your branch head.');
+                }
+
                 if ($ticketDetail->ticket->status === TicketStatus::EDITED) {
                     abort(400, 'You can not edit this ticket because it has been edited');
                 }
@@ -412,6 +416,10 @@ class TicketService
     public function deleteTicket($id)
     {
         $ticketDetail = TicketDetail::findOrFail($id);
+
+        if (!$ticketDetail->ticket->pendingUser->isBranchHead()) {
+            return abort(400, 'You can not delete this ticket because it has been already approved by your branch head.');
+        }
 
         if ($ticketDetail->ticket->status === TicketStatus::EDITED) {
             abort(400, 'You can not delete this ticket because it has been edited');
