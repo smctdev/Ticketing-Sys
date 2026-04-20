@@ -324,7 +324,7 @@ class TicketService
 
                 $ticketDetail = TicketDetail::findOrFail($id);
 
-                if (!$ticketDetail->ticket->pendingUser->isBranchHead()) {
+                if (!$ticketDetail->ticket->pendingUser->isBranchHead() && $ticketDetail->ticket->status === TicketStatus::PENDING) {
                     abort(400, 'You can not update this ticket because it has been already approved by your branch head.');
                 }
 
@@ -417,7 +417,7 @@ class TicketService
     {
         $ticketDetail = TicketDetail::findOrFail($id);
 
-        if (!$ticketDetail->ticket->pendingUser->isBranchHead()) {
+        if (!$ticketDetail->ticket->pendingUser->isBranchHead() && $ticketDetail->ticket->status === TicketStatus::PENDING) {
             abort(400, 'You can not delete this ticket because it has been already approved by your branch head.');
         }
 
