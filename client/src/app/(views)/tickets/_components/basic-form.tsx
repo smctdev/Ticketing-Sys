@@ -16,7 +16,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { formatFileSize } from "@/utils/formatFileSize";
+import { formatFileSize } from "@/utils/format-file-size";
 import { isImage } from "@/utils/image-format";
 import Storage from "@/utils/storage";
 import { CalendarIcon, FileSpreadsheet, X } from "lucide-react";

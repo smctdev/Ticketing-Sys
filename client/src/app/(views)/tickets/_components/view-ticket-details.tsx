@@ -65,8 +65,9 @@ export function ViewTicketDetails({
   handleApproveTicket,
   handleEditTicket,
   handleReviseTicket,
+  handleDirectToAutomation,
 }: any) {
-  const { user } = useAuth();
+  const { user, isAdmin } = useAuth();
   const isYourPendingTicket = user?.login_id === data?.pending_user?.login_id;
   const isYourTicket = user?.login_id === data?.user_login?.login_id;
   const [openImage, setOpenImage] = useState<boolean>(false);
@@ -155,7 +156,9 @@ export function ViewTicketDetails({
                 <span className="text-base font-extrabold">
                   {data?.ticket_code}
                 </span>
-                <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${statusColor(data?.status)}`}>
+                <span
+                  className={`text-xs font-semibold px-2 py-0.5 rounded-full ${statusColor(data?.status)}`}
+                >
                   {data?.status}
                 </span>
               </div>
@@ -485,6 +488,18 @@ export function ViewTicketDetails({
                   )}
                 </>
               )}
+            {isAdmin && (
+              <Button
+                type="button"
+                onClick={handleDirectToAutomation(
+                  data?.ticket_code,
+                  data?.ticket_details_id,
+                )}
+                className="rounded-lg bg-green-500 hover:bg-green-600 text-white md:w-auto w-full"
+              >
+                Direct To Automation
+              </Button>
+            )}
           </DialogFooter>
         </DialogContent>
       </Dialog>

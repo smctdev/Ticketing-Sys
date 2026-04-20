@@ -110,7 +110,7 @@ export function AppSidebar() {
             <SidebarMenu>
               {SIDEBAR_ITEMS.map(
                 (item, index) =>
-                  item?.isAudit === isAudit && (
+                  item?.allowedFor.includes(user?.user_role?.role_name) && (
                     <SidebarMenuItem
                       key={index}
                       className={`${

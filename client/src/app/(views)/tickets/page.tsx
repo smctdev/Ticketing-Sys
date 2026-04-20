@@ -26,7 +26,7 @@ import withAuthPage from "@/lib/hoc/with-auth-page";
 import { TICKETS_FILTER } from "@/constants/filter-by";
 import { CreateTicket } from "./_components/create-ticket";
 import { useAuth } from "@/context/auth-context";
-import { canCreateTicket } from "@/constants/can-create-ticket";
+import { canCreateTicket } from "@/utils/permissions";
 import SearchInput from "@/components/ui/search-input";
 import { useEffect, useState } from "react";
 import echo from "@/lib/echo";
@@ -470,6 +470,79 @@ function Tickets() {
       });
     };
 
+  const handleDirectToAutomation =
+    (ticketCode: string | number, ticketDetailsId: string | number) => () => {
+      setIsOpenView(false);
+      Swal.fire({
+        title: "Direct to Automation Ticket",
+        text: `Are you sure you want to direct this ticket to automation with ticket code of "${ticketCode}"?`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, direct it!",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          refresh(true);
+          Swal.fire({
+            title: "Directing to automation...",
+            text: "Please wait while the ticket is being directing to automation...",
+            allowOutsideClick: false,
+            didOpen: () => {
+              Swal.showLoading();
+            },
+          });
+
+          try {
+            const response = await api.post(
+              `/direct-to-automation-ticket/${ticketDetailsId}/direct-to-automation`,
+            );
+            if (response.status === 200) {
+              setIsOpenView(false);
+              toast.success("Success", {
+                description: response.data.message,
+                position: "bottom-center",
+              });
+              setNote("");
+              setError(null);
+              Swal.close();
+            }
+          } catch (error: any) {
+            console.error(error);
+            if (error.response.status === 422) {
+              setError(error.response.data.errors);
+              Swal.close();
+              setIsOpenView(true);
+            } else if (
+              error.response &&
+              [404, 500, 502, 503, 504].includes(error.response.status)
+            ) {
+              const message =
+                error.response.data.message ||
+                "Something went wrong directing the ticket to automation!";
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: message,
+              });
+              setError(null);
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Something went wrong directing the ticket to automation!",
+              });
+              setError(null);
+            }
+          } finally {
+            refresh(false);
+          }
+        } else {
+          setIsOpenView(true);
+        }
+      });
+    };
+
   return (
     <div className="flex flex-col gap-3">
       <Card className="gap-0">
@@ -632,6 +705,7 @@ function Tickets() {
           handleApproveTicket={handleApproveTicket}
           handleEditTicket={handleEditTicket}
           handleReviseTicket={handleReviseTicket}
+          handleDirectToAutomation={handleDirectToAutomation}
         />
       )}
 

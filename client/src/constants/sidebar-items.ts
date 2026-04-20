@@ -14,15 +14,28 @@ import {
   Users2,
   UserSearch,
 } from "lucide-react";
+import { CAN_ACCESS_ALL, CAN_ACCESS_NO_AUDIT } from "./roles";
 
 export const SIDEBAR_ITEMS = [
-  { title: "Dashboard", url: "/dashboard", icon: Home, isAudit: false },
-  { title: "Tickets", url: "/tickets", icon: TicketCheck, isAudit: false },
-  { title: "Tickets", url: "/tickets", icon: TicketCheck, isAudit: true },
-  { title: "Chats", url: "/chats", icon: MessageCircleMore, isAudit: false },
-  { title: "Chats", url: "/chats", icon: MessageCircleMore, isAudit: true },
-  { title: "Reports", url: "/reports", icon: Home, isAudit: true },
-  { title: "Reports", url: "/reports", icon: Notebook, isAudit: false },
+  {
+    title: "Dashboard",
+    url: "/dashboard",
+    icon: Home,
+    allowedFor: CAN_ACCESS_NO_AUDIT,
+  },
+  {
+    title: "Tickets",
+    url: "/tickets",
+    icon: TicketCheck,
+    allowedFor: CAN_ACCESS_NO_AUDIT,
+  },
+  {
+    title: "Chats",
+    url: "/chats",
+    icon: MessageCircleMore,
+    allowedFor: CAN_ACCESS_NO_AUDIT,
+  },
+  { title: "Reports", url: "/reports", icon: Home, allowedFor: CAN_ACCESS_ALL },
 ];
 
 export const COLLAPSABLE_SIDEBAR_ITEMS = [

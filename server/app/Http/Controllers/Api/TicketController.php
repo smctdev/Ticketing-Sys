@@ -553,6 +553,37 @@ class TicketController extends Controller
         ], 200);
     }
 
+
+    public function directToAutomation(TicketDetail $ticket_detail)
+    {
+
+        if ($ticket_detail->ticket->status !== TicketStatus::PENDING) {
+            abort(400, 'You can not direct this ticket because it has been edited or rejected');
+        }
+
+        $ticket_detail->ticket->update([
+            'displayTicket' => $ticket_detail?->ticket?->assignedPerson?->login_id
+        ]);
+
+
+        $ticket_detail?->ticket?->assignedPerson->notify(new TicketNotification(
+            "Hello, new ticket {$ticket_detail->ticket->ticket_code} has been assigned to you",
+            $ticket_detail->ticket->ticket_code,
+            $ticket_detail?->ticket?->assignedPerson->userDetail->profile_pic,
+            $ticket_detail?->ticket?->assignedPerson->full_name,
+            $ticket_detail?->ticket?->assignedPerson->login_id
+        ));
+
+        activity()
+            ->causedBy(Auth::user())
+            ->performedOn($ticket_detail)
+            ->log("Directed a ticket with ticket code of {$ticket_detail?->ticket?->ticket_code} to automation");
+
+        return response()->json([
+            'message'           => "Ticket with ticket code of {$ticket_detail?->ticket?->ticket_code} has been directed automation successfully",
+        ], 200);
+    }
+
     public function downloadZip(TicketDetail $ticket_detail, TicketService $ticketService)
     {
         $zipPath = $ticketService->downloadZip($ticket_detail->ticket_details_id);
