@@ -488,18 +488,20 @@ export function ViewTicketDetails({
                   )}
                 </>
               )}
-            {isAdmin && (
-              <Button
-                type="button"
-                onClick={handleDirectToAutomation(
-                  data?.ticket_code,
-                  data?.ticket_details_id,
-                )}
-                className="rounded-lg bg-green-500 hover:bg-green-600 text-white md:w-auto w-full"
-              >
-                Direct To Automation
-              </Button>
-            )}
+            {isAdmin &&
+              !isAutomation(data.pending_user.user_role.role_name) &&
+              !isAutomationManager(data.pending_user.user_role.role_name) && (
+                <Button
+                  type="button"
+                  onClick={handleDirectToAutomation(
+                    data?.ticket_code,
+                    data?.ticket_details_id,
+                  )}
+                  className="rounded-lg bg-green-500 hover:bg-green-600 text-white md:w-auto w-full"
+                >
+                  Direct To Automation
+                </Button>
+              )}
           </DialogFooter>
         </DialogContent>
       </Dialog>
