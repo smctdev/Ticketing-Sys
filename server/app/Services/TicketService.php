@@ -174,7 +174,7 @@ class TicketService
             ->first();
 
         if (!$assignedBranchHead) {
-            return abort(400, 'No branch head assigned to your branch. Please contact your administrator.');
+            abort(400, 'No branch head assigned to your branch. Please contact your administrator.');
         }
 
         $assignedAccountingStaff = UserLogin::query()
@@ -325,7 +325,7 @@ class TicketService
                 $ticketDetail = TicketDetail::findOrFail($id);
 
                 if (!$ticketDetail->ticket->pendingUser->isBranchHead()) {
-                    return abort(400, 'You can not update this ticket because it has been already approved by your branch head.');
+                    abort(400, 'You can not update this ticket because it has been already approved by your branch head.');
                 }
 
                 if ($ticketDetail->ticket->status === TicketStatus::EDITED) {
@@ -418,7 +418,7 @@ class TicketService
         $ticketDetail = TicketDetail::findOrFail($id);
 
         if (!$ticketDetail->ticket->pendingUser->isBranchHead()) {
-            return abort(400, 'You can not delete this ticket because it has been already approved by your branch head.');
+            abort(400, 'You can not delete this ticket because it has been already approved by your branch head.');
         }
 
         if ($ticketDetail->ticket->status === TicketStatus::EDITED) {
