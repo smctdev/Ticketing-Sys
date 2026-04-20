@@ -561,17 +561,21 @@ class TicketController extends Controller
             abort(400, 'You can not direct this ticket because it has been edited or rejected');
         }
 
+        $user = UserLogin::query()
+            ->whereRelation('userRole', 'role_name', UserRoles::AUTOMATION_MANAGER)
+            ->first();
+
         $ticket_detail->ticket->update([
-            'displayTicket' => $ticket_detail?->ticket?->assignedPerson?->login_id
+            'displayTicket' => $user?->login_id
         ]);
 
 
-        $ticket_detail?->ticket?->assignedPerson->notify(new TicketNotification(
+        $user->notify(new TicketNotification(
             "Hello, new ticket {$ticket_detail->ticket->ticket_code} has been assigned to you",
             $ticket_detail->ticket->ticket_code,
-            $ticket_detail?->ticket?->assignedPerson->userDetail->profile_pic,
-            $ticket_detail?->ticket?->assignedPerson->full_name,
-            $ticket_detail?->ticket?->assignedPerson->login_id
+            $user->userDetail->profile_pic,
+            $user->full_name,
+            $user->login_id
         ));
 
         activity()
