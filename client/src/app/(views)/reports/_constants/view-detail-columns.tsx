@@ -76,15 +76,15 @@ export const VIEW_DETAIL_COMLUMNS = [
   },
   {
     name: "APPROVED BY BRANCH HEAD",
-    cell: (row: any) => row.approve_head?.full_name,
+    cell: (row: any) => row.approve_by_head?.full_name,
   },
   {
     name: "APPROVED BY ACCOUNTING",
-    cell: (row: any) => row.approve_acctg_sup?.full_name,
+    cell: (row: any) => row.approve_by_acctg_sup?.full_name,
   },
   {
     name: "APPROVED BY ACCOUNTING STAFF",
-    cell: (row: any) => row.approve_acctg_staff?.full_name,
+    cell: (row: any) => row.approve_by_acctg_staff?.full_name,
   },
   {
     name: "EDITED BY",

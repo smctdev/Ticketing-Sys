@@ -68,6 +68,7 @@ export function ViewReportDetails({ data, open, setIsOpen }: any) {
                 open={isViewDialogOpen}
                 setOpen={setIsViewDialogOpen}
                 setNote={setNoteValue}
+                handleDirectToAutomation={() => {}}
               />
             )}
         </>

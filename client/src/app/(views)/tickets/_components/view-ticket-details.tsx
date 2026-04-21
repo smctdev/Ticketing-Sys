@@ -33,6 +33,7 @@ import {
 import Storage from "@/utils/storage";
 import ticketTypeUpperCase from "@/utils/ticket-type-upper-case";
 import {
+  BookmarkCheck,
   CalendarDays,
   CheckCircle2,
   Eye,
@@ -42,6 +43,7 @@ import {
   MessageCircleMore,
   Tag,
   User,
+  UserCheck,
   Users,
   X,
 } from "lucide-react";
@@ -167,7 +169,7 @@ export function ViewTicketDetails({
                 <span className="font-semibold dark:text-white text-gray-700">
                   {data?.user_login?.full_name || "Deleted Account"}
                 </span>{" "}
-                · {data?.branch_name}
+                · {data?.user_login?.branch?.b_name}
               </p>
             </DialogTitle>
           </DialogHeader>
@@ -360,24 +362,47 @@ export function ViewTicketDetails({
                 Other Details
               </span>
 
-              {(data?.approve_head ||
+              {(data?.approve_by_head ||
+                data?.approve_by_acctg_staff ||
+                data?.approve_by_acctg_sup ||
                 data?.last_approver ||
-                data?.assigned_person) && (
+                data?.assigned_person ||
+                data?.edited_by) && (
                 <div className="flex flex-wrap gap-6">
-                  {data?.approve_head && (
+                  {data?.approve_by_head && (
                     <div className="flex flex-col gap-1">
                       <span className="text-xs font-semibold dark:text-white text-gray-400 uppercase tracking-wide flex items-center gap-1">
-                        <CheckCircle2 className="w-3 h-3" /> Approved By
+                        <UserCheck className="w-3 h-3" /> Approved By
                       </span>
                       <span className="text-sm font-medium dark:text-white text-gray-700">
-                        {data.approve_head.full_name}
+                        {data.approve_by_head.full_name}
+                      </span>
+                    </div>
+                  )}
+                  {data?.approve_by_acctg_staff && (
+                    <div className="flex flex-col gap-1">
+                      <span className="text-xs font-semibold dark:text-white text-gray-400 uppercase tracking-wide flex items-center gap-1">
+                        <UserCheck className="w-3 h-3" /> Approved By
+                      </span>
+                      <span className="text-sm font-medium dark:text-white text-gray-700">
+                        {data.approve_by_acctg_staff.full_name}
+                      </span>
+                    </div>
+                  )}
+                  {data?.approve_by_acctg_sup && (
+                    <div className="flex flex-col gap-1">
+                      <span className="text-xs font-semibold dark:text-white text-gray-400 uppercase tracking-wide flex items-center gap-1">
+                        <UserCheck className="w-3 h-3" /> Approved By
+                      </span>
+                      <span className="text-sm font-medium dark:text-white text-gray-700">
+                        {data.approve_by_acctg_sup.full_name}
                       </span>
                     </div>
                   )}
                   {data?.last_approver && (
                     <div className="flex flex-col gap-1">
                       <span className="text-xs font-semibold dark:text-white text-gray-400 uppercase tracking-wide flex items-center gap-1">
-                        <User className="w-3 h-3" /> Approved By
+                        <UserCheck className="w-3 h-3" /> Approved By
                       </span>
                       <span className="text-sm font-medium dark:text-white text-gray-700">
                         {data.last_approver.full_name}
@@ -391,6 +416,16 @@ export function ViewTicketDetails({
                       </span>
                       <span className="text-sm font-medium dark:text-white text-gray-700">
                         {data.assigned_person.full_name}
+                      </span>
+                    </div>
+                  )}
+                  {data?.edited_by && (
+                    <div className="flex flex-col gap-1">
+                      <span className="text-xs font-semibold dark:text-white text-gray-400 uppercase tracking-wide flex items-center gap-1">
+                        <BookmarkCheck className="w-3 h-3" /> Edited By
+                      </span>
+                      <span className="text-sm font-medium dark:text-white text-gray-700">
+                        {data.edited_by.full_name}
                       </span>
                     </div>
                   )}
@@ -489,8 +524,9 @@ export function ViewTicketDetails({
                 </>
               )}
             {isAdmin &&
-              !isAutomation(data.pending_user.user_role.role_name) &&
-              !isAutomationManager(data.pending_user.user_role.role_name) && (
+              data.pending_user &&
+              !isAutomation(data.pending_user?.user_role?.role_name) &&
+              !isAutomationManager(data.pending_user?.user_role?.role_name) && (
                 <Button
                   type="button"
                   onClick={handleDirectToAutomation(

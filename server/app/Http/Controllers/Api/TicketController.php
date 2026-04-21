@@ -22,7 +22,7 @@ class TicketController extends Controller
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(TicketService $ticketService)
     {
         $bcode = request('bcode');
 
@@ -46,121 +46,22 @@ class TicketController extends Controller
 
         $accountingHeadCodes = $user->assignedCategories->pluck('group_code');
 
-        $isAdmin = collect([UserRoles::ADMIN, UserRoles::AUTOMATION_ADMIN, UserRoles::SUPER_ADMIN])->contains($userRole->role_name);
+        $isAdmin = \in_array($userRole->role_name, [UserRoles::ADMIN, UserRoles::AUTOMATION_ADMIN, UserRoles::SUPER_ADMIN]);
 
-        $tickets = Ticket::with(
-            'userLogin.userDetail',
-            'userLogin.userRole',
-            'userLogin.branch',
-            'ticketDetail.ticketCategory',
-            'ticketDetail.supplier',
-            'ticketDetail.subCategory',
-            'assignedPerson.userDetail',
-            'assignedPerson.userRole',
-            'assignedPerson.branch',
-            'approveAcctgStaff.userDetail',
-            'approveAcctgStaff.userRole',
-            'approveAcctgStaff.branch',
-            'approveHead.userDetail',
-            'approveHead.userRole',
-            'approveHead.branch',
-            'approveAutm.userDetail',
-            'approveAutm.userRole',
-            'approveAutm.branch',
-            'approveAcctgSup.userDetail',
-            'approveAcctgSup.userRole',
-            'approveAcctgSup.branch',
-            'pendingUser.userDetail',
-            'pendingUser.userRole',
-            'pendingUser.branch',
-            'lastApprover.userDetail',
-            'lastApprover.userRole',
-            'lastApprover.branch',
-            'branch',
-        )
-            ->when(
-                $status !== 'ALL',
-                fn($q)
-                =>
-                $q->where('status', $status)
-            )
-            ->search($search)
-            ->when($ticket_type !== 'ALL', fn($query) => $query->whereRelation('ticketDetail', 'ticket_type', $ticket_type))
-            ->when($ticket_category, fn($query) => $query->whereHas('ticketDetail', fn($subQuery) => $subQuery->where('ticket_category_id', $ticket_category)))
-            ->when($bcode, fn($query) => $query->where('branch_id', $bcode))
-            ->when(!$isAdmin, function ($query) use ($userRole, $assignedBranchCas, $assignedAreaManagers, $accountingHeadCodes, $user) {
-                $query->where(function ($subQuery) use ($userRole, $assignedBranchCas, $assignedAreaManagers, $accountingHeadCodes, $user) {
-                    $userBranchIds = explode(',', $user->blist_id);
-
-                    switch ($userRole->role_name) {
-                        case UserRoles::STAFF:
-                            $subQuery->where('login_id', Auth::id())
-                                ->whereNot('status', TicketStatus::EDITED);
-                            break;
-                        case UserRoles::AUTOMATION:
-                        case UserRoles::AUTOMATION_ADMIN:
-                            $subQuery->where('assigned_person', $user->login_id)
-                                ->where('status', TicketStatus::PENDING);
-                            break;
-                        case UserRoles::AUTOMATION_MANAGER:
-                            $subQuery->whereNot('status', TicketStatus::EDITED)
-                                ->where('displayTicket', Auth::id());
-                            // ->orWhere('last_approver', Auth::id());
-                            break;
-                        case UserRoles::BRANCH_HEAD:
-                            $subQuery->whereNot('status', TicketStatus::EDITED)
-                                ->whereIn('branch_id', $userBranchIds);
-                            break;
-                        case UserRoles::CAS:
-                            $subQuery->where('status', TicketStatus::PENDING)
-                                ->whereIn('branch_id', $assignedBranchCas);
-                            break;
-                        case UserRoles::AREA_MANAGER:
-                            $subQuery->where('status', TicketStatus::PENDING)
-                                ->whereIn('branch_id', $assignedAreaManagers);
-                            break;
-                        case UserRoles::ACCOUNTING_HEAD:
-                            $subQuery->where('status', TicketStatus::PENDING)
-                                // ->whereHas(
-                                //     'ticketDetail',
-                                //     fn($triQuery)
-                                //     =>
-                                //     $triQuery->whereHas(
-                                //         'ticketCategory',
-                                //         fn($ticketQuery)
-                                //         =>
-                                //         $ticketQuery->whereIn('group_code', $accountingHeadCodes)
-                                //     )
-                                // );
-                                ->where('displayTicket', Auth::id());
-                            break;
-                        case UserRoles::ACCOUNTING_STAFF:
-                            $subQuery->whereNot('status', TicketStatus::EDITED)
-                                ->where('login_id', Auth::id())
-                                // ->orWhereHas(
-                                //     'ticketDetail',
-                                //     fn($triQuery)
-                                //     =>
-                                //     $triQuery->whereHas(
-                                //         'ticketCategory',
-                                //         fn($ticketQuery)
-                                //         =>
-                                //         $ticketQuery->whereIn('group_code', $accountingHeadCodes)
-                                //     )
-                                // );
-                                ->orWhere('displayTicket', Auth::id());
-                            break;
-                    }
-                });
-            })
-            ->when(
-                $isAdmin,
-                fn($query)
-                =>
-                $query->whereNot('status', TicketStatus::EDITED)
-            )
-            ->orderBy('ticket_id', 'desc')
-            ->paginate($take);
+        $tickets = $ticketService->getAllTickets(
+            $status,
+            $search,
+            $ticket_type,
+            $ticket_category,
+            $bcode,
+            $isAdmin,
+            $userRole,
+            $assignedBranchCas,
+            $assignedAreaManagers,
+            $user,
+            $take,
+            $accountingHeadCodes
+        );
 
         return response()->json([
             "message"       => "Tickets fetched successfully",
@@ -190,18 +91,18 @@ class TicketController extends Controller
             'assignedPerson.userDetail',
             'assignedPerson.userRole',
             'assignedPerson.branch',
-            'approveAcctgStaff.userDetail',
-            'approveAcctgStaff.userRole',
-            'approveAcctgStaff.branch',
-            'approveHead.userDetail',
-            'approveHead.userRole',
-            'approveHead.branch',
-            'approveAutm.userDetail',
-            'approveAutm.userRole',
-            'approveAutm.branch',
-            'approveAcctgSup.userDetail',
-            'approveAcctgSup.userRole',
-            'approveAcctgSup.branch',
+            'approveByAcctgStaff.userDetail',
+            'approveByAcctgStaff.userRole',
+            'approveByAcctgStaff.branch',
+            'approveByHead.userDetail',
+            'approveByHead.userRole',
+            'approveByHead.branch',
+            'approveByAutm.userDetail',
+            'approveByAutm.userRole',
+            'approveByAutm.branch',
+            'approveByAcctgSup.userDetail',
+            'approveByAcctgSup.userRole',
+            'approveByAcctgSup.branch',
             'pendingUser.userDetail',
             'pendingUser.userRole',
             'pendingUser.branch',
@@ -304,18 +205,18 @@ class TicketController extends Controller
                 'assignedPerson.userDetail',
                 'assignedPerson.userRole',
                 'assignedPerson.branch',
-                'approveAcctgStaff.userDetail',
-                'approveAcctgStaff.userRole',
-                'approveAcctgStaff.branch',
-                'approveHead.userDetail',
-                'approveHead.userRole',
-                'approveHead.branch',
-                'approveAutm.userDetail',
-                'approveAutm.userRole',
-                'approveAutm.branch',
-                'approveAcctgSup.userDetail',
-                'approveAcctgSup.userRole',
-                'approveAcctgSup.branch',
+                'approveByAcctgStaff.userDetail',
+                'approveByAcctgStaff.userRole',
+                'approveByAcctgStaff.branch',
+                'approveByHead.userDetail',
+                'approveByHead.userRole',
+                'approveByHead.branch',
+                'approveByAutm.userDetail',
+                'approveByAutm.userRole',
+                'approveByAutm.branch',
+                'approveByAcctgSup.userDetail',
+                'approveByAcctgSup.userRole',
+                'approveByAcctgSup.branch',
                 'pendingUser.userDetail',
                 'pendingUser.userRole',
                 'pendingUser.branch',

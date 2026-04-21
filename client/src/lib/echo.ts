@@ -36,7 +36,7 @@ const pusherClient = new Pusher(CONFIG.REVERB_APP_KEY, {
   auth: {
     headers: {},
   },
-  authorizer: authorizer,
+  authorizer,
 });
 
 const echo = new Echo({

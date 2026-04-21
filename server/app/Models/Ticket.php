@@ -52,7 +52,7 @@ class Ticket extends Model
         return $this->belongsTo(UserLogin::class, 'edited_by', 'login_id');
     }
 
-    public function approveHead()
+    public function approveByHead()
     {
         return $this->belongsTo(UserLogin::class, 'approveHead', 'login_id');
     }
@@ -62,17 +62,17 @@ class Ticket extends Model
         return $this->belongsTo(UserLogin::class, 'last_approver', 'login_id');
     }
 
-    public function approveAcctgStaff()
+    public function approveByAcctgStaff()
     {
         return $this->belongsTo(UserLogin::class, 'approveAcctgStaff', 'login_id');
     }
 
-    public function approveAutm()
+    public function approveByAutm()
     {
         return $this->belongsTo(UserLogin::class, 'approveAutm', 'login_id');
     }
 
-    public function approveAcctgSup()
+    public function approveByAcctgSup()
     {
         return $this->belongsTo(UserLogin::class, 'approveAcctgSup', 'login_id');
     }

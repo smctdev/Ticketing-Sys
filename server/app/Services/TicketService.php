@@ -25,6 +25,206 @@ class TicketService
         $this->user = Auth::user();
     }
 
+    public function getAllTickets(
+        $status,
+        $search,
+        $ticket_type,
+        $ticket_category,
+        $bcode,
+        $isAdmin,
+        $userRole,
+        $assignedBranchCas,
+        $assignedAreaManagers,
+        $user,
+        $take,
+        $accountingHeadCodes,
+    ) {
+        return Ticket::with(
+            'userLogin.userDetail',
+            'userLogin.userRole',
+            'userLogin.branch',
+            'ticketDetail.ticketCategory',
+            'ticketDetail.supplier',
+            'ticketDetail.subCategory',
+            'assignedPerson.userDetail',
+            'assignedPerson.userRole',
+            'assignedPerson.branch',
+            'approveByAcctgStaff.userDetail',
+            'approveByAcctgStaff.userRole',
+            'approveByAcctgStaff.branch',
+            'approveByHead.userDetail',
+            'approveByHead.userRole',
+            'approveByHead.branch',
+            'approveByAutm.userDetail',
+            'approveByAutm.userRole',
+            'approveByAutm.branch',
+            'approveByAcctgSup.userDetail',
+            'approveByAcctgSup.userRole',
+            'approveByAcctgSup.branch',
+            'pendingUser.userDetail',
+            'pendingUser.userRole',
+            'pendingUser.branch',
+            'lastApprover.userDetail',
+            'lastApprover.userRole',
+            'lastApprover.branch',
+            'branch',
+            'editedBy.userDetail',
+            'editedBy.userRole',
+            'editedBy.branch',
+        )
+            ->when(
+                $status !== 'ALL',
+                fn($q)
+                =>
+                $q->where('status', $status)
+            )
+            ->search($search)
+            ->when($ticket_type !== 'ALL', fn($query) => $query->whereRelation('ticketDetail', 'ticket_type', $ticket_type))
+            ->when($ticket_category, fn($query) => $query->whereHas('ticketDetail', fn($subQuery) => $subQuery->where('ticket_category_id', $ticket_category)))
+            ->when($bcode, fn($query) => $query->where('branch_id', $bcode))
+            ->when(!$isAdmin, function ($query) use ($userRole, $assignedBranchCas, $assignedAreaManagers, $accountingHeadCodes, $user) {
+                $query->where(function ($subQuery) use ($userRole, $assignedBranchCas, $assignedAreaManagers, $accountingHeadCodes, $user) {
+                    $userBranchIds = explode(',', $user->blist_id);
+
+                    switch ($userRole->role_name) {
+                        case UserRoles::STAFF:
+                            $subQuery->where('login_id', Auth::id())
+                                ->whereNot('status', TicketStatus::EDITED);
+                            break;
+                        case UserRoles::AUTOMATION:
+                        case UserRoles::AUTOMATION_ADMIN:
+                            $subQuery->where('assigned_person', $user->login_id)
+                                ->where('status', TicketStatus::PENDING);
+                            break;
+                        case UserRoles::AUTOMATION_MANAGER:
+                            $subQuery->whereNot('status', TicketStatus::EDITED)
+                                ->where('displayTicket', Auth::id());
+                            // ->orWhere('last_approver', Auth::id());
+                            break;
+                        case UserRoles::BRANCH_HEAD:
+                            $subQuery->whereNot('status', TicketStatus::EDITED)
+                                ->whereIn('branch_id', $userBranchIds);
+                            break;
+                        case UserRoles::CAS:
+                            $subQuery->where('status', TicketStatus::PENDING)
+                                ->whereIn('branch_id', $assignedBranchCas);
+                            break;
+                        case UserRoles::AREA_MANAGER:
+                            $subQuery->where('status', TicketStatus::PENDING)
+                                ->whereIn('branch_id', $assignedAreaManagers);
+                            break;
+                        case UserRoles::ACCOUNTING_HEAD:
+                            $subQuery->where('status', TicketStatus::PENDING)
+                                // ->whereHas(
+                                //     'ticketDetail',
+                                //     fn($triQuery)
+                                //     =>
+                                //     $triQuery->whereHas(
+                                //         'ticketCategory',
+                                //         fn($ticketQuery)
+                                //         =>
+                                //         $ticketQuery->whereIn('group_code', $accountingHeadCodes)
+                                //     )
+                                // );
+                                ->where('displayTicket', Auth::id());
+                            break;
+                        case UserRoles::ACCOUNTING_STAFF:
+                            $subQuery->whereNot('status', TicketStatus::EDITED)
+                                ->where('login_id', Auth::id())
+                                // ->orWhereHas(
+                                //     'ticketDetail',
+                                //     fn($triQuery)
+                                //     =>
+                                //     $triQuery->whereHas(
+                                //         'ticketCategory',
+                                //         fn($ticketQuery)
+                                //         =>
+                                //         $ticketQuery->whereIn('group_code', $accountingHeadCodes)
+                                //     )
+                                // );
+                                ->orWhere('displayTicket', Auth::id());
+                            break;
+                    }
+                });
+            })
+            ->when(
+                $isAdmin,
+                fn($query)
+                =>
+                $query->whereNot('status', TicketStatus::EDITED)
+            )
+            ->orderBy('ticket_id', 'desc')
+            ->paginate($take)
+            ->through(fn($ticket)             => [
+                'ticket_id'                   => $ticket->ticket_id,
+                'ticket_details_id'           => $ticket->ticket_details_id,
+                'ticket_code'                 => $ticket->ticket_code,
+                'status'                      => $ticket->status,
+                'assigned_person'             => [
+                    'login_id'                => $ticket->assignedPerson->login_id,
+                    'full_name'               => $ticket->assignedPerson->full_name,
+                ],
+                'ticket_detail'               => [
+                    'ticket_details_id'       => $ticket->ticketDetail->ticket_details_id,
+                    'ticket_type'             => $ticket->ticketDetail->ticket_type,
+                    'ticket_transaction_date' => $ticket->ticketDetail->ticket_transaction_date,
+                    'td_ref_number'           => $ticket->ticketDetail->td_ref_number,
+                    'td_from'                 => $ticket->ticketDetail->td_from,
+                    'td_to'                   => $ticket->ticketDetail->td_to,
+                    'td_purpose'              => $ticket->ticketDetail->td_purpose,
+                    'td_note'                 => $ticket->ticketDetail->td_note,
+                    'td_note_bh'              => $ticket->ticketDetail->td_note_bh,
+                    'td_note_accounting'      => $ticket->ticketDetail->td_note_accounting,
+                    'td_support'              => $ticket->ticketDetail->td_support,
+                    'ticket_category'         => [
+                        'category_name'       => $ticket->ticketDetail->ticketCategory->category_name
+                    ],
+                    'date_created'            => $ticket->ticketDetail->date_created,
+                    'sub_category'            => !$ticket->ticketDetail?->subCategory ? null : [
+                        'sub_category_name'   => $ticket->ticketDetail?->subCategory?->sub_category_name
+                    ]
+                ],
+                'user_login'                  => [
+                    'login_id'                => $ticket->userLogin->login_id,
+                    'full_name'               => $ticket->userLogin->full_name,
+                    'branch'                  => [
+                        'b_name'              => $ticket->userLogin->branch->b_name,
+                        'b_code'              => $ticket->userLogin->branch->b_code,
+                    ],
+                ],
+                'branch'                      => [
+                    'b_name'                  => $ticket->branch->b_name,
+                    'b_code'                  => $ticket->branch->b_code,
+                ],
+                'pending_user'                => [
+                    'full_name'               => $ticket->pendingUser->full_name,
+                    'user_role'               => [
+                        'role_name'           => $ticket->pendingUser->userRole->role_name
+                    ],
+                    'user_detail'             => [
+                        'user_email'          => $ticket->pendingUser->userDetail->user_email,
+                        'profile_pic'         => $ticket->pendingUser->userDetail->profile_pic,
+                    ],
+                    'branch'                  => [
+                        'b_name'              => $ticket->pendingUser->branch->b_name,
+                        'b_code'              => $ticket->pendingUser->branch->b_code,
+                    ],
+                ],
+                'approve_by_head'             => !$ticket?->approveByHead ? null : [
+                    'full_name'               => $ticket?->approveByHead?->full_name,
+                ],
+                'approve_by_acctg_staff'      => !$ticket?->approveByAcctgStaff ? null : [
+                    'full_name'               => $ticket?->approveByAcctgStaff?->full_name,
+                ],
+                'approve_by_acctg_sup'        => !$ticket?->approveByAcctgSup ? null : [
+                    'full_name'               => $ticket?->approveByAcctgSup?->full_name,
+                ],
+                'edited_by'                   => !$ticket?->editedBy ? null : [
+                    'full_name'               => $ticket->editedBy->full_name,
+                ],
+            ]);
+    }
+
     private function branchHeads()
     {
         $ids = explode(',', Auth::user()->blist_id);
@@ -50,10 +250,10 @@ class TicketService
             'assignedPerson.userDetail',
             'assignedPerson.userRole',
             'assignedPerson.branch',
-            'approveAcctgStaff',
-            'approveHead',
-            'approveAutm',
-            'approveAcctgSup',
+            'approveByAcctgStaff',
+            'approveByHead',
+            'approveByAutm',
+            'approveByAcctgSup',
             'branch',
             'userLogin.userDetail',
             'pendingUser.userDetail'
@@ -557,16 +757,18 @@ class TicketService
             $requestData = [];
 
             if ($this->user->isBranchHead() && $directToAccounting) {
-                $ticketApprovedData['approveHead'] = $this->user?->login_id;
+                $ticketApprovedData['approveByHead'] = $this->user?->login_id;
                 $ticketApprovedData['displayTicket'] = $accountingStaff->login_id;
                 $ticketApprovedData['appTBranchHead'] = now()->format('n/j/Y, h:i:s A');
             } elseif ($this->user->isBranchHead()) {
-                $ticketApprovedData['approveHead'] = $this->user?->login_id;
+                $ticketApprovedData['approveByHead'] = $this->user?->login_id;
                 $ticketApprovedData['displayTicket'] = $automationManager?->login_id;
                 $ticketApprovedData['appTBranchHead'] = now()->format('n/j/Y, h:i:s A');
             } elseif ($this->user->isAccountingStaff()) {
+                $ticketApprovedData['approveByAcctgStaff'] = $this->user?->login_id;
                 $ticketApprovedData['displayTicket'] = $accountingHead?->login_id ?? $automationManager?->login_id;
             } elseif ($this->user->isAccountingHead()) {
+                $ticketApprovedData['approveByAcctgSup'] = $this->user?->login_id;
                 $ticketApprovedData['displayTicket'] = $automationManager?->login_id;
             } else {
                 if ($this->user->isAutomation()) {
@@ -620,25 +822,21 @@ class TicketService
         $data = DB::transaction(function () use ($id, $request) {
             $ticketDetail = TicketDetail::findOrFail($id);
 
-            $ticketApprovedData = [
-                'last_approver'     => $this->user->login_id,
-            ];
-
             $requestData = [
                 'td_note_bh'        => $request->td_note_bh,
                 'date_completed'    => now(),
                 'time'              => now()->format('h:i:s A'),
             ];
 
-            $ticketApprovedData['displayTicket'] = null;
-            $ticketApprovedData['edited_by'] = $this->user->login_id;
-            $ticketApprovedData['status'] = TicketStatus::EDITED;
-            $ticketApprovedData['isCounted'] = $request->is_counted;
-            $ticketApprovedData['appTEdited'] = now()->format('n/j/Y, h:i:s A');
-
             $ticketDetail->update($requestData);
 
-            $ticketDetail->ticket->update($ticketApprovedData);
+            $ticketDetail->ticket->update([
+                'displayTicket' => null,
+                'status'        => TicketStatus::EDITED,
+                'edited_by'     => $this->user->login_id,
+                'isCounted'     => $request->is_counted,
+                'appTEdited'    => now()->format('n/j/Y, h:i:s A'),
+            ]);
 
             $this->readNotificationOnAction($ticketDetail->ticket->ticket_code);
 

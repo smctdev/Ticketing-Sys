@@ -151,11 +151,11 @@ function Reports() {
             Branch: i === 0 ? t?.branch_name : "",
             "Requested By":
               i === 0 ? t?.user_login?.full_name || "Deleted Account" : "",
-            "Approve By BM/BS": i === 0 ? t?.approve_head?.full_name : "",
+            "Approve By BM/BS": i === 0 ? t?.approve_by_head?.full_name : "",
             "Approve By Acctg. Staff":
-              i === 0 ? t?.approve_acctg_staff?.full_name : "",
+              i === 0 ? t?.approve_by_acctg_staff?.full_name : "",
             "Approve By Accounting Head":
-              i === 0 ? t?.approve_acctg_sup?.full_name : "",
+              i === 0 ? t?.approve_by_acctg_sup?.full_name : "",
             "Edited By": i === 0 ? t?.assigned_person?.full_name : "",
             "Date Edited":
               i === 0 ? formattedDate(t?.ticket_detail?.date_completed) : "",
