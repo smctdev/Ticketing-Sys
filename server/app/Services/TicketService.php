@@ -156,6 +156,7 @@ class TicketService
             ->orderBy('ticket_id', 'desc')
             ->paginate($take)
             ->through(fn($ticket)             => [
+                'login_id'                    => $ticket->login_id,
                 'ticket_id'                   => $ticket->ticket_id,
                 'ticket_details_id'           => $ticket->ticket_details_id,
                 'ticket_code'                 => $ticket->ticket_code,
