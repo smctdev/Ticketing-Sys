@@ -64,6 +64,7 @@ function Tickets() {
     handleReset,
     setIsRefresh,
     setIsLoading,
+    isRefresh: isRefreshTickets,
   } = useFetch({
     url: "/tickets",
     isPaginated: true,
@@ -634,10 +635,9 @@ function Tickets() {
                 <ButtonLoader
                   type="button"
                   className="bg-yellow-500 hover:bg-yellow-600"
-                  isLoading={isLoading}
+                  isLoading={isRefreshTickets}
                   onClick={() => {
                     setIsRefresh(true);
-                    setIsLoading(true);
                     setIsRefreshBranchHeads(true);
                   }}
                 >
@@ -662,7 +662,7 @@ function Tickets() {
           <DataTableComponent
             data={data?.data?.data}
             columns={[...TICKETS_COLUMNS, ...TICKET_COLUMNS_ACTIONS]}
-            loading={isLoading}
+            loading={isLoading || isRefreshTickets}
             handlePageChange={handlePageChange}
             handlePerPageChange={handlePerPageChange}
             handleShort={handleShort}

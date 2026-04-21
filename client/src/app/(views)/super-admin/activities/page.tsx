@@ -82,7 +82,7 @@ function ActivityPage() {
           <DataTableComponent
             data={data?.data?.data}
             columns={ACTIVITIES_COLUMNS}
-            loading={isLoading}
+            loading={isLoading || isRefresh}
             handlePageChange={handlePageChange}
             handlePerPageChange={handlePerPageChange}
             column={pagination.sortBy}
