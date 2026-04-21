@@ -79,12 +79,16 @@ export const VIEW_DETAIL_COMLUMNS = [
     cell: (row: any) => row.approve_by_head?.full_name,
   },
   {
-    name: "APPROVED BY ACCOUNTING",
+    name: "APPROVED BY ACCOUNTING HEAD",
     cell: (row: any) => row.approve_by_acctg_sup?.full_name,
   },
   {
     name: "APPROVED BY ACCOUNTING STAFF",
     cell: (row: any) => row.approve_by_acctg_staff?.full_name,
+  },
+  {
+    name: "APPROVED BY AUTOMATION MANAGER",
+    cell: (row: any) => row.last_approver?.full_name,
   },
   {
     name: "EDITED BY",

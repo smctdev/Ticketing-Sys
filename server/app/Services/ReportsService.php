@@ -61,6 +61,9 @@ class ReportsService
             'editedBy.userDetail',
             'editedBy.userRole',
             'editedBy.branch',
+            'lastApprover.userDetail',
+            'lastApprover.userRole',
+            'lastApprover.branch',
             'branch',
         )
             ->when(
@@ -265,6 +268,9 @@ class ReportsService
             'editedBy.userDetail',
             'editedBy.userRole',
             'editedBy.branch',
+            'lastApprover.userDetail',
+            'lastApprover.userRole',
+            'lastApprover.branch',
             'branch',
         )
             ->when(

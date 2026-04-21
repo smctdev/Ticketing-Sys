@@ -187,12 +187,12 @@ class TicketService
                 'user_login'                  => [
                     'login_id'                => $ticket->userLogin->login_id,
                     'full_name'               => $ticket->userLogin->full_name,
-                    'branch'                  => [
+                    'branch'                  => !$ticket->userLogin->branch ? null : [
                         'b_name'              => $ticket->userLogin->branch->b_name,
                         'b_code'              => $ticket->userLogin->branch->b_code,
                     ],
                 ],
-                'branch'                      => [
+                'branch'                      => !$ticket->branch ? null : [
                     'b_name'                  => $ticket->branch->b_name,
                     'b_code'                  => $ticket->branch->b_code,
                 ],
