@@ -197,6 +197,7 @@ class TicketService
                     'b_code'                  => $ticket->branch->b_code,
                 ],
                 'pending_user'                => [
+                    'login_id'                => $ticket->pendingUser->login_id,
                     'full_name'               => $ticket->pendingUser->full_name,
                     'user_role'               => [
                         'role_name'           => $ticket->pendingUser->userRole->role_name
