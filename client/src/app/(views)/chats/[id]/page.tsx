@@ -49,7 +49,7 @@ function ChatsPage() {
   const { newMessage, setMessageRecords } = useChat();
   const [message, setMessage] = useState<string>(
     ticketCode
-      ? `Hello, let's talk about the ticket with the ticket code of ${ticketCode}?`
+      ? `Hello, let's discuss the ticket with code #${ticketCode}?`
       : "",
   );
   const [messages, setMessages] = useState<MessageType[]>([]);
