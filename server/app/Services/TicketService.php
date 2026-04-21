@@ -205,10 +205,11 @@ class TicketService
                         'user_email'          => $ticket->pendingUser->userDetail->user_email,
                         'profile_pic'         => $ticket->pendingUser->userDetail->profile_pic,
                     ],
-                    'branch'                  => [
+                    'branch'                  => !$ticket->pendingUser->branch ? null : [
                         'b_name'              => $ticket->pendingUser->branch->b_name,
                         'b_code'              => $ticket->pendingUser->branch->b_code,
                     ],
+                    'branches'                => $ticket->pendingUser->branches,
                 ],
                 'approve_by_head'             => !$ticket?->approveByHead ? null : [
                     'full_name'               => $ticket?->approveByHead?->full_name,
