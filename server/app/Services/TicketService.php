@@ -760,18 +760,18 @@ class TicketService
             $requestData = [];
 
             if ($this->user->isBranchHead() && $directToAccounting) {
-                $ticketApprovedData['approveByHead'] = $this->user?->login_id;
+                $ticketApprovedData['approveHead'] = $this->user?->login_id;
                 $ticketApprovedData['displayTicket'] = $accountingStaff->login_id;
                 $ticketApprovedData['appTBranchHead'] = now()->format('n/j/Y, h:i:s A');
             } elseif ($this->user->isBranchHead()) {
-                $ticketApprovedData['approveByHead'] = $this->user?->login_id;
+                $ticketApprovedData['approveHead'] = $this->user?->login_id;
                 $ticketApprovedData['displayTicket'] = $automationManager?->login_id;
                 $ticketApprovedData['appTBranchHead'] = now()->format('n/j/Y, h:i:s A');
             } elseif ($this->user->isAccountingStaff()) {
-                $ticketApprovedData['approveByAcctgStaff'] = $this->user?->login_id;
+                $ticketApprovedData['approveAcctgStaff'] = $this->user?->login_id;
                 $ticketApprovedData['displayTicket'] = $accountingHead?->login_id ?? $automationManager?->login_id;
             } elseif ($this->user->isAccountingHead()) {
-                $ticketApprovedData['approveByAcctgSup'] = $this->user?->login_id;
+                $ticketApprovedData['approveAcctgSup'] = $this->user?->login_id;
                 $ticketApprovedData['displayTicket'] = $automationManager?->login_id;
             } else {
                 if ($this->user->isAutomation()) {
