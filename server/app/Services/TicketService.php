@@ -160,11 +160,11 @@ class TicketService
                 'ticket_details_id'           => $ticket->ticket_details_id,
                 'ticket_code'                 => $ticket->ticket_code,
                 'status'                      => $ticket->status,
-                'assigned_person'             => [
+                'assigned_person'             => !$ticket->assignedPerson ? null : [
                     'login_id'                => $ticket->assignedPerson->login_id,
                     'full_name'               => $ticket->assignedPerson->full_name,
                 ],
-                'ticket_detail'               => [
+                'ticket_detail'               => !$ticket->ticketDetail ? null : [
                     'ticket_details_id'       => $ticket->ticketDetail->ticket_details_id,
                     'ticket_type'             => $ticket->ticketDetail->ticket_type,
                     'ticket_transaction_date' => $ticket->ticketDetail->ticket_transaction_date,
@@ -176,7 +176,7 @@ class TicketService
                     'td_note_bh'              => $ticket->ticketDetail->td_note_bh,
                     'td_note_accounting'      => $ticket->ticketDetail->td_note_accounting,
                     'td_support'              => $ticket->ticketDetail->td_support,
-                    'ticket_category'         => [
+                    'ticket_category'         => !$ticket->ticketDetail->ticketCategory ? null : [
                         'category_name'       => $ticket->ticketDetail->ticketCategory->category_name
                     ],
                     'date_created'            => $ticket->ticketDetail->date_created,
@@ -184,7 +184,7 @@ class TicketService
                         'sub_category_name'   => $ticket->ticketDetail?->subCategory?->sub_category_name
                     ]
                 ],
-                'user_login'                  => [
+                'user_login'                  => !$ticket->userLogin ? null : [
                     'login_id'                => $ticket->userLogin->login_id,
                     'full_name'               => $ticket->userLogin->full_name,
                     'branch'                  => !$ticket->userLogin->branch ? null : [
@@ -196,13 +196,13 @@ class TicketService
                     'b_name'                  => $ticket->branch->b_name,
                     'b_code'                  => $ticket->branch->b_code,
                 ],
-                'pending_user'                => [
+                'pending_user'                => !$ticket->pendingUser ? null : [
                     'login_id'                => $ticket->pendingUser->login_id,
                     'full_name'               => $ticket->pendingUser->full_name,
-                    'user_role'               => [
+                    'user_role'               => !$ticket->pendingUser->userRole ? null : [
                         'role_name'           => $ticket->pendingUser->userRole->role_name
                     ],
-                    'user_detail'             => [
+                    'user_detail'             => !$ticket->pendingUser->userDetail ? null : [
                         'user_email'          => $ticket->pendingUser->userDetail->user_email,
                         'profile_pic'         => $ticket->pendingUser->userDetail->profile_pic,
                     ],
