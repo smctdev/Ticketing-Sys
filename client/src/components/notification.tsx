@@ -154,7 +154,7 @@ export default function Notification() {
           </div>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end" className="min-w-[350px]">
-          <DropdownMenuLabel className="dark:text-white dark:text-white text-gray-600 font-bold text-md">
+          <DropdownMenuLabel className="dark:text-white text-gray-600 font-bold text-md">
             Notifications
           </DropdownMenuLabel>
           <DropdownMenuSeparator />

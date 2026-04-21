@@ -29,7 +29,13 @@ type ChatContextType = {
   setMessageReceivedCount: Dispatch<SetStateAction<number>>;
   newMessage: MessageType | null;
   handlePoked: (id: number) => () => void;
-  usersOnlineCount: number;
+  usersOnline: UsersOnlineType[];
+};
+
+export type UsersOnlineType = {
+  id: number;
+  full_name: string;
+  timestamp: Date;
 };
 
 const ChatContext = createContext<ChatContextType | undefined>(undefined);
@@ -38,7 +44,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const [messageRecords, setMessageRecords] = useState<MessageRecordType[]>([]);
   const [messageReceivedCount, setMessageReceivedCount] = useState<number>(0);
   const [newMessage, setNewMessage] = useState<MessageType | null>(null);
-  const [usersOnlineCount, setUsersOnlineCount] = useState<number>(0);
+  const [usersOnline, setUsersOnline] = useState<UsersOnlineType[]>([]);
   const pathname = usePathname();
   const router = useRouter();
   const { user } = useAuth();
@@ -114,13 +120,13 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         });
       })
       .here((e: any) => {
-        setUsersOnlineCount(e.length);
+        setUsersOnline(e);
       })
-      .joining(() => {
-        setUsersOnlineCount((prev) => prev + 1);
+      .joining((e: any) => {
+        setUsersOnline((prev) => [e, ...prev]);
       })
-      .leaving(() => {
-        setUsersOnlineCount((prev) => prev - 1);
+      .leaving((e: any) => {
+        setUsersOnline((prev) => [...prev.filter((user) => user.id !== e.id)]);
       });
 
     return () => {
@@ -151,7 +157,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         setMessageReceivedCount,
         newMessage,
         handlePoked,
-        usersOnlineCount,
+        usersOnline,
       }}
     >
       {children}

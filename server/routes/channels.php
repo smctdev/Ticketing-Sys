@@ -24,5 +24,9 @@ Broadcast::channel('chats.{login_id}', function ($user, $login_id) {
 });
 
 Broadcast::channel('poked', function ($user) {
-    return true;
+    return [
+        'id'        => $user->login_id,
+        'full_name' => $user->full_name,
+        'timestamp' => now()
+    ];
 });

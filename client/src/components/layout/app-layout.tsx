@@ -13,10 +13,17 @@ import ProfileDropdown from "../profile-dropdown";
 import SettingsSheet from "../settings-sheet";
 import { Badge } from "../ui/badge";
 import { useChat } from "@/context/chat-context";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "../ui/hover-card";
+import { HoverCardArrow } from "@radix-ui/react-hover-card";
+import { differenceInSeconds, formatDistanceToNowStrict } from "date-fns";
 
 const AppLayout = ({ children }: { children: ReactNode }) => {
   const { open } = useSidebar();
-  const { usersOnlineCount } = useChat();
+  const { usersOnline } = useChat();
   const pathname = usePathname();
   const path: any =
     pathname === "/"
@@ -52,13 +59,48 @@ const AppLayout = ({ children }: { children: ReactNode }) => {
                 ))}
               </div>
               <div className="flex items-center gap-3">
-                {usersOnlineCount > 0 && (
-                  <Badge
-                    variant={"outline"}
-                    className="bg-green-600 text-green-100 py-1 font-bold"
-                  >
-                    Total online: {usersOnlineCount}
-                  </Badge>
+                {usersOnline.length > 0 && (
+                  <HoverCard>
+                    <HoverCardTrigger asChild>
+                      <Badge
+                        variant={"outline"}
+                        className="bg-green-600 text-green-100 py-1 font-bold"
+                      >
+                        Total online: {usersOnline.length}
+                      </Badge>
+                    </HoverCardTrigger>
+                    <HoverCardContent>
+                      <HoverCardArrow />
+                      <div className="flex flex-col gap-3 max-h-[300px] overflow-y-auto">
+                        {usersOnline?.map((user) => (
+                          <div
+                            className="flex justify-between items-center"
+                            key={user.id}
+                          >
+                            <div className="text-[10px] flex items-center gap-2">
+                              <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
+                              <span className="font-bold">
+                                {user.full_name}
+                              </span>
+                            </div>
+                            <div className="text-[10px]">
+                              {differenceInSeconds(
+                                new Date(),
+                                new Date(user.timestamp),
+                              ) < 1
+                                ? "Just now"
+                                : formatDistanceToNowStrict(
+                                    new Date(user.timestamp),
+                                    {
+                                      addSuffix: true,
+                                    },
+                                  )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </HoverCardContent>
+                  </HoverCard>
                 )}
                 <Notification />
                 <ProfileDropdown />

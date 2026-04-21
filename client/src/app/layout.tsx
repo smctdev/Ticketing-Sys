@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: {
       default: "SMCT Group of Companies Ticketing",
-      template: "SMCT Group of Companies Ticketing | %s",
+      template: "SMCT Ticketing | %s",
     },
     description: "The official website for SMCT Group of Companies Ticketing",
     images: [
