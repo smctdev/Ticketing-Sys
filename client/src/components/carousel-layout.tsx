@@ -40,7 +40,10 @@ function ZoomableImage({
   const dragStart = useRef({ x: 0, y: 0 });
   const lastPosition = useRef({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
-  const [rotate, setRotate] = useState<number>(0);
+  const [rotate, setRotate] = useState<{ deg: number; rotation: string }>({
+    deg: 0,
+    rotation: "rotate-0",
+  });
 
   const clampPosition = (x: number, y: number, currentScale: number) => {
     if (!containerRef.current) return { x, y };
@@ -111,7 +114,12 @@ function ZoomableImage({
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 bg-black/50 backdrop-blur-sm rounded-full px-4 py-2">
         <Button
           variant={"link"}
-          onClick={() => setRotate((prev) => (prev + 90) % 360)}
+          onClick={() =>
+            setRotate((prev) => ({
+              deg: (prev.deg + 90) % 360,
+              rotation: `rotate-${(prev.deg + 90) % 360}`,
+            }))
+          }
           className="text-white disabled:opacity-30 hover:scale-110 transition-all duration-300"
         >
           <RefreshCcw size={18} />
@@ -165,7 +173,7 @@ function ZoomableImage({
           alt={alt}
           src={src}
           fill
-          className={`object-contain select-none ${`rotate-${rotate}`} transition-all duration-300 ease-in-out`}
+          className={`object-contain select-none ${rotate.rotation} transition-all duration-300 ease-in-out`}
           loading="lazy"
           draggable={false}
         />
