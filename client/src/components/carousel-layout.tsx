@@ -117,7 +117,7 @@ function ZoomableImage({
           onClick={() =>
             setRotate((prev) => ({
               deg: (prev.deg + 90) % 360,
-              rotation: `rotate-${(prev.deg + 90) % 360}`,
+              rotation: `${(prev.deg + 90) % 360}deg`,
             }))
           }
           className="text-white disabled:opacity-30 hover:scale-110 transition-all duration-300"
@@ -173,7 +173,8 @@ function ZoomableImage({
           alt={alt}
           src={src}
           fill
-          className={`object-contain select-none ${rotate.rotation} transition-all duration-300 ease-in-out`}
+          className="object-contain select-none transition-all duration-300 ease-in-out"
+          style={{ rotate: rotate.rotation }}
           loading="lazy"
           draggable={false}
         />
