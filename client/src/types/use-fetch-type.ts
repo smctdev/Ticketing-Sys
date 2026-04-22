@@ -20,6 +20,7 @@ export interface UseFetchType {
   isRefresh: boolean;
   setIsLoading: Dispatch<SetStateAction<boolean>>;
   errorStatus: number | null;
+  fetchData: () => Promise<void>;
 }
 
 export interface FilterByType {

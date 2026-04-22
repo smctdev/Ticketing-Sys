@@ -63,9 +63,9 @@ function Tickets() {
     handleSelectFilter,
     handleReset,
     setIsRefresh,
-    setIsLoading,
     isRefresh: isRefreshTickets,
-    error: ticketsError
+    error: ticketsError,
+    fetchData,
   } = useFetch({
     url: "/tickets",
     isPaginated: true,
@@ -647,13 +647,13 @@ function Tickets() {
               </div>
               {canCreateTicket(user?.user_role?.role_name) && (
                 <CreateTicket
-                  setIsRefresh={setIsRefresh}
                   categories={categories}
                   user={user}
                   setTicketType={setTicketType}
                   setIsRefreshCategories={setIsRefreshCategories}
                   branchHeads={branchHeads?.data}
                   setIsRefreshBranchHeads={setIsRefreshBranchHeads}
+                  fetchData={fetchData}
                 />
               )}
             </div>

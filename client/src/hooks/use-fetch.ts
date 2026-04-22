@@ -39,69 +39,6 @@ export default function useFetch({
   const router = useRouter();
 
   useEffect(() => {
-    const fetchData = async () => {
-      const { defaultSearchValue, ...filteredData } = filterBy;
-      const payload = {
-        page: pagination.page,
-        limit: pagination.perPage,
-        // sortBy: pagination.sortBy,
-        // sortDirection: pagination.sortDirection,
-        ...filteredData,
-      };
-      try {
-        const response = await api.get(url, {
-          params: isPaginated ? payload : {},
-        });
-        if (response.status === 200) {
-          setData(response.data);
-          setPagination((pagination) => ({
-            ...pagination,
-            totalRecords: response?.data?.data?.total,
-          }));
-        }
-      } catch (error: any) {
-        console.error("Error fetching data:", error);
-        if (!error.response && !errorRef.current) {
-          Swal.fire({
-            icon: "error",
-            title: error.code || "Server Error",
-            confirmButtonColor: "#1e88e5",
-            confirmButtonText: "Ok",
-            html: `${error.message || "Something went wrong."}<br>Please try again later.<br>Thank you!`,
-          });
-          setError(
-            `${error.message || "Something went wrong."} Please try again later. Thank you!`,
-          );
-          errorRef.current = true;
-        }
-
-        if (error?.response?.status === 429 && !errorRef.current) {
-          toast.error(error?.code, {
-            position: "bottom-center",
-            description: `${error?.response?.data?.message || "Something went wrong."} Please try again later.`,
-          });
-          setError(`${error?.response?.data?.message} Please try again later.`);
-          errorRef.current = true;
-        }
-
-        setError(
-          `${error?.response?.data?.message || "Something went wrong."} Please try again later.`,
-        );
-        setErrorStatus(error?.response?.status);
-        setData([]);
-      } finally {
-        setIsLoading(false);
-        setIsRefresh(false);
-        if (isPaginated) {
-          setPagination((pagination) => ({
-            ...pagination,
-            isLoading: false,
-          }));
-        }
-        setRefresh(false);
-      }
-    };
-
     fetchData();
   }, [
     pagination?.page,
@@ -126,6 +63,69 @@ export default function useFetch({
     canBeRefreshGlobal,
     status,
   ]);
+
+  const fetchData = async () => {
+    const { defaultSearchValue, ...filteredData } = filterBy;
+    const payload = {
+      page: pagination.page,
+      limit: pagination.perPage,
+      // sortBy: pagination.sortBy,
+      // sortDirection: pagination.sortDirection,
+      ...filteredData,
+    };
+    try {
+      const response = await api.get(url, {
+        params: isPaginated ? payload : {},
+      });
+      if (response.status === 200) {
+        setData(response.data);
+        setPagination((pagination) => ({
+          ...pagination,
+          totalRecords: response?.data?.data?.total,
+        }));
+      }
+    } catch (error: any) {
+      console.error("Error fetching data:", error);
+      if (!error.response && !errorRef.current) {
+        Swal.fire({
+          icon: "error",
+          title: error.code || "Server Error",
+          confirmButtonColor: "#1e88e5",
+          confirmButtonText: "Ok",
+          html: `${error.message || "Something went wrong."}<br>Please try again later.<br>Thank you!`,
+        });
+        setError(
+          `${error.message || "Something went wrong."} Please try again later. Thank you!`,
+        );
+        errorRef.current = true;
+      }
+
+      if (error?.response?.status === 429 && !errorRef.current) {
+        toast.error(error?.code, {
+          position: "bottom-center",
+          description: `${error?.response?.data?.message || "Something went wrong."} Please try again later.`,
+        });
+        setError(`${error?.response?.data?.message} Please try again later.`);
+        errorRef.current = true;
+      }
+
+      setError(
+        `${error?.response?.data?.message || "Something went wrong."} Please try again later.`,
+      );
+      setErrorStatus(error?.response?.status);
+      setData([]);
+    } finally {
+      setIsLoading(false);
+      setIsRefresh(false);
+      if (isPaginated) {
+        setPagination((pagination) => ({
+          ...pagination,
+          isLoading: false,
+        }));
+      }
+      setRefresh(false);
+    }
+  };
 
   const handleSearchTerm =
     (debounce = 2000) =>
@@ -222,5 +222,6 @@ export default function useFetch({
     isRefresh,
     setIsLoading,
     errorStatus,
+    fetchData,
   };
 }

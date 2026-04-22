@@ -21,13 +21,13 @@ import BasicForm from "./basic-form";
 import SqlForm from "./sql-form";
 
 export function CreateTicket({
-  setIsRefresh,
   categories,
   user,
   setTicketType,
   setIsRefreshCategories,
   branchHeads,
   setIsRefreshBranchHeads,
+  fetchData,
 }: any) {
   const [formInput, setFormInput] =
     useState<TicketFormDataType>(TICKET_FORM_DATA);
@@ -92,7 +92,6 @@ export function CreateTicket({
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
-    setIsRefresh(true);
     setIsRefreshBranchHeads(true);
     try {
       const formData = new FormData();
@@ -154,6 +153,7 @@ export function CreateTicket({
           description: response.data.message,
           position: "bottom-center",
         });
+        fetchData();
       }
     } catch (error: any) {
       console.error(error);
@@ -166,7 +166,6 @@ export function CreateTicket({
       }
     } finally {
       setIsLoading(false);
-      setIsRefresh(false);
       setIsRefreshBranchHeads(true);
     }
   };
@@ -243,7 +242,10 @@ export function CreateTicket({
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-2xl flex flex-col">
-        <form className="flex flex-col flex-1 gap-5 min-h-0" onSubmit={handleSubmit}>
+        <form
+          className="flex flex-col flex-1 gap-5 min-h-0"
+          onSubmit={handleSubmit}
+        >
           <DialogHeader>
             <DialogTitle>Create Ticket</DialogTitle>
           </DialogHeader>
