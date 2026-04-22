@@ -6,12 +6,12 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { format } from "date-fns";
+import { dateRangeFormat } from "@/utils/date-range-format";
 import { CalendarIcon } from "lucide-react";
 
 export default function DateFilter({ filterBy, handleDateFilter }: any) {
   return (
-    <div className="grid 2xl:grid-cols-3 items-center gap-4">
+    <div className="grid md:grid-cols-3 items-center gap-4">
       <div className="flex gap-2 w-full">
         <div className="flex flex-col gap-3 w-full">
           <Label htmlFor="edited_date" className="px-1">
@@ -28,11 +28,11 @@ export default function DateFilter({ filterBy, handleDateFilter }: any) {
                 {filterBy.edited_end_date ? (
                   filterBy.edited_end_date ? (
                     <>
-                      {format(filterBy.edited_start_date, "LLL dd, y")} -{" "}
-                      {format(filterBy.edited_end_date, "LLL dd, y")}
+                      {dateRangeFormat(filterBy.edited_start_date)} -{" "}
+                      {dateRangeFormat(filterBy.edited_end_date)}
                     </>
                   ) : (
-                    format(filterBy.edited_start_date, "LLL dd, y")
+                    dateRangeFormat(filterBy.edited_start_date)
                   )
                 ) : (
                   <span>Pick a date</span>
@@ -76,18 +76,11 @@ export default function DateFilter({ filterBy, handleDateFilter }: any) {
                 {filterBy.edited_transaction_end_date ? (
                   filterBy.edited_transaction_end_date ? (
                     <>
-                      {format(
-                        filterBy.edited_transaction_start_date,
-                        "LLL dd, y",
-                      )}{" "}
-                      -{" "}
-                      {format(
-                        filterBy.edited_transaction_end_date,
-                        "LLL dd, y",
-                      )}
+                      {dateRangeFormat(filterBy.edited_transaction_start_date)}{" "}
+                      - {dateRangeFormat(filterBy.edited_transaction_end_date)}
                     </>
                   ) : (
-                    format(filterBy.edited_transaction_start_date, "LLL dd, y")
+                    dateRangeFormat(filterBy.edited_transaction_start_date)
                   )
                 ) : (
                   <span>Pick a date</span>
@@ -133,18 +126,11 @@ export default function DateFilter({ filterBy, handleDateFilter }: any) {
                 {filterBy.created_end_date ? (
                   filterBy.created_end_date ? (
                     <>
-                      {format(
-                        filterBy.created_start_date,
-                        "LLL dd, y",
-                      )}{" "}
-                      -{" "}
-                      {format(
-                        filterBy.created_end_date,
-                        "LLL dd, y",
-                      )}
+                      {dateRangeFormat(filterBy.created_start_date)} -{" "}
+                      {dateRangeFormat(filterBy.created_end_date)}
                     </>
                   ) : (
-                    format(filterBy.created_start_date, "LLL dd, y")
+                    dateRangeFormat(filterBy.created_start_date)
                   )
                 ) : (
                   <span>Pick a date</span>
@@ -161,9 +147,7 @@ export default function DateFilter({ filterBy, handleDateFilter }: any) {
                   to: filterBy.created_end_date,
                 }}
                 onSelect={(range) => {
-                  handleDateFilter("created_start_date")(
-                    range?.from,
-                  );
+                  handleDateFilter("created_start_date")(range?.from);
                   handleDateFilter("created_end_date")(range?.to);
                 }}
                 numberOfMonths={2}

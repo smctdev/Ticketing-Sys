@@ -265,9 +265,9 @@ Route::middleware([
 });
 
 // GUEST ROUTES
-Route::middleware(["throttle:20,1"])->group(function () {
+Route::middleware(["throttle:10,1"])->group(function () {
     Route::controller(BranchController::class)->group(function () {
-        Route::get('/branches', 'index')->withoutMiddleware('throttle:20,1');
+        Route::get('/branches', 'index')->withoutMiddleware('throttle:10,1');
     });
 
     Route::controller(LoginController::class)->group(function () {
@@ -279,7 +279,7 @@ Route::middleware(["throttle:20,1"])->group(function () {
     });
 
     Route::controller(LogoutController::class)->group(function () {
-        Route::post('/logout', 'store')->withoutMiddleware('throttle:20,1');
+        Route::post('/logout', 'store')->withoutMiddleware('throttle:10,1');
     });
 
     Route::controller(SendLoginCodeController::class)->group(function () {

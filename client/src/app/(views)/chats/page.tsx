@@ -29,6 +29,7 @@ function ChatsPage() {
     pagination,
     handleShort,
     setIsRefresh,
+    error
   } = useFetch({
     url: "/chats",
     isPaginated: true,
@@ -143,6 +144,7 @@ function ChatsPage() {
             searchTerm={filterBy.search}
             perPage={pagination.perPage}
             currentPage={pagination.page}
+            error={error}
           />
         </CardContent>
       </Card>

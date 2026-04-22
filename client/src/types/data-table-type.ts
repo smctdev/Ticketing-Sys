@@ -16,4 +16,5 @@ export interface DataTableType {
   currentPage?: any;
   isPaginated?: boolean;
   isFixedHeader?: boolean;
+  error?: string;
 }

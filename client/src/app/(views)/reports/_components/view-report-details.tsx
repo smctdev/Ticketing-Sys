@@ -37,7 +37,6 @@ export function ViewReportDetails({ data, open, setIsOpen }: any) {
   const [isViewDialogOpen, setIsViewDialogOpen] = useState<boolean>(false);
   const [selectedTicketData, setSelectedTicketData] = useState<any>(null);
   const [type, setType] = useState<string | undefined>("");
-  const [isLoading, setIsLoading] = useState<any>(false);
   const [isOpenImage, setOpenImage] = useState<boolean>(false);
   const [selectedImages, setSelectedImages] = useState<any>([]);
   const { isAdmin } = useAuth();
@@ -49,28 +48,11 @@ export function ViewReportDetails({ data, open, setIsOpen }: any) {
         <>
           <button
             type="button"
-            onClick={handleViewTicket(row.ticket_code)}
+            onClick={handleViewTicket(row)}
             className="text-blue-500 hover:text-blue-600 hover:underline font-bold"
           >
-            {isLoading[row.ticket_code] ? (
-              <>
-                <Loader2 className="animate-spin" />
-              </>
-            ) : (
-              row.ticket_code
-            )}
+            {row.ticket_code}
           </button>
-
-          {row.ticket_code === selectedTicketData?.ticket_code &&
-            isViewDialogOpen && (
-              <ViewTicketDetails
-                data={selectedTicketData}
-                open={isViewDialogOpen}
-                setOpen={setIsViewDialogOpen}
-                setNote={setNoteValue}
-                handleDirectToAutomation={() => {}}
-              />
-            )}
         </>
       ),
     },
@@ -157,19 +139,9 @@ export function ViewReportDetails({ data, open, setIsOpen }: any) {
       }
     };
 
-  const handleViewTicket = (id: any) => async () => {
-    setIsLoading({ [id]: true });
-    try {
-      const response = await api.get(`/view-ticket/${id}/view`);
-      if (response.status === 200) {
-        setSelectedTicketData(response.data.data);
-        setIsViewDialogOpen(true);
-      }
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsLoading(false);
-    }
+  const handleViewTicket = (data: any) => () => {
+    setSelectedTicketData(data);
+    setIsViewDialogOpen(true);
   };
 
   const handleSelectImages = (images: any) => () => {
@@ -265,6 +237,16 @@ export function ViewReportDetails({ data, open, setIsOpen }: any) {
             </div>
           </DialogContent>
         </Dialog>
+      )}
+
+      {isViewDialogOpen && (
+        <ViewTicketDetails
+          data={selectedTicketData}
+          open={isViewDialogOpen}
+          setOpen={setIsViewDialogOpen}
+          setNote={setNoteValue}
+          handleDirectToAutomation={() => {}}
+        />
       )}
     </>
   );

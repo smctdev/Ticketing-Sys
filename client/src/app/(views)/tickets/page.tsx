@@ -65,6 +65,7 @@ function Tickets() {
     setIsRefresh,
     setIsLoading,
     isRefresh: isRefreshTickets,
+    error: ticketsError
   } = useFetch({
     url: "/tickets",
     isPaginated: true,
@@ -672,6 +673,7 @@ function Tickets() {
             searchTerm={filterBy.search}
             perPage={pagination.perPage}
             currentPage={pagination.page}
+            error={ticketsError}
           />
         </CardContent>
       </Card>

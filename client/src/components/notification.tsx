@@ -178,14 +178,14 @@ export default function Notification() {
                     </AvatarFallback>
                   </Avatar>
                   <div className="flex flex-col">
-                    <p className="text-sm font-bold dark:text-white dark:text-white text-gray-700">
+                    <p className="text-sm font-bold dark:text-white text-gray-700">
                       {notification.data.full_name}
                     </p>
-                    <p className="text-sm dark:text-white dark:text-white text-gray-600">
+                    <p className="text-sm dark:text-white text-gray-600">
                       {notification.data.message}
                     </p>
                   </div>
-                  <span className="absolute top-0 right-1 text-xs dark:text-white dark:text-white text-gray-400 font-bold">
+                  <span className="absolute top-0 right-1 text-xs dark:text-white text-gray-400 font-bold">
                     {formatDistanceToNowStrict(notification.created_at, {
                       addSuffix: true,
                     })}
@@ -195,8 +195,8 @@ export default function Notification() {
             </div>
           ) : (
             <div className="text-center p-10 space-y-3">
-              <BellOffIcon className="mx-auto size-10 dark:text-white dark:text-white text-gray-500" />
-              <h3 className="text-lg font-bold dark:text-white dark:text-white text-gray-500">
+              <BellOffIcon className="mx-auto size-10 dark:text-white text-gray-500" />
+              <h3 className="text-lg font-bold dark:text-white text-gray-500">
                 No new notifications
               </h3>
             </div>

@@ -20,9 +20,11 @@ import { USER_DASHBOARD_TABLE_COLUMNS } from "../_constants/user-dashboard-table
 export default function UserDashboard({
   data,
   isLoading,
+  error,
 }: {
   data: any;
   isLoading: boolean;
+  error?: string;
 }) {
   const ticketDetails = {
     totalTickets: data?.total_tickets,
@@ -119,6 +121,7 @@ export default function UserDashboard({
                     data={data?.data?.data}
                     columns={USER_DASHBOARD_TABLE_COLUMNS}
                     loading={isLoading}
+                    error={error}
                   />
                 </CardContent>
               </Card>

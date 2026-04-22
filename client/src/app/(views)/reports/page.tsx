@@ -45,6 +45,7 @@ function Reports() {
     handleDateFilter,
     handleReset,
     handleSearchTerm,
+    error,
   } = useFetch({
     url: "/reports",
     isPaginated: true,
@@ -358,6 +359,7 @@ function Reports() {
         toast.error("Ops! Something went wrong in exporting", {
           description: error.message,
           position: "bottom-center",
+          duration: 10000,
         });
       }
     } finally {
@@ -480,6 +482,7 @@ function Reports() {
             perPage={pagination.perPage}
             conditionalRowStyles={conditionalRowStyles}
             currentPage={pagination.page}
+            error={error}
           />
         </CardContent>
       </Card>

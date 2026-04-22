@@ -8,6 +8,8 @@ import formattedDate from "@/utils/format-date";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { toast } from "sonner";
+import Swal from "sweetalert2";
 
 export default function useFetch({
   url,
@@ -33,6 +35,7 @@ export default function useFetch({
   const [errorStatus, setErrorStatus] = useState<number | null>(null);
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
   const { setIsRefresh: setRefresh } = useIsRefresh();
+  const errorRef = useRef<boolean>(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -58,8 +61,34 @@ export default function useFetch({
         }
       } catch (error: any) {
         console.error("Error fetching data:", error);
-        setError(error.response.data);
-        setErrorStatus(error.response.status);
+        if (!error.response && !errorRef.current) {
+          Swal.fire({
+            icon: "error",
+            title: error.code || "Server Error",
+            confirmButtonColor: "#1e88e5",
+            confirmButtonText: "Ok",
+            html: `${error.message || "Something went wrong."}<br>Please try again later.<br>Thank you!`,
+          });
+          setError(
+            `${error.message || "Something went wrong."} Please try again later. Thank you!`,
+          );
+          errorRef.current = true;
+        }
+
+        if (error?.response?.status === 429 && !errorRef.current) {
+          toast.error(error?.code, {
+            position: "bottom-center",
+            description: `${error?.response?.data?.message || "Something went wrong."} Please try again later.`,
+          });
+          setError(`${error?.response?.data?.message} Please try again later.`);
+          errorRef.current = true;
+        }
+
+        setError(
+          `${error?.response?.data?.message || "Something went wrong."} Please try again later.`,
+        );
+        setErrorStatus(error?.response?.status);
+        setData([]);
       } finally {
         setIsLoading(false);
         setIsRefresh(false);

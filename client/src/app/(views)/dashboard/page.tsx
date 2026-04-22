@@ -12,7 +12,7 @@ import Swal from "sweetalert2";
 
 const Dashboard = () => {
   const { isAdmin, user } = useAuth();
-  const { data, isLoading } = useFetch({
+  const { data, isLoading, error } = useFetch({
     url: "/dashboard-data",
   });
 
@@ -25,7 +25,7 @@ const Dashboard = () => {
   } else if (user?.user_role?.role_name === ROLE.AUTOMATION) {
     return <AutomationDashboard data={data} isLoading={isLoading} />;
   } else {
-    return <UserDashboard data={data} isLoading={isLoading} />;
+    return <UserDashboard data={data} isLoading={isLoading} error={error} />;
   }
 };
 

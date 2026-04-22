@@ -19,14 +19,20 @@ export default function DataTableComponent({
   currentPage,
   isPaginated = true,
   isFixedHeader = false,
+  error,
 }: DataTableType) {
   const NoData = () => {
     return (
       <div className="py-10 text-sm font-bold text-gray-600">
-        {searchTerm ? `No results for "${searchTerm}"` : "No data available"}
+        {searchTerm
+          ? `No results for "${searchTerm}"`
+          : error
+            ? error
+            : "No data available"}
       </div>
     );
   };
+  console.log(error)
 
   return (
     <DataTable
