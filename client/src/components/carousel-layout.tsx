@@ -6,7 +6,13 @@ import {
   CarouselPrevious,
 } from "@/components/ui/carousel";
 import Storage from "@/utils/storage";
-import { FileInput, ZoomIn, ZoomOut, RotateCcw } from "lucide-react";
+import {
+  FileInput,
+  ZoomIn,
+  ZoomOut,
+  RotateCcw,
+  RefreshCcw,
+} from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
@@ -34,6 +40,7 @@ function ZoomableImage({
   const dragStart = useRef({ x: 0, y: 0 });
   const lastPosition = useRef({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
+  const [rotate, setRotate] = useState<number>(0);
 
   const clampPosition = (x: number, y: number, currentScale: number) => {
     if (!containerRef.current) return { x, y };
@@ -104,9 +111,16 @@ function ZoomableImage({
       <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 bg-black/50 backdrop-blur-sm rounded-full px-4 py-2">
         <Button
           variant={"link"}
+          onClick={() => setRotate((prev) => (prev + 90) % 360)}
+          className="text-white disabled:opacity-30 hover:scale-110 transition-all duration-300"
+        >
+          <RefreshCcw size={18} />
+        </Button>
+        <Button
+          variant={"link"}
           onClick={() => zoom(-0.5)}
           disabled={scale <= 1}
-          className="text-white disabled:opacity-30 hover:dark:text-white text-gray-300 transition-colors"
+          className="text-white disabled:opacity-30 hover:scale-110 transition-all duration-300 ease-in-out"
         >
           <ZoomOut size={18} />
         </Button>
@@ -117,7 +131,7 @@ function ZoomableImage({
           variant={"link"}
           onClick={() => zoom(0.5)}
           disabled={scale >= 5}
-          className="text-white disabled:opacity-30 hover:dark:text-white text-gray-300 transition-colors"
+          className="text-white disabled:opacity-30 hover:scale-110 transition-all duration-300 ease-in-out"
         >
           <ZoomIn size={18} />
         </Button>
@@ -125,7 +139,7 @@ function ZoomableImage({
           <Button
             variant={"link"}
             onClick={reset}
-            className="text-white hover:dark:text-white text-gray-300 transition-colors ml-1 border-l border-white/30 pl-3"
+            className="text-white hover:scale-110 transition-all duration-300 ease-in-out ml-1 border-l border-white/30 pl-3"
           >
             <RotateCcw size={15} />
           </Button>
@@ -151,7 +165,7 @@ function ZoomableImage({
           alt={alt}
           src={src}
           fill
-          className="object-contain select-none"
+          className={`object-contain select-none ${`rotate-${rotate}`} transition-all duration-300 ease-in-out`}
           loading="lazy"
           draggable={false}
         />

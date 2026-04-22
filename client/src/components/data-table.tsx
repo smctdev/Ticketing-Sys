@@ -32,7 +32,6 @@ export default function DataTableComponent({
       </div>
     );
   };
-  console.log(error)
 
   return (
     <DataTable
