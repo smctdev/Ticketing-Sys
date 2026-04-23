@@ -118,7 +118,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
               ? {
                   ...record,
                   message_count: record.message_count + 1,
-                  last_message: e.message.body,
+                  last_message: e.message.body || `Sent ${e.message.attachments?.length} attchment(s)`,
                 }
               : record,
           );

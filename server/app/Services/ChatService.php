@@ -26,8 +26,8 @@ class ChatService
             ->orderByRaw('GREATEST(COALESCE(sent_message_latest, 0), COALESCE(received_message_latest, 0)) DESC')
             ->paginate($limit)
             ->through(function ($user) {
-                $attachment_count = collect([$user->sentMessages->last(), $user->receivedMessages->last()])->max()->attachments()->count();
-                $last_message_by_attachment = "sent {$attachment_count} " . Str::plural('attachment', $attachment_count);
+                $attachment_count = collect([$user->sentMessages->last(), $user->receivedMessages->last()])->max()?->attachments()?->count();
+                $last_message_by_attachment = $attachment_count > 0 ? "Sent {$attachment_count} " . Str::plural('attachment', $attachment_count) : "";
 
                 return [
                     'login_id'     => $user->login_id,
