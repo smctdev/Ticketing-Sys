@@ -8,6 +8,10 @@ class Message extends Model
 {
     protected $guarded = [];
 
+    protected $appends = [
+        'reply_attachments_count'
+    ];
+
     public function sender()
     {
         return $this->belongsTo(UserLogin::class, 'sender_id', 'login_id');
@@ -29,5 +33,25 @@ class Message extends Model
             $href  = preg_match('/^https?:\/\//i', $url) ? $url : 'https://' . $url;
             return '<a href="' . $href . '" target="_blank" rel="noopener noreferrer" class="underline underline-offset-2 opacity-90 hover:opacity-100 break-all">' . $url . '</a>';
         }, $text);
+    }
+
+    public function attachments()
+    {
+        return $this->hasMany(MessageAttachment::class);
+    }
+
+    public function replyFrom()
+    {
+        return $this->belongsTo(Message::class, 'parent_id');
+    }
+
+    public function parent()
+    {
+        return $this->hasMany(Message::class, 'parent_id', 'id');
+    }
+
+    public function getReplyAttachmentsCountAttribute()
+    {
+        return $this->replyFrom?->attachments()->count();
     }
 }

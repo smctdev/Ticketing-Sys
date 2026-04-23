@@ -4,6 +4,7 @@ import { ChatSkeleton } from "@/components/chat-skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import ButtonLoader from "@/components/ui/button-loader";
+import { Input } from "@/components/ui/input";
 import { Separator } from "@/components/ui/separator";
 import { Textarea } from "@/components/ui/textarea";
 import { CAN_ACCESS_ALL } from "@/constants/roles";
@@ -12,11 +13,12 @@ import { useChat } from "@/context/chat-context";
 import { useSimple } from "@/hooks/use-simple";
 import { api } from "@/lib/api";
 import withAuthPage from "@/lib/hoc/with-auth-page";
-import formattedDateAndTimeStrict from "@/utils/format-date-time-strict";
 import nameShortHand from "@/utils/name-short-hand";
 import Storage from "@/utils/storage";
 import {
   ArrowDown,
+  Ellipsis,
+  Image as ImageIcon,
   MessageCircleOff,
   MessageCircleX,
   SendHorizonal,
@@ -28,14 +30,44 @@ import {
   useRouter,
   useSearchParams,
 } from "next/navigation";
-import { FormEvent, KeyboardEvent, useEffect, useRef, useState } from "react";
+import {
+  ChangeEvent,
+  FormEvent,
+  KeyboardEvent,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
+import ReceiverContent from "../_components/receiver-content";
+import SenderContent from "../_components/sender-content";
+import ReplyingAttachmentContent from "../_components/replying-attachment-content";
+
+export type AttachmentType = {
+  id: number;
+  path: string;
+};
 
 export type MessageType = {
   id: number;
   sender_id: number;
   receiver_id: number;
   body: string;
+  attachments: AttachmentType[];
+  reply_from: ReplyFormType;
   created_at: Date;
+  reply_attachments_count: number;
+};
+
+export type ReplyFormType = {
+  id: number;
+  body: string;
+};
+
+export type MessageFormInput = {
+  message: string;
+  message_id: number | null;
+  attachments: File[];
+  reply_message_content: string;
 };
 
 function ChatsPage() {
@@ -44,14 +76,18 @@ function ChatsPage() {
   const { data, isLoading, errorStatus, handleNextPage, loadMore } = useSimple(
     `/chats/${id}`,
   );
+  const { typing, handleTyping } = useChat();
   const searchParams = useSearchParams();
   const ticketCode = Number(searchParams.get("ticket_code")) || "";
   const { newMessage, setMessageRecords } = useChat();
-  const [message, setMessage] = useState<string>(
-    ticketCode
+  const [formInput, setFormInput] = useState<MessageFormInput>({
+    message: ticketCode
       ? `Hello, let's discuss the ticket with code #${ticketCode}?`
       : "",
-  );
+    message_id: null,
+    attachments: [],
+    reply_message_content: "",
+  });
   const [messages, setMessages] = useState<MessageType[]>([]);
   const messageRef = useRef<MessageType | null>(null);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -62,6 +98,7 @@ function ChatsPage() {
   const pathname = usePathname();
   const router = useRouter();
   const submittedRef = useRef<boolean>(false);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     setMessageRecords((prev) =>
@@ -129,13 +166,29 @@ function ChatsPage() {
     setIsSubmitting(true);
     textAreaRef.current?.focus();
     try {
-      const response = await api.post(`/chats`, {
-        body: message,
-        receiver_id: Number(id),
-      });
+      const formData = new FormData();
+
+      formData.append("receiver_id", id as string);
+      formData.append("body", formInput.message);
+      if (formInput.attachments.length > 0) {
+        formInput.attachments.forEach((attachment) => {
+          formData.append("attachments[]", attachment);
+        });
+      }
+
+      if (formInput.message_id) {
+        formData.append("message_id", String(formInput.message_id));
+      }
+
+      const response = await api.post(`/chats`, formData);
 
       if (response.status === 201) {
-        setMessage("");
+        setFormInput({
+          message: "",
+          message_id: null,
+          attachments: [],
+          reply_message_content: "",
+        });
         setMessages((prev) => [response.data.data, ...prev]);
       }
     } catch (error: any) {
@@ -146,8 +199,23 @@ function ChatsPage() {
   };
 
   const handleOnKeyUp = (e: KeyboardEvent<HTMLTextAreaElement>) => {
-    if (!e.shiftKey && e.key === "Enter" && message.trim() && !isSubmitting) {
+    if (
+      !e.shiftKey &&
+      e.key === "Enter" &&
+      formInput.message.trim() &&
+      !isSubmitting
+    ) {
       handleSubmit(e);
+    }
+  };
+
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (files) {
+      setFormInput((prev) => ({
+        ...prev,
+        attachments: [...prev.attachments, ...Array.from(files)],
+      }));
     }
   };
 
@@ -195,46 +263,39 @@ function ChatsPage() {
               className="space-y-4 flex flex-col-reverse px-6 py-4 overflow-y-auto h-full w-full"
               ref={convoRef}
             >
+              {typing.isTyping &&
+                typing.target_id === user?.login_id &&
+                typing.typer_id === Number(id) && (
+                  <span className="flex items-center gap-3 justify-center text-[10px]">
+                    <span className="flex gap-1">
+                      {Array.from({ length: 3 }).map((_, index) => (
+                        <span
+                          key={index}
+                          className="w-1 h-1 rounded-full bg-chat-receiver-background animate-bounce [animation-delay:0.2s]"
+                          style={{
+                            animationDelay: `${index * 0.1}s`,
+                          }}
+                        />
+                      ))}
+                    </span>
+                    <span>{typing.user} is typing...</span>
+                  </span>
+                )}
               {messages?.length > 0 ? (
                 <>
                   {messages.map((message: MessageType) => (
                     <div key={message?.id}>
                       {message?.sender_id === user?.login_id ? (
-                        <div className="flex justify-end items-end gap-2">
-                          <div className="max-w-4/5">
-                            <div
-                              className="px-4 py-2.5 rounded-2xl rounded-br-sm text-sm wrap-break-word whitespace-break-spaces leading-relaxed bg-chat-background dark:text-white shadow-lg shadow-chat-background/50"
-                              dangerouslySetInnerHTML={{
-                                __html: message?.body,
-                              }}
-                            />
-                            <p className="text-[10px] dark:text-white/20 mt-1 text-right">
-                              {formattedDateAndTimeStrict(message?.created_at)}
-                            </p>
-                          </div>
-                        </div>
+                        <SenderContent
+                          message={message}
+                          setFormInput={setFormInput}
+                        />
                       ) : (
-                        <div className="flex justify-start items-end gap-2">
-                          <Avatar className="w-7 h-7 shrink-0 mb-1">
-                            <AvatarImage
-                              src={Storage(data?.user?.profile_pic)}
-                            />
-                            <AvatarFallback className="text-xs font-bold">
-                              {nameShortHand(data?.user?.full_name)}
-                            </AvatarFallback>
-                          </Avatar>
-                          <div className="max-w-4/5">
-                            <div
-                              className="px-4 py-2.5 rounded-2xl rounded-bl-sm text-sm wrap-break-word whitespace-break-spaces bg-chat-receiver-background leading-relaxed dark:text-white border border-white/10 backdrop-blur-sm shadow-lg shadow-chat-receiver-background/50"
-                              dangerouslySetInnerHTML={{
-                                __html: message?.body,
-                              }}
-                            />
-                            <p className="text-[10px] dark:text-white/20 mt-1">
-                              {formattedDateAndTimeStrict(message?.created_at)}
-                            </p>
-                          </div>
-                        </div>
+                        <ReceiverContent
+                          message={message}
+                          setFormInput={setFormInput}
+                          data={data}
+                        />
                       )}
                     </div>
                   ))}
@@ -275,16 +336,38 @@ function ChatsPage() {
               <ArrowDown />
             </Button>
           </div>
-          <div className="border-t border-white/5 bg-background/2 shrink-0">
-            <form
-              onSubmit={handleSubmit}
-              className="flex items-center px-4 py-2.5 gap-1"
-            >
+          <div className="border-t border-white/5 bg-background/2 shrink-0 px-4 py-2.5">
+            <ReplyingAttachmentContent
+              formInput={formInput}
+              setFormInput={setFormInput}
+              inputRef={inputRef}
+            />
+            <form onSubmit={handleSubmit} className="flex items-center gap-1">
+              <Button
+                type="button"
+                variant={"link"}
+                onClick={() => inputRef.current?.click()}
+              >
+                <ImageIcon />
+              </Button>
+              <Input
+                type="file"
+                multiple
+                className="hidden"
+                ref={inputRef}
+                onChange={handleFileChange}
+              />
               <div className="flex-1 flex items-center gap-3 bg-background border border-white/10 rounded-2xl focus-within:bg-background/8 transition shadow-xl shadow-chat-background/15">
                 <Textarea
                   placeholder="Type a message..."
-                  value={message}
-                  onChange={(e) => setMessage(e.target.value)}
+                  value={formInput.message}
+                  onChange={(e) => {
+                    setFormInput((prev) => ({
+                      ...prev,
+                      message: e.target.value,
+                    }));
+                    handleTyping(Number(id));
+                  }}
                   className="flex-1 bg-transparent text-sm dark:text-white placeholder-white/20 focus:outline-none resize-none max-h-50 wrap-break-word"
                   onKeyUp={handleOnKeyUp}
                   onKeyDown={(e) =>
@@ -295,7 +378,12 @@ function ChatsPage() {
               </div>
               <Button
                 type="submit"
-                disabled={!message.trim() || isSubmitting || isLoading}
+                disabled={
+                  (!formInput.message.trim() &&
+                    formInput.attachments.length <= 0) ||
+                  isSubmitting ||
+                  isLoading
+                }
                 className="self-end w-11 h-11 rounded-2xl bg-chat-background flex items-center justify-center shadow-lg shadow-violet-500/25 transition-all hover:-translate-y-0.5 active:translate-y-0 shrink-0"
               >
                 <SendHorizonal />

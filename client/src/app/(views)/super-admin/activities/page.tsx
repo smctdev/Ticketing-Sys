@@ -10,6 +10,7 @@ import useFetch from "@/hooks/use-fetch";
 import withAuthPage from "@/lib/hoc/with-auth-page";
 import formattedDateAndTimeStrict from "@/utils/format-date-time-strict";
 import { ActivityIcon } from "lucide-react";
+import NotifyAllUser from "../_components/notify-all-user";
 
 function ActivityPage() {
   const {
@@ -21,7 +22,7 @@ function ActivityPage() {
     filterBy,
     handleSearchTerm,
     setIsRefresh,
-    isRefresh
+    isRefresh,
   } = useFetch({ url: "/super-admin/activities", isPaginated: true });
 
   const ACTIVITIES_COLUMNS = [
@@ -76,6 +77,7 @@ function ActivityPage() {
             >
               Refresh
             </ButtonLoader>
+            <NotifyAllUser />
           </div>
         </CardHeader>
         <CardContent>

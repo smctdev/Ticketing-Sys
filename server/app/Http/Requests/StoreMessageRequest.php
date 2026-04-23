@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreMessageRequest extends FormRequest
 {
@@ -22,7 +23,7 @@ class StoreMessageRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'body' => ['required', 'max:10000', 'min:1'],
+            'body' => ['nullable', Rule::requiredIf(!$this->attachments), 'max:10000', 'min:1'],
         ];
     }
 }

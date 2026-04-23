@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('messages', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('parent_id')->constrained('messages')->nullOnDelete();
             $table->foreignId('sender_id')->constrained('user_logins', 'login_id')->cascadeOnDelete();
             $table->foreignId('receiver_id')->constrained('user_logins', 'login_id')->cascadeOnDelete();
             $table->text('body');

@@ -19,6 +19,8 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "./ui/tooltip";
 import { isImage } from "@/utils/image-format";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { Button } from "./ui/button";
+import isVideo from "@/utils/is-video";
+import isAudio from "@/utils/is-audio";
 
 interface CarouselProps {
   images: string[];
@@ -221,6 +223,33 @@ export default function CarouselLayout({ images, image }: CarouselProps) {
                 alt={`Image ${index}`}
                 setIsZoom={setIsZoom}
               />
+            ) : isVideo(item.split(".").pop()) ? (
+              <div className="relative w-full h-screen flex items-center justify-center">
+                <video
+                  width="700"
+                  height="700"
+                  controls
+                  className="cursor-pointer"
+                >
+                  <source
+                    src={Storage(item)}
+                    className="object-cover w-40 h-40 rounded-2xl"
+                    type="video/mp4"
+                  />
+                  Your browser does not support the video tag.
+                </video>
+              </div>
+            ) : isAudio(item.split(".").pop()) ? (
+              <div className="relative w-full h-screen flex items-center justify-center">
+                <audio controls>
+                  <source
+                    src={Storage(item)}
+                    className="object-cover w-40 h-40 rounded-2xl"
+                    type="audio/mpeg"
+                  />
+                  Your browser does not support the audio element.
+                </audio>
+              </div>
             ) : (
               <div className="relative w-full h-screen">
                 <Tooltip>

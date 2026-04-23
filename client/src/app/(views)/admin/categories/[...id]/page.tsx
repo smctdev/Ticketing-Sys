@@ -22,6 +22,7 @@ import {
 import { TooltipArrow } from "@radix-ui/react-tooltip";
 import { ADMIN_ACCESS } from "@/constants/roles";
 import { useEffect, useRef } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 type idParamstype = {
   id: string[];
@@ -92,10 +93,10 @@ function SubCategories() {
               </TooltipContent>
             </Tooltip>
             <Gauge size={18} />
-            <span className="text-xs md:text-lg truncate">
+           {isLoading ? <Skeleton className="h-8 w-60" /> : <span className="text-xs md:text-lg truncate">
               Sub Categories of{" "}
               {`"${data?.category_name ?? "Unknown Category"}"`}
-            </span>
+            </span>}
           </CardTitle>
           <div className="flex items-center gap-2">
             <SearchInput onChange={handleSearchTerm(1000)} />

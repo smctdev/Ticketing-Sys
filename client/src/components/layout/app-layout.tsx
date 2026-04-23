@@ -13,14 +13,26 @@ import ProfileDropdown from "../profile-dropdown";
 import SettingsSheet from "../settings-sheet";
 import { Badge } from "../ui/badge";
 import { useChat } from "@/context/chat-context";
-import { differenceInSeconds, formatDistanceToNowStrict } from "date-fns";
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover";
 import { useAuth } from "@/context/auth-context";
+import diffForHumans from "@/utils/diff-for-humans";
+import Link from "next/link";
+import { MessageCircleMore } from "lucide-react";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "../ui/dialog";
+import { Button } from "../ui/button";
 
 const AppLayout = ({ children }: { children: ReactNode }) => {
   const { open } = useSidebar();
   const { user: authUser } = useAuth();
-  const { usersOnline } = useChat();
+  const { usersOnline, notify, setNotify } = useChat();
   const pathname = usePathname();
   const path: any =
     pathname === "/"
@@ -64,34 +76,33 @@ const AppLayout = ({ children }: { children: ReactNode }) => {
                       </Badge>
                     </PopoverTrigger>
                     <PopoverContent>
-                      <div className="flex flex-col gap-3 max-h-[300px] overflow-y-auto">
+                      <div className="flex flex-col max-h-[300px] overflow-y-auto">
                         {usersOnline?.map((user) => (
-                          <div
-                            className="flex justify-between items-center"
+                          <Link
+                            href={`/chats/${user.id}`}
+                            className="font-bold"
                             key={user.id}
                           >
-                            <div className="text-[10px] flex items-center gap-2">
-                              <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
-                              <span className="font-bold">
-                                {authUser.login_id === user.id
-                                  ? "You"
-                                  : user.full_name}
-                              </span>
+                            <div className="flex justify-between items-center group hover:bg-black/10 rounded-md p-2">
+                              <div className="text-xs flex items-center gap-2">
+                                <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
+                                <span className="font-bold group-hover:hidden">
+                                  {authUser.login_id === user.id
+                                    ? "You"
+                                    : user.full_name}
+                                </span>
+                                <span className="font-bold group-hover:block hidden gap-1">
+                                  <span className="flex gap-1 items-center text-blue-500">
+                                    <MessageCircleMore size={15} />{" "}
+                                    <span>Chat now!</span>
+                                  </span>
+                                </span>
+                              </div>
+                              <div className="text-[10px]">
+                                {diffForHumans(user.timestamp)}
+                              </div>
                             </div>
-                            <div className="text-[10px]">
-                              {differenceInSeconds(
-                                new Date(),
-                                new Date(user.timestamp),
-                              ) < 1
-                                ? "Just now"
-                                : formatDistanceToNowStrict(
-                                    new Date(user.timestamp),
-                                    {
-                                      addSuffix: true,
-                                    },
-                                  )}
-                            </div>
-                          </div>
+                          </Link>
                         ))}
                       </div>
                     </PopoverContent>
@@ -110,6 +121,29 @@ const AppLayout = ({ children }: { children: ReactNode }) => {
         </div>
       </main>
       <SettingsSheet />
+      <Dialog
+        open={notify.isOpen}
+        onOpenChange={(open) =>
+          setNotify((prev) => ({ ...prev, isOpen: open }))
+        }
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="capitalize">{notify.title}</DialogTitle>
+          </DialogHeader>
+          <div className="break-word whitespace-break-spaces max-h-96 overflow-y-auto">
+            {notify.message}
+          </div>
+          <DialogFooter className="flex justify-between! items-center">
+            <DialogDescription>From: {notify.notifyBy}</DialogDescription>
+            <DialogClose asChild>
+              <Button type="button" variant={"secondary"}>
+                Close
+              </Button>
+            </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 };
