@@ -100,12 +100,12 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     const channelName = `chats.${user?.login_id}`;
 
     echo.private(channelName).listen("ChatEvent", (e: any) => {
-      console.log(e)
       if (e.type === "updated" || e.type === "deleted") {
         setNewMessage({ ...e.message, type: e.type });
         return;
       }
-      setNewMessage(e.message);
+
+      setNewMessage({ ...e.message, type: e.type });
 
       setMessageRecords((prev) => {
         const id = e.message.sender_id;

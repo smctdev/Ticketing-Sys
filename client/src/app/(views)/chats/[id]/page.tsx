@@ -179,16 +179,6 @@ function ChatsPage() {
   }, [isEditingMessage]);
 
   useEffect(() => {
-    if (
-      !newMessage ||
-      messageRef.current?.id === newMessage?.id ||
-      newMessage?.sender_id !== Number(id) ||
-      newMessage?.sender_id === newMessage?.receiver_id
-    )
-      return;
-
-    messageRef.current = newMessage;
-
     if (newMessage?.type === "updated") {
       setMessages((prev) =>
         prev.map((item) => (item.id === newMessage.id ? newMessage : item)),
@@ -200,6 +190,16 @@ function ChatsPage() {
       setMessages((prev) => prev.filter((item) => item.id !== newMessage.id));
       return;
     }
+
+    if (
+      !newMessage ||
+      messageRef.current?.id === newMessage?.id ||
+      newMessage?.sender_id !== Number(id) ||
+      newMessage?.sender_id === newMessage?.receiver_id
+    )
+      return;
+
+    messageRef.current = newMessage;
 
     setMessages((prev) => [newMessage, ...prev]);
   }, [newMessage, id]);
