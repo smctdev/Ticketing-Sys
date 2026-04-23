@@ -223,7 +223,7 @@ Route::middleware([
         Route::delete('sub-categories/{id}/delete', 'destroy');
     });
 
-    Route::resource('chats', ChatController::class)->only(['show', 'store', 'index']);
+    Route::resource('chats', ChatController::class);
     Route::delete('unseen-message/{id}/flush', [ChatController::class, 'flushUnseenMessage']);
 
     Route::prefix('super-admin')->group(function () {

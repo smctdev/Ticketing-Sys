@@ -15,7 +15,7 @@ export default function ReceiverContent({
   data: Record<string, any>;
 }) {
   return (
-    <div className="group">
+    <div className="group py-2">
       {message?.reply_from && (
         <div className="flex justify-start items-start flex-col">
           <span className="text-[10px] font-semibold">
@@ -33,6 +33,11 @@ export default function ReceiverContent({
       )}
       <div className="flex justify-start items-center gap-2 group">
         <div className="flex flex-col gap-1 items-start max-w-4/5 min-w-0">
+          {message?.is_edited && (
+            <span className="text-blue-500 text-[10px] font-bold">
+              • Edited
+            </span>
+          )}
           <div className="self-start w-full">
             {message?.body && (
               <div

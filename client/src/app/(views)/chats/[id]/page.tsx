@@ -1,5 +1,16 @@
 "use client";
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { ChatSkeleton } from "@/components/chat-skeleton";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -56,6 +67,8 @@ export type MessageType = {
   reply_from: ReplyFormType;
   created_at: Date;
   reply_attachments_count: number;
+  type?: null | "created" | "updated" | "deleted";
+  is_edited: boolean;
 };
 
 export type ReplyFormType = {
@@ -99,6 +112,16 @@ function ChatsPage() {
   const router = useRouter();
   const submittedRef = useRef<boolean>(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const [isEditing, setIsEditing] = useState<{ [key: number]: boolean }>({});
+  const [isEditingMessage, setIsEditingMessage] = useState<{
+    isEditing: boolean;
+    message: MessageType;
+  }>({ isEditing: false, message: {} as MessageType });
+  const [isDeletingMessage, setIsDeletingMessage] = useState<{
+    isDeleting: boolean;
+    message: MessageType;
+    isLoadingDelete: boolean;
+  }>({ isDeleting: false, message: {} as MessageType, isLoadingDelete: false });
 
   useEffect(() => {
     setMessageRecords((prev) =>
@@ -146,6 +169,16 @@ function ChatsPage() {
   }, [data]);
 
   useEffect(() => {
+    if (isEditingMessage.isEditing) {
+      inputRef.current?.focus();
+      setFormInput({
+        ...formInput,
+        message: isEditingMessage.message.body,
+      });
+    }
+  }, [isEditingMessage]);
+
+  useEffect(() => {
     if (
       !newMessage ||
       messageRef.current?.id === newMessage?.id ||
@@ -155,6 +188,18 @@ function ChatsPage() {
       return;
 
     messageRef.current = newMessage;
+
+    if (newMessage?.type === "updated") {
+      setMessages((prev) =>
+        prev.map((item) => (item.id === newMessage.id ? newMessage : item)),
+      );
+      return;
+    }
+
+    if (newMessage?.type === "deleted") {
+      setMessages((prev) => prev.filter((item) => item.id !== newMessage.id));
+      return;
+    }
 
     setMessages((prev) => [newMessage, ...prev]);
   }, [newMessage, id]);
@@ -205,7 +250,7 @@ function ChatsPage() {
       formInput.message.trim() &&
       !isSubmitting
     ) {
-      handleSubmit(e);
+      isEditingMessage.isEditing ? handleUpdate(e) : handleSubmit(e);
     }
   };
 
@@ -216,6 +261,81 @@ function ChatsPage() {
         ...prev,
         attachments: [...prev.attachments, ...Array.from(files)],
       }));
+    }
+  };
+
+  const handleUpdate = async (
+    e: FormEvent<HTMLFormElement | HTMLTextAreaElement>,
+  ) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    textAreaRef.current?.focus();
+    try {
+      const response = await api.patch(
+        `/chats/${isEditingMessage.message.id}`,
+        {
+          body: formInput.message,
+        },
+      );
+
+      if (response.status === 200) {
+        setFormInput({
+          message: "",
+          message_id: null,
+          attachments: [],
+          reply_message_content: "",
+        });
+
+        setMessages((prev) =>
+          prev.map((message) =>
+            message.id === response.data.data.id ? response.data.data : message,
+          ),
+        );
+
+        setIsEditingMessage({ isEditing: false, message: {} as MessageType });
+      }
+    } catch (error: any) {
+      console.error(error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleDeleteMessage = async () => {
+    setIsDeletingMessage((prev) => ({ ...prev, isLoadingDelete: true }));
+    try {
+      const response = await api.delete(
+        `/chats/${isDeletingMessage.message.id}`,
+      );
+      if (response.status === 200) {
+        setMessages((prev) =>
+          prev.filter((message) => message.id !== isDeletingMessage.message.id),
+        );
+        setIsDeletingMessage({
+          isDeleting: false,
+          message: {} as MessageType,
+          isLoadingDelete: false,
+        });
+
+        setFormInput({
+          message: "",
+          message_id: null,
+          attachments: [],
+          reply_message_content: "",
+        });
+
+        setMessages((prev) =>
+          prev.map((message) =>
+            message.id === response.data.data.id ? response.data.data : message,
+          ),
+        );
+
+        setIsEditingMessage({ isEditing: false, message: {} as MessageType });
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsDeletingMessage((prev) => ({ ...prev, isLoadingDelete: false }));
     }
   };
 
@@ -260,7 +380,7 @@ function ChatsPage() {
           <Separator className="bg-background/5" />
           <div className="flex h-full overflow-hidden relative">
             <div
-              className="space-y-4 flex flex-col-reverse px-6 py-4 overflow-y-auto h-full w-full"
+              className="flex flex-col-reverse px-6 py-4 overflow-y-auto h-full w-full"
               ref={convoRef}
             >
               {typing.isTyping &&
@@ -284,11 +404,21 @@ function ChatsPage() {
               {messages?.length > 0 ? (
                 <>
                   {messages.map((message: MessageType) => (
-                    <div key={message?.id}>
+                    <div
+                      key={message?.id}
+                      className={
+                        isEditingMessage.isEditing
+                          ? `${isEditing[message?.id] ? "" : "bg-chat-background/30"}`
+                          : ""
+                      }
+                    >
                       {message?.sender_id === user?.login_id ? (
                         <SenderContent
                           message={message}
                           setFormInput={setFormInput}
+                          setIsEditing={setIsEditing}
+                          setIsEditingMessage={setIsEditingMessage}
+                          setIsDeletingMessage={setIsDeletingMessage}
                         />
                       ) : (
                         <ReceiverContent
@@ -341,8 +471,15 @@ function ChatsPage() {
               formInput={formInput}
               setFormInput={setFormInput}
               inputRef={inputRef}
+              isEditingMessage={isEditingMessage}
+              setIsEditingMessage={setIsEditingMessage}
             />
-            <form onSubmit={handleSubmit} className="flex items-center gap-1">
+            <form
+              onSubmit={
+                isEditingMessage.isEditing ? handleUpdate : handleSubmit
+              }
+              className="flex items-center gap-1"
+            >
               <Button
                 type="button"
                 variant={"link"}
@@ -392,6 +529,34 @@ function ChatsPage() {
           </div>
         </>
       )}
+      <AlertDialog
+        open={isDeletingMessage.isDeleting}
+        onOpenChange={(open) =>
+          setIsDeletingMessage((prev) => ({ ...prev, isDeleting: open }))
+        }
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete your
+              message.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction asChild>
+              <ButtonLoader
+                type="button"
+                onClick={handleDeleteMessage}
+                isLoading={isDeletingMessage.isLoadingDelete}
+              >
+                Delete
+              </ButtonLoader>
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

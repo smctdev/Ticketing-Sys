@@ -5,11 +5,11 @@ namespace App\Http\Controllers\Api;
 use App\Events\ChatEvent;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\StoreMessageRequest;
+use App\Models\Message;
 use App\Models\UserLogin;
-use App\Models\UserUnreadMessage;
 use App\Services\ChatService;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 
 class ChatController extends Controller
 {
@@ -41,7 +41,7 @@ class ChatController extends Controller
 
         $message = $this->chat->sendMessage($request);
 
-        ChatEvent::dispatch($message->receiver_id, $message);
+        ChatEvent::dispatch($message->receiver_id, $message, 'created');
 
         $this->flushUnseenMessage($message->receiver_id);
 
@@ -67,17 +67,47 @@ class ChatController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(StoreMessageRequest $request, Message $chat)
     {
-        //
+        $request->validated();
+
+        $message = $this->chat->updateMessage($request, $chat);
+
+        ChatEvent::dispatch($message?->receiver_id, $message, 'updated');
+
+        $this->flushUnseenMessage($message?->receiver_id);
+
+        return response()->json([
+            'message' => 'Message Updated Successfully',
+            'data'    => $message
+        ], 200);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy(Message $chat)
     {
-        //
+        $item = (object) [
+            'id'          => $chat->id,
+            'receiver_id' => $chat->receiver_id,
+            'sender_id'   => $chat->sender_id
+        ];
+
+        if ($chat->attachments) {
+            foreach ($chat->attachments as $attachment) {
+                Storage::disk('public')->delete($attachment->path);
+            }
+        }
+
+        $chat->delete();
+
+        ChatEvent::dispatch($item?->receiver_id, $item, 'deleted');
+
+        return response()->json([
+            'message' => 'Message Deleted Successfully',
+            'data'    => $chat
+        ], 200);
     }
 
     public function flushUnseenMessage(int $user)

@@ -1,5 +1,5 @@
 import { Dispatch, RefObject, SetStateAction } from "react";
-import { MessageFormInput } from "../[id]/page";
+import { MessageFormInput, MessageType } from "../[id]/page";
 import { isImage } from "@/utils/image-format";
 import Image from "next/image";
 import isVideo from "@/utils/is-video";
@@ -11,17 +11,35 @@ export default function ReplyingAttachmentContent({
   formInput,
   setFormInput,
   inputRef,
+  isEditingMessage,
+  setIsEditingMessage,
 }: {
   formInput: MessageFormInput;
   setFormInput: Dispatch<SetStateAction<MessageFormInput>>;
   inputRef: RefObject<HTMLInputElement | null>;
+  isEditingMessage: {
+    isEditing: boolean;
+    message: MessageType;
+  };
+  setIsEditingMessage: Dispatch<
+    SetStateAction<{
+      isEditing: boolean;
+      message: MessageType;
+    }>
+  >;
 }) {
   return (
     <>
       {(formInput.reply_message_content ||
-        formInput.attachments.length > 0) && (
+        formInput.attachments.length > 0 ||
+        isEditingMessage?.isEditing) && (
         <div className="p-3 border -mb-0.5 rounded-xl grid grid-cols-[95%_5%] items-center">
           <div className="flex flex-col space-y-5 w-full">
+            {isEditingMessage?.isEditing && (
+              <div className="text-xs line-clamp-2 wrap-break-word">
+                <span className="font-semibold">Editing a message</span>
+              </div>
+            )}
             {formInput.reply_message_content && (
               <div className="text-xs line-clamp-2 wrap-break-word">
                 <span className="font-semibold">Replying to:</span>{" "}
@@ -76,12 +94,18 @@ export default function ReplyingAttachmentContent({
           <Button
             type="button"
             variant={"link"}
-            onClick={() =>
+            onClick={() => {
+              setIsEditingMessage({
+                isEditing: false,
+                message: {} as MessageType,
+              });
               setFormInput((prev) => ({
                 ...prev,
                 reply_message_content: "",
-              }))
-            }
+                message: "",
+                attachments: [],
+              }));
+            }}
           >
             <X />
           </Button>

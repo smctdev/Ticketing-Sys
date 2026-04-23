@@ -8,12 +8,29 @@ import AttachmentContent from "./attachment-content";
 export default function SenderContent({
   message,
   setFormInput,
+  setIsEditing,
+  setIsEditingMessage,
+  setIsDeletingMessage,
 }: {
   message: MessageType;
   setFormInput: Dispatch<SetStateAction<MessageFormInput>>;
+  setIsEditing: Dispatch<SetStateAction<{ [key: number]: boolean }>>;
+  setIsEditingMessage: Dispatch<
+    SetStateAction<{
+      isEditing: boolean;
+      message: MessageType;
+    }>
+  >;
+  setIsDeletingMessage: Dispatch<
+    SetStateAction<{
+      isDeleting: boolean;
+      message: MessageType;
+      isLoadingDelete: boolean;
+    }>
+  >;
 }) {
   return (
-    <div>
+    <div className="py-2">
       {message?.reply_from && (
         <div className="flex justify-end items-end flex-col">
           <span className="text-[10px] font-semibold">
@@ -52,19 +69,37 @@ export default function SenderContent({
               type="button"
               variant={"link"}
               className="hover:no-underline"
+              onClick={() => {
+                setIsDeletingMessage({
+                  isDeleting: true,
+                  message,
+                  isLoadingDelete: false,
+                });
+              }}
             >
               <Trash />
             </Button>
-            <Button
-              type="button"
-              variant={"link"}
-              className="hover:no-underline"
-            >
-              <Pencil />
-            </Button>
+            {message?.body && (
+              <Button
+                type="button"
+                variant={"link"}
+                className="hover:no-underline"
+                onClick={() => {
+                  setIsEditingMessage({ isEditing: true, message });
+                  setIsEditing({ [message.id]: true });
+                }}
+              >
+                <Pencil />
+              </Button>
+            )}
           </div>
         </div>
         <div className="flex flex-col gap-1 items-end max-w-4/5 min-w-0">
+          {message?.is_edited && (
+            <span className="text-blue-500 text-[10px] font-bold">
+              • Edited
+            </span>
+          )}
           <div className="self-end w-full">
             {message?.body && (
               <div

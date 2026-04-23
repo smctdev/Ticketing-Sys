@@ -87,4 +87,13 @@ class ChatService
 
         return $message->load('attachments:id,message_id,path', 'replyFrom:id,body');
     }
+
+    public function updateMessage($request, $chat)
+    {
+        $chat->update([
+            'body' => $request->body
+        ]);
+
+        return $chat->load('attachments:id,message_id,path', 'replyFrom:id,body');
+    }
 }

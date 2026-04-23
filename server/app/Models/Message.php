@@ -3,13 +3,15 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 class Message extends Model
 {
     protected $guarded = [];
 
     protected $appends = [
-        'reply_attachments_count'
+        'reply_attachments_count',
+        'is_edited'
     ];
 
     public function sender()
@@ -53,5 +55,10 @@ class Message extends Model
     public function getReplyAttachmentsCountAttribute()
     {
         return $this->replyFrom?->attachments()->count();
+    }
+
+    public function getIsEditedAttribute()
+    {
+        return Carbon::parse($this?->created_at)->lt(Carbon::parse($this?->updated_at));
     }
 }

@@ -103,7 +103,7 @@ export default function AttachmentContent({
             ))}
           {files?.length > 0 && (
             <div
-              className={`flex flex-col items-end ${message.sender_id === user?.login_id ? "items-end" : "items-start"}`}
+              className={`flex flex-col items-end gap-1 ${message.sender_id === user?.login_id ? "items-end" : "items-start"}`}
             >
               {files?.map((attachment) => (
                 <Link

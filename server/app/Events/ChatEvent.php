@@ -21,7 +21,8 @@ class ChatEvent implements ShouldBroadcast, ShouldQueue
      */
     public function __construct(
         public ?int $receiver_id,
-        public ?Message $message
+        public ?object $message,
+        public ?string $type
     ) {
         //
     }
@@ -42,6 +43,7 @@ class ChatEvent implements ShouldBroadcast, ShouldQueue
     {
         return [
             "message" => $this->message,
+            "type"    => $this->type
         ];
     }
 }

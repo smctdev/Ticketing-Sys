@@ -100,6 +100,11 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     const channelName = `chats.${user?.login_id}`;
 
     echo.private(channelName).listen("ChatEvent", (e: any) => {
+      console.log(e)
+      if (e.type === "updated" || e.type === "deleted") {
+        setNewMessage({ ...e.message, type: e.type });
+        return;
+      }
       setNewMessage(e.message);
 
       setMessageRecords((prev) => {
@@ -118,7 +123,9 @@ export function ChatProvider({ children }: { children: ReactNode }) {
               ? {
                   ...record,
                   message_count: record.message_count + 1,
-                  last_message: e.message.body || `Sent ${e.message.attachments?.length} attchment(s)`,
+                  last_message:
+                    e.message.body ||
+                    `Sent ${e.message.attachments?.length} attchment(s)`,
                 }
               : record,
           );
