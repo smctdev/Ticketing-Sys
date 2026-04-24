@@ -23,7 +23,7 @@ export function Pagination({
   return (
     <PaginationMain>
       <PaginationContent>
-        {links.map((link, index) => (
+        {links?.map((link, index) => (
           <div key={index}>
             {link?.label?.toLocaleLowerCase().includes("previous") && (
               <PaginationItem>
