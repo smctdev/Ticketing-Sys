@@ -86,7 +86,7 @@ const AppLayout = ({ children }: { children: ReactNode }) => {
                             <div className="flex justify-between items-center group hover:bg-black/10 rounded-md p-2">
                               <div className="text-xs flex items-center gap-2">
                                 <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
-                                <span className="font-bold group-hover:hidden">
+                                <span className="font-bold group-hover:hidden truncate w-25">
                                   {authUser.login_id === user.id
                                     ? "You"
                                     : user.full_name}

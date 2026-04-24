@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import formattedDateAndTimeStrict from "@/utils/format-date-time-strict";
 import { Pencil, Reply, Trash } from "lucide-react";
 import { MessageFormInput, MessageType } from "../[id]/page";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, RefObject, SetStateAction } from "react";
 import AttachmentContent from "./attachment-content";
 
 export default function SenderContent({
@@ -11,6 +11,7 @@ export default function SenderContent({
   setIsEditing,
   setIsEditingMessage,
   setIsDeletingMessage,
+  textAreaRef,
 }: {
   message: MessageType;
   setFormInput: Dispatch<SetStateAction<MessageFormInput>>;
@@ -28,6 +29,7 @@ export default function SenderContent({
       isLoadingDelete: boolean;
     }>
   >;
+  textAreaRef: RefObject<HTMLTextAreaElement | null>;
 }) {
   return (
     <div className="py-2">
@@ -53,15 +55,16 @@ export default function SenderContent({
               type="button"
               variant={"link"}
               className="hover:no-underline"
-              onClick={() =>
+              onClick={() => {
                 setFormInput((prev) => ({
                   ...prev,
                   message_id: message?.id,
                   reply_message_content:
                     message?.body ||
                     `${message?.attachments?.length} attachment(s)`,
-                }))
-              }
+                }));
+                textAreaRef?.current?.focus();
+              }}
             >
               <Reply />
             </Button>
@@ -87,6 +90,7 @@ export default function SenderContent({
                 onClick={() => {
                   setIsEditingMessage({ isEditing: true, message });
                   setIsEditing({ [message.id]: true });
+                  textAreaRef?.current?.focus();
                 }}
               >
                 <Pencil />

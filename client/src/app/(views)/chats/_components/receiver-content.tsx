@@ -2,17 +2,19 @@ import { Button } from "@/components/ui/button";
 import formattedDateAndTimeStrict from "@/utils/format-date-time-strict";
 import { Reply } from "lucide-react";
 import { MessageFormInput, MessageType } from "../[id]/page";
-import { Dispatch, SetStateAction } from "react";
+import { Dispatch, RefObject, SetStateAction } from "react";
 import AttachmentContent from "./attachment-content";
 
 export default function ReceiverContent({
   message,
   setFormInput,
   data,
+  textAreaRef,
 }: {
   message: MessageType;
   setFormInput: Dispatch<SetStateAction<MessageFormInput>>;
   data: Record<string, any>;
+  textAreaRef: RefObject<HTMLTextAreaElement | null>;
 }) {
   return (
     <div className="group py-2">
@@ -58,15 +60,16 @@ export default function ReceiverContent({
               type="button"
               variant={"link"}
               className="hover:no-underline"
-              onClick={() =>
+              onClick={() => {
                 setFormInput((prev) => ({
                   ...prev,
                   message_id: message?.id,
                   reply_message_content:
                     message?.body ||
                     `${message?.attachments?.length} attachment(s)`,
-                }))
-              }
+                }));
+                textAreaRef?.current?.focus();
+              }}
             >
               <Reply />
             </Button>

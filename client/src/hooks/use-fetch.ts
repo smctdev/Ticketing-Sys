@@ -3,7 +3,11 @@ import { TICKET_STATUS } from "@/constants/ticket-status";
 import { useIsRefresh } from "@/context/is-refresh-context";
 import { api } from "@/lib/api";
 import { PaginationType } from "@/types/pagination-type";
-import { UseFetchDataType, UseFetchType } from "@/types/use-fetch-type";
+import {
+  PaginationLinksType,
+  UseFetchDataType,
+  UseFetchType,
+} from "@/types/use-fetch-type";
 import formattedDate from "@/utils/format-date";
 import { usePathname, useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
@@ -33,6 +37,9 @@ export default function useFetch({
   const [isFiltered, setIsFiltered] = useState<boolean>(false);
   const [isRefresh, setIsRefresh] = useState<boolean>(false);
   const [errorStatus, setErrorStatus] = useState<number | null>(null);
+  const [paginationLinks, setPaginationLinks] = useState<PaginationLinksType[]>(
+    [],
+  );
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
   const { setIsRefresh: setRefresh } = useIsRefresh();
   const errorRef = useRef<boolean>(false);
@@ -82,7 +89,15 @@ export default function useFetch({
         setPagination((pagination) => ({
           ...pagination,
           totalRecords: response?.data?.data?.total,
+          last_page: response.data.data.last_page,
         }));
+        setPaginationLinks(
+          response.data.data.links.map((link: any) => ({
+            label: link.label,
+            page: link.page,
+            active: link.active,
+          })),
+        );
       }
     } catch (error: any) {
       console.error("Error fetching data:", error);
@@ -205,6 +220,34 @@ export default function useFetch({
     }
   };
 
+  const handleNextPage = () => {
+    if (pagination.page === pagination.last_page || pagination.isLoading)
+      return;
+    setPagination((pagination) => ({
+      ...pagination,
+      page: pagination.page + 1,
+      isLoading: true,
+    }));
+  };
+
+  const handlePrevPage = () => {
+    if (pagination.page === 1 || pagination.isLoading) return;
+    setPagination((pagination) => ({
+      ...pagination,
+      page: pagination.page - 1,
+      isLoading: true,
+    }));
+  };
+
+  const handleJumpToPage = (page: number | null) => {
+    if (pagination.page === page || pagination.isLoading) return;
+    setPagination((pagination) => ({
+      ...pagination,
+      page,
+      isLoading: true,
+    }));
+  };
+
   return {
     data,
     isLoading,
@@ -223,5 +266,9 @@ export default function useFetch({
     setIsLoading,
     errorStatus,
     fetchData,
+    handleNextPage,
+    handlePrevPage,
+    paginationLinks,
+    handleJumpToPage,
   };
 }

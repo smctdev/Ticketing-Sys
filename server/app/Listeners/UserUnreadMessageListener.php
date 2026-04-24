@@ -23,6 +23,8 @@ class UserUnreadMessageListener
      */
     public function handle(ChatEvent $event): void
     {
+        if ($event->type !== 'created') return;
+
         UserUnreadMessage::firstOrCreate([
             'user_id'  => $event->receiver_id,
             'login_id' => Auth::id()

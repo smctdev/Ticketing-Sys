@@ -43,7 +43,7 @@ class ChatController extends Controller
 
         ChatEvent::dispatch($message->receiver_id, $message, 'created');
 
-        $this->flushUnseenMessage($message->receiver_id);
+        $this->flushUnseenMessage($message?->receiver_id);
 
         return response()->json([
             'message' => 'Message Sent Successfully',
@@ -103,6 +103,8 @@ class ChatController extends Controller
         $chat->delete();
 
         ChatEvent::dispatch($item?->receiver_id, $item, 'deleted');
+
+        $this->flushUnseenMessage($item?->receiver_id);
 
         return response()->json([
             'message' => 'Message Deleted Successfully',

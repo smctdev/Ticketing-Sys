@@ -1,6 +1,11 @@
 import { ChangeEvent, Dispatch, SetStateAction } from "react";
 import { PaginationType } from "./pagination-type";
 
+export interface PaginationLinksType {
+  label: string | null;
+  page: number | null;
+  active?: boolean;
+}
 export interface UseFetchType {
   data: any;
   isLoading: boolean;
@@ -21,6 +26,10 @@ export interface UseFetchType {
   setIsLoading: Dispatch<SetStateAction<boolean>>;
   errorStatus: number | null;
   fetchData: () => Promise<void>;
+  handleNextPage: () => void;
+  handlePrevPage: () => void;
+  handleJumpToPage: (page: number | null) => void;
+  paginationLinks: PaginationLinksType[];
 }
 
 export interface FilterByType {

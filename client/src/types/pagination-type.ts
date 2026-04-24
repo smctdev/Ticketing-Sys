@@ -5,4 +5,5 @@ export interface PaginationType {
   sortBy: string;
   sortDirection: string;
   isLoading: boolean;
+  last_page: number;
 }

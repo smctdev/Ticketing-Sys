@@ -13,6 +13,7 @@ export default function ReplyingAttachmentContent({
   inputRef,
   isEditingMessage,
   setIsEditingMessage,
+  textAreaRef,
 }: {
   formInput: MessageFormInput;
   setFormInput: Dispatch<SetStateAction<MessageFormInput>>;
@@ -27,6 +28,7 @@ export default function ReplyingAttachmentContent({
       message: MessageType;
     }>
   >;
+  textAreaRef: RefObject<HTMLTextAreaElement | null>;
 }) {
   return (
     <>
@@ -79,6 +81,7 @@ export default function ReplyingAttachmentContent({
                             (_, idx) => idx !== index,
                           ),
                         }));
+                        textAreaRef?.current?.focus();
                         if (inputRef.current) {
                           inputRef.current.value = "";
                         }
@@ -105,6 +108,7 @@ export default function ReplyingAttachmentContent({
                 message: "",
                 attachments: [],
               }));
+              textAreaRef?.current?.focus();
             }}
           >
             <X />

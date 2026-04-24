@@ -261,6 +261,7 @@ function ChatsPage() {
         ...prev,
         attachments: [...prev.attachments, ...Array.from(files)],
       }));
+      textAreaRef?.current?.focus();
     }
   };
 
@@ -419,12 +420,14 @@ function ChatsPage() {
                           setIsEditing={setIsEditing}
                           setIsEditingMessage={setIsEditingMessage}
                           setIsDeletingMessage={setIsDeletingMessage}
+                          textAreaRef={textAreaRef}
                         />
                       ) : (
                         <ReceiverContent
                           message={message}
                           setFormInput={setFormInput}
                           data={data}
+                          textAreaRef={textAreaRef}
                         />
                       )}
                     </div>
@@ -473,6 +476,7 @@ function ChatsPage() {
               inputRef={inputRef}
               isEditingMessage={isEditingMessage}
               setIsEditingMessage={setIsEditingMessage}
+              textAreaRef={textAreaRef}
             />
             <form
               onSubmit={

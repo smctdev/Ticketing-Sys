@@ -5,4 +5,5 @@ export const PAGINATION = {
   sortBy: "ticket_id",
   sortDirection: "desc",
   isLoading: false,
+  last_page: 1,
 };
