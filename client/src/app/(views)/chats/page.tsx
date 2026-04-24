@@ -12,6 +12,8 @@ import { useChat } from "@/context/chat-context";
 import useFetch from "@/hooks/use-fetch";
 import { api } from "@/lib/api";
 import withAuthPage from "@/lib/hoc/with-auth-page";
+import nameShortHand from "@/utils/name-short-hand";
+import Storage from "@/utils/storage";
 import { Check, MessageCircleMore, Pointer, Users2 } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
@@ -106,9 +108,9 @@ function ChatsPage() {
                     >
                       <div className="relative shrink-0">
                         <Avatar className="w-10 h-10">
-                          <AvatarImage src={row.profile_picture} />
-                          <AvatarFallback>
-                            {row.full_name?.[0]?.toUpperCase()}
+                          <AvatarImage src={Storage(row.profile_pic)} />
+                          <AvatarFallback className="font-semibold">
+                            {nameShortHand(row?.full_name)}
                           </AvatarFallback>
                         </Avatar>
                         {isOnline && (
