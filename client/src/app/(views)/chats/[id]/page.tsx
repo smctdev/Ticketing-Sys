@@ -247,7 +247,7 @@ function ChatsPage() {
     if (
       !e.shiftKey &&
       e.key === "Enter" &&
-      formInput.message.trim() &&
+      (formInput.message.trim() || formInput?.attachments?.length > 0) &&
       !isSubmitting
     ) {
       isEditingMessage.isEditing ? handleUpdate(e) : handleSubmit(e);
