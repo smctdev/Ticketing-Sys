@@ -9,3 +9,9 @@ services:
       - "7030:7030"
     volumes:
       - /home/webserver/systems/Ticketing-V2/Ticketing-Sys/client/.env:/app/.env
+    networks:
+      - ticketing-v2-client
+  
+networks:
+  ticketing-v2-client:
+    driver: bridge
