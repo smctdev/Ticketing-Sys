@@ -1,7 +1,7 @@
 import { ButtonHTMLAttributes, ReactNode } from "react";
 import { Button } from "./button";
 import { Spinner } from "./spinner";
-import { RefreshCcw } from "lucide-react";
+import { ArrowBigUpDash } from "lucide-react";
 
 interface ButtonLoaderProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   isLoading?: boolean;
@@ -21,13 +21,11 @@ interface ButtonLoaderProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 export default function ButtonLoader({
   isLoading = false,
   children,
-  variant = "default",
-  size = "default",
   ...props
 }: ButtonLoaderProps) {
   return (
-    <Button disabled={isLoading} variant={variant} size={size} {...props}>
-      {isLoading ? <Spinner /> : <RefreshCcw />}
+    <Button disabled={isLoading} {...props}>
+      {isLoading ? <Spinner /> : <ArrowBigUpDash />}
       <span>{children}</span>
     </Button>
   );
