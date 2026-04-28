@@ -549,15 +549,14 @@ function ChatsPage() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction asChild>
-              <ButtonLoader
-                type="button"
-                onClick={handleDeleteMessage}
-                isLoading={isDeletingMessage.isLoadingDelete}
-              >
-                Delete
-              </ButtonLoader>
-            </AlertDialogAction>
+            <ButtonLoader
+              type="button"
+              onClick={handleDeleteMessage}
+              variant={"destructive"}
+              isLoading={isDeletingMessage.isLoadingDelete}
+            >
+              Delete
+            </ButtonLoader>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
