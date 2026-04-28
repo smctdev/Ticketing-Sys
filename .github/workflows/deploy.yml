@@ -46,8 +46,8 @@ jobs:
 
       
         if: steps.changes.outputs.server == 'true'
-        run: git pull && docker-compose down && docker-compose up -d --build
+        run: cd /home/webserver/systems/Ticketing-V2/Ticketing-Sys && git pull && docker-compose down && docker-compose up -d --build
 
       - name: Deploy Client
         if: steps.changes.outputs.client == 'true'
-        run: git pull && docker-compose down && docker-compose up -d --build
+        run: cd /home/webserver/systems/Ticketing-V2/Ticketing-Sys && git pull && docker-compose down && docker-compose up -d --build
