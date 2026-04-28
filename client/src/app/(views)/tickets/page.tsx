@@ -94,6 +94,7 @@ function Tickets() {
   const [error, setError] = useState<any>(null);
   const [note, setNote] = useState<string>("");
   const [isCounted, setIsCounted] = useState<string>("");
+  const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const role = user?.user_role?.role_name;
 
   useEffect(() => {
@@ -544,6 +545,16 @@ function Tickets() {
       });
     };
 
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    setIsRefreshBranchHeads(true);
+    try {
+      await fetchData();
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-3">
       <Card className="gap-0">
@@ -635,12 +646,8 @@ function Tickets() {
                 <ButtonLoader
                   type="button"
                   className="bg-yellow-500 hover:bg-yellow-600"
-                  isLoading={isLoading}
-                  onClick={() => {
-                    fetchData();
-                    setIsLoading(true);
-                    setIsRefreshBranchHeads(true);
-                  }}
+                  isLoading={isRefreshing}
+                  onClick={handleRefresh}
                 >
                   Refresh
                 </ButtonLoader>
@@ -663,7 +670,7 @@ function Tickets() {
           <DataTableComponent
             data={data?.data?.data}
             columns={[...TICKETS_COLUMNS, ...TICKET_COLUMNS_ACTIONS]}
-            loading={isLoading}
+            loading={isLoading || isRefreshing}
             handlePageChange={handlePageChange}
             handlePerPageChange={handlePerPageChange}
             handleShort={handleShort}
