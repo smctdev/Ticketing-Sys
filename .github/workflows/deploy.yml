@@ -46,8 +46,8 @@ jobs:
 
       
         if: steps.changes.outputs.server == 'true'
-        run: bash /home/webserver/scripts/deploy_scripts/ticketing_v2_server.sh
+        run: git pull && docker-compose down && docker-compose up -d --build
 
       - name: Deploy Client
         if: steps.changes.outputs.client == 'true'
-        run: bash /home/webserver/scripts/deploy_scripts/ticketing_v2_client.sh
+        run: git pull && docker-compose down && docker-compose up -d --build
