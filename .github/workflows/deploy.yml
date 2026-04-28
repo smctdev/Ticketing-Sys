@@ -17,23 +17,24 @@ jobs:
 
       - name: Check changed folders
         id: changes
+        shell: powershell
         run: |
-          CHANGED_FILES=$(git diff --name-only ${{ github.event.before }} ${{ github.sha }})
+          $CHANGED_FILES = git diff --name-only "${{ github.event.before }}" "${{ github.sha }}"
 
-          echo "Changed files:"
-          echo "$CHANGED_FILES"
+          Write-Host "Changed files:"
+          Write-Host $CHANGED_FILES
 
-          if echo "$CHANGED_FILES" | grep -q "^server/"; then
-            echo "server=true" >> $GITHUB_OUTPUT
-          else
-            echo "server=false" >> $GITHUB_OUTPUT
-          fi
+          if ($CHANGED_FILES -match "^server/") {
+            "server=true" >> $env:GITHUB_OUTPUT
+          } else {
+            "server=false" >> $env:GITHUB_OUTPUT
+          }
 
-          if echo "$CHANGED_FILES" | grep -q "^client/"; then
-            echo "client=true" >> $GITHUB_OUTPUT
-          else
-            echo "client=false" >> $GITHUB_OUTPUT
-          fi
+          if ($CHANGED_FILES -match "^client/") {
+            "client=true" >> $env:GITHUB_OUTPUT
+          } else {
+            "client=false" >> $env:GITHUB_OUTPUT
+          }
 
       - name: Set up SSH
         if: steps.changes.outputs.server == 'true' || steps.changes.outputs.client == 'true'
