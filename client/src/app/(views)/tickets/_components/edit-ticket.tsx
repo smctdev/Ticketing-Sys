@@ -19,7 +19,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import BasicForm from "./basic-form";
 
 export function EditTicket({
-  setIsRefresh,
+  fetchData,
   ticketData,
   categories,
   user,
@@ -126,7 +126,6 @@ export function EditTicket({
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
-    setIsRefresh(true);
     setIsRefreshBranchHeads(true);
     try {
       const formData = new FormData();
@@ -189,6 +188,7 @@ export function EditTicket({
           description: response.data.message,
           position: "bottom-center",
         });
+        fetchData()
       }
     } catch (error: any) {
       console.error(error);
@@ -201,7 +201,6 @@ export function EditTicket({
       }
     } finally {
       setIsLoading(false);
-      setIsRefresh(false);
       setIsRefreshBranchHeads(false);
     }
   };

@@ -4,6 +4,7 @@ import { Reply } from "lucide-react";
 import { MessageFormInput, MessageType } from "../[id]/page";
 import { Dispatch, RefObject, SetStateAction } from "react";
 import AttachmentContent from "./attachment-content";
+import { strPlural } from "@/utils/str-formats";
 
 export default function ReceiverContent({
   message,
@@ -28,7 +29,7 @@ export default function ReceiverContent({
             dangerouslySetInnerHTML={{
               __html:
                 message?.reply_from?.body ||
-                `${message?.reply_attachments_count} attachment(s)`,
+                `${message?.reply_attachments_count} ${strPlural(message?.reply_attachments_count, "attachment")}`,
             }}
           />
         </div>
@@ -66,7 +67,7 @@ export default function ReceiverContent({
                   message_id: message?.id,
                   reply_message_content:
                     message?.body ||
-                    `${message?.attachments?.length} attachment(s)`,
+                    `${message?.attachments?.length} ${strPlural(message?.attachments?.length, "attachment")}`,
                 }));
                 textAreaRef?.current?.focus();
               }}

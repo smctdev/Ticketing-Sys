@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/tooltip";
 import { TooltipArrow } from "@radix-ui/react-tooltip";
 
-export function DeleteTicket({ data, setIsRefresh }: any) {
+export function DeleteTicket({ data, fetchData }: any) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -29,10 +29,9 @@ export function DeleteTicket({ data, setIsRefresh }: any) {
   const handleDeleteTicket = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
-    setIsRefresh(true);
     try {
       const response = await api.delete(
-        `/delete-ticket/${data.ticket_details_id}/delete`
+        `/delete-ticket/${data.ticket_details_id}/delete`,
       );
       if (response.status === 200) {
         setError(null);
@@ -41,13 +40,13 @@ export function DeleteTicket({ data, setIsRefresh }: any) {
           description: response.data.message,
           position: "bottom-center",
         });
+        fetchData();
       }
     } catch (error: any) {
       console.error(error);
       setError(error.response.data.message);
     } finally {
       setIsLoading(false);
-      setIsRefresh(false);
     }
   };
 

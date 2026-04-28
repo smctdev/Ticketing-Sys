@@ -144,6 +144,46 @@ export default function BasicForm({
           <small className="text-red-500">{errors?.ticket_category[0]}</small>
         )}
       </div>
+      {ticketSubCategories?.length > 0 && (
+        <div className="flex flex-col gap-3">
+          <Label htmlFor="ticket_sub_category" className="px-1">
+            Ticket sub category
+          </Label>
+          <Select
+            onValueChange={handleChange("ticket_sub_category")}
+            value={String(formInput.ticket_sub_category)}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select ticket category" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectItem value="Select ticket category" disabled>
+                  Select ticket category
+                </SelectItem>
+                {ticketSubCategories?.length === 0 ? (
+                  <SelectItem value="No ticket categories found">
+                    No ticket categories found
+                  </SelectItem>
+                ) : (
+                  ticketSubCategories?.map(
+                    (sub_category: any, index: number) => (
+                      <SelectItem key={index} value={String(sub_category.id)}>
+                        {sub_category.sub_category_name}
+                      </SelectItem>
+                    ),
+                  )
+                )}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+          {errors?.ticket_sub_category && (
+            <small className="text-red-500">
+              {errors?.ticket_sub_category[0]}
+            </small>
+          )}
+        </div>
+      )}
       <Activity mode={branchHeads?.length > 1 ? "visible" : "hidden"}>
         <div className="flex flex-col gap-3">
           <Label htmlFor="branch_head_id" className="px-1">
@@ -185,46 +225,6 @@ export default function BasicForm({
           )}
         </div>
       </Activity>
-      {ticketSubCategories?.length > 0 && (
-        <div className="flex flex-col gap-3">
-          <Label htmlFor="ticket_sub_category" className="px-1">
-            Ticket sub category
-          </Label>
-          <Select
-            onValueChange={handleChange("ticket_sub_category")}
-            value={String(formInput.ticket_sub_category)}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select ticket category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectItem value="Select ticket category" disabled>
-                  Select ticket category
-                </SelectItem>
-                {ticketSubCategories?.length === 0 ? (
-                  <SelectItem value="No ticket categories found">
-                    No ticket categories found
-                  </SelectItem>
-                ) : (
-                  ticketSubCategories?.map(
-                    (sub_category: any, index: number) => (
-                      <SelectItem key={index} value={String(sub_category.id)}>
-                        {sub_category.sub_category_name}
-                      </SelectItem>
-                    ),
-                  )
-                )}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-          {errors?.ticket_sub_category && (
-            <small className="text-red-500">
-              {errors?.ticket_sub_category[0]}
-            </small>
-          )}
-        </div>
-      )}
       <SqlForm
         formInput={formInput}
         errors={errors}

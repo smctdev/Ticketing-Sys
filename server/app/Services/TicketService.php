@@ -177,6 +177,8 @@ class TicketService
                     'td_note_bh'              => $ticket->ticketDetail->td_note_bh,
                     'td_note_accounting'      => $ticket->ticketDetail->td_note_accounting,
                     'td_support'              => $ticket->ticketDetail->td_support,
+                    'ticket_category_id'      => $ticket->ticketDetail->ticketCategory->ticket_category_id,
+                    'sub_category_id'         => $ticket->ticketDetail?->subCategory?->id,
                     'ticket_category'         => !$ticket->ticketDetail->ticketCategory ? null : [
                         'category_name'       => $ticket->ticketDetail->ticketCategory->category_name
                     ],
@@ -185,6 +187,7 @@ class TicketService
                         'sub_category_name'   => $ticket->ticketDetail?->subCategory?->sub_category_name
                     ]
                 ],
+                'displayTicket'               => $ticket->displayTicket,
                 'user_login'                  => !$ticket->userLogin ? null : [
                     'login_id'                => $ticket->userLogin->login_id,
                     'full_name'               => $ticket->userLogin->full_name,
@@ -620,7 +623,7 @@ class TicketService
     {
         $ticketDetail = TicketDetail::findOrFail($id);
 
-        if (!$ticketDetail->ticket->pendingUser->isBranchHead() && $ticketDetail->ticket->status === TicketStatus::PENDING) {
+        if (!$ticketDetail->ticket->pendingUser->isBranchHead() && $ticketDetail->ticket->status === TicketStatus::PENDING && !$this->user->isSuperAdmin()) {
             abort(400, 'You can not delete this ticket because it has been already approved by your branch head.');
         }
 

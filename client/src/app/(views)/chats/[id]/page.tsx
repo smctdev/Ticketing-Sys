@@ -392,9 +392,9 @@ function ChatsPage() {
                       {Array.from({ length: 3 }).map((_, index) => (
                         <span
                           key={index}
-                          className="w-1 h-1 rounded-full bg-chat-receiver-background animate-bounce [animation-delay:0.2s]"
+                          className="w-1 h-1 rounded-full bg-chat-receiver-background animate-bounce"
                           style={{
-                            animationDelay: `${index * 0.1}s`,
+                            animationDelay: `${index * 0.2}s`,
                           }}
                         />
                       ))}

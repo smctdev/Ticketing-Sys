@@ -62,10 +62,9 @@ function Tickets() {
     pagination,
     handleSelectFilter,
     handleReset,
-    setIsRefresh,
-    isRefresh: isRefreshTickets,
     error: ticketsError,
     fetchData,
+    setIsLoading,
   } = useFetch({
     url: "/tickets",
     isPaginated: true,
@@ -103,7 +102,7 @@ function Tickets() {
     echo
       .private(`approver-of-ticket-${user?.login_id}`)
       .notification((notification: any) => {
-        setIsRefresh(true);
+        fetchData();
       });
 
     echo.channel("ticket-deleted").listen("DeleteTicketEvent", (event: any) => {
@@ -115,7 +114,7 @@ function Tickets() {
         setIsOpenDialog(false);
         setIsOpenView(false);
       }
-      setIsRefresh(true);
+      fetchData();
     });
 
     return () => {
@@ -173,7 +172,7 @@ function Tickets() {
             </TooltipContent>
           </Tooltip>
           {(user?.login_id === row?.login_id || isAdmin) && (
-            <DeleteTicket data={row} setIsRefresh={setIsRefresh} />
+            <DeleteTicket data={row} fetchData={fetchData} />
           )}
           {isAdmin && (
             <Tooltip>
@@ -636,9 +635,10 @@ function Tickets() {
                 <ButtonLoader
                   type="button"
                   className="bg-yellow-500 hover:bg-yellow-600"
-                  isLoading={isRefreshTickets}
+                  isLoading={isLoading}
                   onClick={() => {
-                    setIsRefresh(true);
+                    fetchData();
+                    setIsLoading(true);
                     setIsRefreshBranchHeads(true);
                   }}
                 >
@@ -663,7 +663,7 @@ function Tickets() {
           <DataTableComponent
             data={data?.data?.data}
             columns={[...TICKETS_COLUMNS, ...TICKET_COLUMNS_ACTIONS]}
-            loading={isLoading || isRefreshTickets}
+            loading={isLoading}
             handlePageChange={handlePageChange}
             handlePerPageChange={handlePerPageChange}
             handleShort={handleShort}
@@ -680,7 +680,7 @@ function Tickets() {
 
       {isOpenDialog && (
         <EditTicket
-          setIsRefresh={setIsRefresh}
+          fetchData={fetchData}
           ticketData={selectedTicketData}
           categories={categories}
           user={user}

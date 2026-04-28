@@ -14,22 +14,29 @@ export function Pagination({
   handlePrevPage,
   handleNextPage,
   handleJumpToPage,
+  isLoading,
+  noData,
 }: {
   links: PaginationLinksType[];
   handlePrevPage: () => void;
   handleNextPage: () => void;
   handleJumpToPage: (page: number | null) => void;
+  isLoading: boolean;
+  noData?: boolean;
 }) {
+  if (isLoading || noData) return null;
+
   return (
     <PaginationMain>
-      <PaginationContent>
+      <PaginationContent className="cursor-pointer">
         {links?.map((link, index) => (
           <div key={index}>
-            {link?.label?.toLocaleLowerCase().includes("previous") && (
-              <PaginationItem>
-                <PaginationPrevious onClick={handlePrevPage} />
-              </PaginationItem>
-            )}
+            {link?.label?.toLocaleLowerCase().includes("previous") &&
+              link.page && (
+                <PaginationItem>
+                  <PaginationPrevious onClick={handlePrevPage} />
+                </PaginationItem>
+              )}
             {link?.label?.toLocaleLowerCase().includes("...") && (
               <PaginationItem>
                 <PaginationEllipsis />
@@ -47,7 +54,7 @@ export function Pagination({
                   </PaginationLink>
                 </PaginationItem>
               )}
-            {link?.label?.toLocaleLowerCase().includes("next") && (
+            {link?.label?.toLocaleLowerCase().includes("next") && link.page && (
               <PaginationItem>
                 <PaginationNext onClick={handleNextPage} />
               </PaginationItem>

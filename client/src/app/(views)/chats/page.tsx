@@ -14,7 +14,13 @@ import { api } from "@/lib/api";
 import withAuthPage from "@/lib/hoc/with-auth-page";
 import nameShortHand from "@/utils/name-short-hand";
 import Storage from "@/utils/storage";
-import { Check, MessageCircleMore, Pointer, Users2 } from "lucide-react";
+import {
+  Check,
+  MessageCircleMore,
+  MessageCircleOff,
+  Pointer,
+  Users2,
+} from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -32,6 +38,7 @@ function ChatsPage() {
     handlePrevPage,
     handleNextPage,
     handleJumpToPage,
+    pagination,
   } = useFetch({
     url: "/chats",
     isPaginated: true,
@@ -65,7 +72,7 @@ function ChatsPage() {
           </div>
         </CardHeader>
         <CardContent className="p-0">
-          {isLoading ? (
+          {isLoading || pagination.isLoading ? (
             <div className="divide-y">
               {Array.from({ length: 6 }).map((_, i) => (
                 <div key={i} className="flex items-center gap-3 px-6 py-4">
@@ -78,9 +85,12 @@ function ChatsPage() {
               ))}
             </div>
           ) : users.length === 0 ? (
-            <p className="text-center text-muted-foreground py-10 text-sm">
-              No conversations found.
-            </p>
+            <div className="flex flex-col items-center justify-center py-10 gap-3">
+              <MessageCircleOff size={50} />
+              <span className="text-center text-muted-foreground text-sm">
+                No conversations found.
+              </span>
+            </div>
           ) : (
             <ul className="divide-y">
               {users.map((row: any) => {
@@ -198,6 +208,8 @@ function ChatsPage() {
             handlePrevPage={handlePrevPage}
             handleNextPage={handleNextPage}
             handleJumpToPage={handleJumpToPage}
+            isLoading={pagination.isLoading || isLoading}
+            noData={users?.length === 0}
           />
         </CardContent>
       </Card>
