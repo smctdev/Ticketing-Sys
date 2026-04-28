@@ -2,6 +2,14 @@ import { paginationRowsPerPageOptions } from "@/constants/pagination-rows-per-pa
 import TableLoader from "./loaders/table-loader";
 import DataTable from "react-data-table-component";
 import { DataTableType } from "@/types/data-table-type";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "./ui/empty";
+import { CopySlash, Search } from "lucide-react";
 
 export default function DataTableComponent({
   data,
@@ -23,13 +31,32 @@ export default function DataTableComponent({
 }: DataTableType) {
   const NoData = () => {
     return (
-      <div className="py-10 text-sm font-bold text-gray-600">
-        {searchTerm
-          ? `No results for "${searchTerm}"`
-          : error
-            ? error
-            : "No data available"}
-      </div>
+      <Empty>
+        <EmptyHeader>
+          <EmptyMedia>
+            {searchTerm ? (
+              <Search />
+            ) : (
+              <CopySlash className="size-12 text-muted-foreground/40" />
+            )}
+          </EmptyMedia>
+          <EmptyTitle>
+            {" "}
+            {searchTerm
+              ? `No results for "${searchTerm}"`
+              : error
+                ? error
+                : "No data available"}
+          </EmptyTitle>
+          <EmptyDescription>
+            {`All ${searchTerm ? "searches" : "records"} will appear here. ${
+              searchTerm
+                ? "Try adjusting your search to find what you're looking for."
+                : "Please check back later or adjust your filters."
+            }`}
+          </EmptyDescription>
+        </EmptyHeader>
+      </Empty>
     );
   };
 
