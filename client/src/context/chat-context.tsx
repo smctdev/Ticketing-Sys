@@ -16,6 +16,7 @@ import { useAuth } from "./auth-context";
 import { MessageType } from "@/app/(views)/chats/[id]/page";
 import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
+import { strPlural } from "@/utils/str-formats";
 
 type MessageRecordType = {
   login_id: number;
@@ -125,7 +126,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
                   message_count: record.message_count + 1,
                   last_message:
                     e.message.body ||
-                    `Sent ${e.message.attachments?.length} attchment(s)`,
+                    `Sent ${e.message.attachments?.length} ${strPlural(e.message.attachments?.length, "attachment")}`,
                 }
               : record,
           );
@@ -134,13 +135,15 @@ export function ChatProvider({ children }: { children: ReactNode }) {
             ...prev,
             {
               login_id: id,
-              last_message: e.message.body,
+              last_message:
+                e.message.body ||
+                `Sent ${e.message.attachments?.length} ${strPlural(e.message.attachments?.length, "attachment")}`,
               message_count: 1,
             },
           ];
         }
 
-        document.title = `(${newData.current?.length}) New message(s) arrived`;
+        document.title = `(${newData.current?.length}) New ${strPlural(newData.current?.length, "message")} arrived`;
 
         return newData.current;
       });

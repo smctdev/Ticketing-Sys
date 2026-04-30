@@ -236,6 +236,10 @@ function ChatsPage() {
           reply_message_content: "",
         });
         setMessages((prev) => [response.data.data, ...prev]);
+
+        if (inputRef.current) {
+          inputRef.current.value = "";
+        }
       }
     } catch (error: any) {
       console.error(error);
