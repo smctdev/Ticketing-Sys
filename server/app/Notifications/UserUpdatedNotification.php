@@ -56,11 +56,10 @@ class UserUpdatedNotification extends Notification implements ShouldQueue, Shoul
         ];
     }
 
-    public function toBroadCast()
+    public function toBroadcast()
     {
-
         return new BroadcastMessage([
-            'data'      => "Hello, {$this->user->full_name} your profile has been updated by the admin"
+            'data' => "Hello, {$this->user->full_name} your profile has been updated by the admin"
         ]);
     }
 

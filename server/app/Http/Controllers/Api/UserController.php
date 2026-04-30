@@ -23,7 +23,11 @@ class UserController extends Controller
         $limit = request('limit');
         $search = request('search');
 
-        $users = UserLogin::with('userDetail', 'branch', 'userRole')
+        $users = UserLogin::with([
+            'userDetail',
+            'branch',
+            'userRole'
+        ])
             ->search($search)
             ->whereNot('login_id', Auth::id())
             ->orderByDesc(
@@ -38,8 +42,8 @@ class UserController extends Controller
             ->paginate($limit);
 
         return response()->json([
-            "message"       => "Users fetched successfully",
-            "data"          => $users
+            "message" => "Users fetched successfully",
+            "data"    => $users
         ], 200);
     }
 
@@ -61,7 +65,7 @@ class UserController extends Controller
         $data = $manageUserService->storeUser($request);
 
         return response()->json([
-            "message"       => "User \"{$data->user_email}\" created successfully",
+            "message" => "User \"{$data->user_email}\" created successfully",
         ], 201);
     }
 
@@ -91,7 +95,7 @@ class UserController extends Controller
         $data = $manageUserService->updateUser($request, $id);
 
         return response()->json([
-            "message"       => "User \"{$data->user_email}\" updated successfully",
+            "message" => "User \"{$data->user_email}\" updated successfully",
         ], 200);
     }
 
@@ -103,7 +107,7 @@ class UserController extends Controller
         $data = $manageUserService->deleteUser($id);
 
         return response()->json([
-            "message"       => "User \"{$data->user_email}\" deleted successfully",
+            "message" => "User \"{$data->user_email}\" deleted successfully",
         ], 200);
     }
 

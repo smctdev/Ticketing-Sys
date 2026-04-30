@@ -28,8 +28,8 @@ class SupplierController extends Controller
             ->paginate($limit);
 
         return response()->json([
-            "message"           => "Suppliers fetched successfully",
-            "data"              => $suppliers
+            "message" => "Suppliers fetched successfully",
+            "data"    => $suppliers
         ], 200);
     }
 
@@ -50,7 +50,7 @@ class SupplierController extends Controller
 
         $supplier = Supplier::query()
             ->create([
-                'suppliers'    => $request->suppliers
+                'suppliers' => $request->suppliers
             ]);
 
         activity()
@@ -59,7 +59,7 @@ class SupplierController extends Controller
             ->log("Created a supplier");
 
         return response()->json([
-            "message"           => "Supplier \"{$supplier->suppliers}\" created successfully",
+            "message" => "Supplier \"{$supplier->suppliers}\" created successfully",
         ], 201);
     }
 
@@ -89,7 +89,7 @@ class SupplierController extends Controller
         $supplier = Supplier::findOrFail($id);
 
         $supplier->update([
-            'suppliers'    => $request->suppliers
+            'suppliers' => $request->suppliers
         ]);
 
         activity()
@@ -98,7 +98,7 @@ class SupplierController extends Controller
             ->log("Updated a supplier");
 
         return response()->json([
-            "message"           => "Supplier \"{$supplier->suppliers}\" updated successfully",
+            "message" => "Supplier \"{$supplier->suppliers}\" updated successfully",
         ], 200);
     }
 
@@ -117,7 +117,7 @@ class SupplierController extends Controller
             ->log("Deleted a supplier");
 
         return response()->json([
-            "message"           => "Supplier \"{$supplier->suppliers}\" deleted successfully",
+            "message" => "Supplier \"{$supplier->suppliers}\" deleted successfully",
         ], 200);
     }
 }

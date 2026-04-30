@@ -64,8 +64,8 @@ class TicketController extends Controller
         );
 
         return response()->json([
-            "message"       => "Tickets fetched successfully",
-            "data"          => $tickets
+            "message" => "Tickets fetched successfully",
+            "data"    => $tickets
         ], 200);
     }
 
@@ -81,7 +81,7 @@ class TicketController extends Controller
 
         $ticket_type = request('ticket_type');
 
-        $tickets = Ticket::with(
+        $tickets = Ticket::with([
             'userLogin.userDetail',
             'userLogin.userRole',
             'userLogin.branch',
@@ -110,7 +110,7 @@ class TicketController extends Controller
             'lastApprover.userRole',
             'lastApprover.branch',
             'branch',
-        )
+        ])
             ->search($search)
             ->when($ticket_type !== 'ALL', fn($query) => $query->whereRelation('ticketDetail', 'ticket_type', $ticket_type))
             ->when($ticket_category, fn($query) => $query->whereHas('ticketDetail', fn($subQuery) => $subQuery->where('ticket_category_id', $ticket_category)))
@@ -119,8 +119,8 @@ class TicketController extends Controller
             ->paginate($take);
 
         return response()->json([
-            "message"       => "Tickets fetched successfully",
-            "data"          => $tickets
+            "message" => "Tickets fetched successfully",
+            "data"    => $tickets
         ], 200);
     }
 
@@ -186,7 +186,7 @@ class TicketController extends Controller
         $data = $ticketService->storeTicket($request);
 
         return response()->json([
-            "message"   => "Ticket with ticket code of {$data?->ticket_code} created successfully",
+            "message" => "Ticket with ticket code of {$data?->ticket_code} created successfully",
         ], 201);
     }
 
@@ -196,7 +196,7 @@ class TicketController extends Controller
     public function show(string $id)
     {
         $ticket = Ticket::query()
-            ->with(
+            ->with([
                 'userLogin.userDetail',
                 'userLogin.userRole',
                 'userLogin.branch',
@@ -227,12 +227,12 @@ class TicketController extends Controller
                 'lastApprover.userRole',
                 'lastApprover.branch',
                 'branch'
-            )
+            ])
             ->where('ticket_code', $id)->first();
 
         return response()->json([
-            "message"   => "Ticket fetched successfully",
-            "data"      => $ticket
+            "message" => "Ticket fetched successfully",
+            "data"    => $ticket
         ], 200);
     }
 
@@ -254,11 +254,11 @@ class TicketController extends Controller
         $data = $ticketService->updateTicket($request, $id);
 
         return response()->json([
-            "message"   => "Ticket with ticket code of {$data->ticket_code} updated successfully",
+            "message" => "Ticket with ticket code of {$data->ticket_code} updated successfully",
         ], 200);
     }
 
-    public function updateNotif(Request $request, $id)
+    public function updateNotif(Request $request, string $id)
     {
         $ticket = Ticket::find($id);
         $user = Auth::user();
@@ -296,7 +296,7 @@ class TicketController extends Controller
         $data = $ticketService->deleteTicket($id);
 
         return response()->json([
-            'message'           => "Ticket with ticket code of {$data->ticket->ticket_code} deleted successfully",
+            'message' => "Ticket with ticket code of {$data->ticket->ticket_code} deleted successfully",
         ], 200);
     }
 
@@ -311,7 +311,7 @@ class TicketController extends Controller
         };
 
         $validateData = [
-            $field              => ["nullable", Rule::requiredIf(!$user->isAccountingHead() && !$user->isBranchHead()), 'max:5000', 'min:1']
+            $field => ["nullable", Rule::requiredIf(!$user->isAccountingHead() && !$user->isBranchHead()), 'max:5000', 'min:1']
         ];
 
         $validateDataMessage = [
@@ -325,7 +325,7 @@ class TicketController extends Controller
         $data = $ticketService->reviseTicket($id, $request);
 
         return response()->json([
-            'message'           => "Ticket with ticket code of {$data->ticket->ticket_code} revised successfully",
+            'message' => "Ticket with ticket code of {$data->ticket->ticket_code} revised successfully",
         ], 200);
     }
 
@@ -336,13 +336,13 @@ class TicketController extends Controller
         $field = $user->isAutomation() ? 'td_note_bh' : 'td_note';
 
         $validateData = [
-            $field            => ["nullable", Rule::requiredIf(!$user->isAccountingHead() && !$user->isAccountingStaff() && !$user->isBranchHead()), 'max:5000', 'min:1']
+            $field => ["nullable", Rule::requiredIf(!$user->isAccountingHead() && !$user->isAccountingStaff() && !$user->isBranchHead()), 'max:5000', 'min:1']
         ];
 
         $validateDataMessage = [
-            "{$field}.required"   => 'Note is required',
-            "{$field}.max"        => 'Note must be less than 5000 characters',
-            "{$field}.min"        => 'Note must be at least 1 character',
+            "{$field}.required" => 'Note is required',
+            "{$field}.max"      => 'Note must be less than 5000 characters',
+            "{$field}.min"      => 'Note must be at least 1 character',
         ];
 
         $request->validate($validateData, $validateDataMessage);
@@ -350,15 +350,15 @@ class TicketController extends Controller
         $data = $ticketService->approveTicket($id, $request);
 
         return response()->json([
-            'message'           => "Ticket with ticket code of {$data->ticket->ticket_code} approved successfully",
+            'message' => "Ticket with ticket code of {$data->ticket->ticket_code} approved successfully",
         ], 200);
     }
 
     public function markAsEdited(Request $request, TicketService $ticketService, string $id)
     {
         $validateData = [
-            'td_note_bh'          => ['required', 'max:5000', 'min:1'],
-            'is_counted'          => ['required']
+            'td_note_bh' => ['required', 'max:5000', 'min:1'],
+            'is_counted' => ['required']
         ];
 
         $validateDataMessage = [
@@ -372,7 +372,7 @@ class TicketController extends Controller
         $data = $ticketService->markAsEdited($id, $request);
 
         return response()->json([
-            'message'           => "Ticket with ticket code of {$data->ticket->ticket_code} has been marked as edited successfully",
+            'message' => "Ticket with ticket code of {$data->ticket->ticket_code} has been marked as edited successfully",
         ], 200);
     }
 
@@ -381,7 +381,7 @@ class TicketController extends Controller
         $data = $ticketService->returnToAutomation($ticketCode);
 
         return response()->json([
-            'message'           => "Ticket with ticket code of {$data->ticket_code} has been returned to Automation successfully",
+            'message' => "Ticket with ticket code of {$data->ticket_code} has been returned to Automation successfully",
         ], 200);
     }
 
@@ -392,27 +392,27 @@ class TicketController extends Controller
         $msg = $data->isCounted === 1 ? 'not counted' : 'counted';
 
         return response()->json([
-            'message'           => "Ticket with ticket code of {$data->ticket_code} has been marked as {$msg} successfully",
+            'message' => "Ticket with ticket code of {$data->ticket_code} has been marked as {$msg} successfully",
         ], 200);
     }
 
     public function editNote(Request $request, TicketService $ticketService, $ticketCode)
     {
         $request->validate([
-            'note'          => ['required', 'max:5000', 'min:1']
+            'note' => ['required', 'max:5000', 'min:1']
         ]);
 
         [$old_data, $new_data, $ticket_code] = $ticketService->editNote($request, $ticketCode);
 
         return response()->json([
-            'message'           => "Ticket with ticket code of {$ticket_code} note has been changed from {$old_data} to {$new_data} successfully",
+            'message' => "Ticket with ticket code of {$ticket_code} note has been changed from {$old_data} to {$new_data} successfully",
         ], 200);
     }
 
     public function transferTicketToAutomation(Request $request, $ticketCode)
     {
         $request->validate([
-            'automation'        => ['required']
+            'automation' => ['required']
         ]);
 
         $user = UserLogin::findOrFail($request->automation);
@@ -453,7 +453,7 @@ class TicketController extends Controller
             ->log("Transferred a ticket");
 
         return response()->json([
-            'message'           => "Ticket with ticket code of {$ticketCode} has been transferred to {$data->assignedPerson->full_name} automation successfully",
+            'message' => "Ticket with ticket code of {$ticketCode} has been transferred to {$data->assignedPerson->full_name} automation successfully",
         ], 200);
     }
 
@@ -488,7 +488,7 @@ class TicketController extends Controller
             ->log("Directed a ticket with ticket code of {$ticket_detail?->ticket?->ticket_code} to automation");
 
         return response()->json([
-            'message'           => "Ticket with ticket code of {$ticket_detail?->ticket?->ticket_code} has been directed automation successfully",
+            'message' => "Ticket with ticket code of {$ticket_detail?->ticket?->ticket_code} has been directed automation successfully",
         ], 200);
     }
 

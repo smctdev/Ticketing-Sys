@@ -44,38 +44,38 @@ class TicketRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'ticket_transaction_date'             => ['required', 'date', 'before_or_equal:today'],
-            'ticket_category'                     => ['required', Rule::exists('ticket_categories', 'ticket_category_id')],
-            'ticket_support'                      => ['required', 'array'],
-            'ticket_support.*'                    => ['file', 'max:5120'],
-            'ticket_type'                         => ['nullable'],
-            'purpose'                             => ['required', 'max:1000', 'min:2'],
-            'from'                                => ['required', 'max:255', 'min:2'],
-            'to'                                  => ['required', 'max:255', 'min:2'],
-            'ticket_reference_number'             => ['required', 'max:255', 'min:2'],
-            'branch_head_id'                      => [Rule::requiredIf($this->branchHeads() > 1)]
+            'ticket_transaction_date' => ['required', 'date', 'before_or_equal:today'],
+            'ticket_category'         => ['required', Rule::exists('ticket_categories', 'ticket_category_id')],
+            'ticket_support'          => ['required', 'array'],
+            'ticket_support.*'        => ['file', 'max:5120'],
+            'ticket_type'             => ['nullable'],
+            'purpose'                 => ['required', 'max:1000', 'min:2'],
+            'from'                    => ['required', 'max:255', 'min:2'],
+            'to'                      => ['required', 'max:255', 'min:2'],
+            'ticket_reference_number' => ['required', 'max:255', 'min:2'],
+            'branch_head_id'          => [Rule::requiredIf($this->branchHeads() > 1)]
         ];
     }
 
     public function messages(): array
     {
         return [
-            'ticket_support.required'             => 'At least one support file is required.',
-            'ticket_support.*.file'               => 'Each support upload must be a valid file.',
-            'ticket_support.*.max'                => 'Please upload a file less than 5MB.',
-            'purpose.required_if'                 => 'Purpose is required.',
-            'purpose.max'                         => 'Purpose must be less than 255 characters.',
-            'purpose.min'                         => 'Purpose must be at least 2 characters.',
-            'from.required_if'                    => 'From is required.',
-            'from.max'                            => 'From must be less than 255 characters.',
-            'from.min'                            => 'From must be at least 2 characters.',
-            'to.required_if'                      => 'To is required.',
-            'to.max'                              => 'To must be less than 255 characters.',
-            'to.min'                              => 'To must be at least 2 characters.',
-            'ticket_reference_number.required'    => 'Ticket reference number is required.',
-            'ticket_reference_number.max'         => 'Ticket reference number must be less than 255 characters.',
-            'ticket_reference_number.min'         => 'Ticket reference number must be at least 2 characters.',
-            'branch_head_id.required_if'          => 'Branch head is required.',
+            'ticket_support.required'          => 'At least one support file is required.',
+            'ticket_support.*.file'            => 'Each support upload must be a valid file.',
+            'ticket_support.*.max'             => 'Please upload a file less than 5MB.',
+            'purpose.required_if'              => 'Purpose is required.',
+            'purpose.max'                      => 'Purpose must be less than 255 characters.',
+            'purpose.min'                      => 'Purpose must be at least 2 characters.',
+            'from.required_if'                 => 'From is required.',
+            'from.max'                         => 'From must be less than 255 characters.',
+            'from.min'                         => 'From must be at least 2 characters.',
+            'to.required_if'                   => 'To is required.',
+            'to.max'                           => 'To must be less than 255 characters.',
+            'to.min'                           => 'To must be at least 2 characters.',
+            'ticket_reference_number.required' => 'Ticket reference number is required.',
+            'ticket_reference_number.max'      => 'Ticket reference number must be less than 255 characters.',
+            'ticket_reference_number.min'      => 'Ticket reference number must be at least 2 characters.',
+            'branch_head_id.required_if'       => 'Branch head is required.',
         ];
     }
 

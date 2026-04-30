@@ -2,6 +2,8 @@
 
 namespace App\Notifications;
 
+use App\Enums\UserRoles;
+use App\Models\UserLogin;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
@@ -57,41 +59,49 @@ class TicketNotification extends Notification implements ShouldQueue, ShouldBroa
     public function toArray(object $notifiable): array
     {
         return [
-            'message'                       => $this->message,
-            'profile'                       => $this->user_profile,
-            'full_name'                     => $this->full_name,
-            'ticket_code'                   => $this->ticket_code,
+            'message'     => $this->message,
+            'profile'     => $this->user_profile,
+            'full_name'   => $this->full_name,
+            'ticket_code' => $this->ticket_code,
         ];
     }
 
-    public function toBroadcast($notifiable)
+    public function toBroadcast(object $notifiable)
     {
         return new BroadcastMessage(
             [
-                'id'                                => $this->id,
-                'type'                              => static::class,
-                'notifiable_type'                   => get_class($notifiable),
-                'notifiable_id'                     => $notifiable->id,
-                'data'                              =>
+                'id'                        => $this->id,
+                'type'                      => static::class,
+                'notifiable_type'           => get_class($notifiable),
+                'notifiable_id'             => $notifiable->id,
+                'data'                      =>
                 [
-                    'message'                       => $this->message,
-                    'profile'                       => $this->user_profile,
-                    'full_name'                     => $this->full_name,
-                    'ticket_code'                   => $this->ticket_code,
+                    'message'               => $this->message,
+                    'profile'               => $this->user_profile,
+                    'full_name'             => $this->full_name,
+                    'ticket_code'           => $this->ticket_code,
                 ],
-                'read_at'                           => null,
-                'created_at'                        => now(),
-                'updated_at'                        => now(),
-                'unread_notification_count'         => $notifiable->unreadNotifications()->count(),
+                'read_at'                   => null,
+                'created_at'                => now(),
+                'updated_at'                => now(),
+                'unread_notification_count' => $notifiable->unreadNotifications()->count(),
             ]
         );
     }
 
     public function broadcastOn()
     {
+        $admins = UserLogin::query()
+            ->whereRelation('userRole', 'role_name', UserRoles::SUPER_ADMIN->value)
+            ->orWhereRelation('userRole', 'role_name', UserRoles::ADMIN->value)
+            ->pluck('login_id')
+            ->map(fn($id) => new PrivateChannel("approver-of-ticket-{$id}"))
+            ->toArray();
+
         return [
             new PrivateChannel("App.Models.UserLogin.{$this->login_id}"),
             new PrivateChannel("approver-of-ticket-{$this->login_id}"),
+            ...$admins
         ];
     }
 }

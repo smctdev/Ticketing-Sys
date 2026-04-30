@@ -37,9 +37,12 @@ class AccountingBranchSetupController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show($userId)
+    public function show(string $userId)
     {
-        $user = UserLogin::with('accountingAssignedBranches', 'assignedCategories')->findOrFail($userId);
+        $user = UserLogin::with([
+            'accountingAssignedBranches',
+            'assignedCategories'
+        ])->findOrFail($userId);
 
         $branches = BranchList::query()
             ->whereDoesntHaveRelation(

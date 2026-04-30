@@ -14,6 +14,7 @@ export default function ReplyingAttachmentContent({
   isEditingMessage,
   setIsEditingMessage,
   textAreaRef,
+  buttonRef,
 }: {
   formInput: MessageFormInput;
   setFormInput: Dispatch<SetStateAction<MessageFormInput>>;
@@ -29,6 +30,7 @@ export default function ReplyingAttachmentContent({
     }>
   >;
   textAreaRef: RefObject<HTMLTextAreaElement | null>;
+  buttonRef: RefObject<HTMLButtonElement | null>;
 }) {
   return (
     <>
@@ -95,6 +97,7 @@ export default function ReplyingAttachmentContent({
             )}
           </div>
           <Button
+            ref={buttonRef}
             type="button"
             variant={"link"}
             onClick={() => {

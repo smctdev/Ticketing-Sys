@@ -66,9 +66,9 @@ class AutomationDashboardService
             ->get();
 
         return [
-            "recent_pending_tickets"    => $recent_pending_tickets,
-            "recent_edited_tickets"     => $recent_edited_tickets,
-            "recent_rejected_tickets"   => $recent_rejected_tickets
+            "recent_pending_tickets"  => $recent_pending_tickets,
+            "recent_edited_tickets"   => $recent_edited_tickets,
+            "recent_rejected_tickets" => $recent_rejected_tickets
         ];
     }
 }

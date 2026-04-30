@@ -22,13 +22,13 @@ class UpdateProfileRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'profile_picture'       => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
-            'first_name'            => ['required', 'string', 'min:2', 'max:255'],
-            'last_name'             => ['required', 'string', 'min:2', 'max:255'],
-            'contact_number'        => ['nullable', 'numeric', 'digits:11'],
-            'email'                 => ['required', 'email', 'min:2', 'max:255'],
-            'current_password'      => ['nullable', 'string', 'min:6', 'max:255', 'current_password'],
-            'password'              => ["nullable", 'required_with:current_password', 'string', 'min:6', 'max:255', 'different:current_password', 'confirmed'],
+            'profile_picture'  => ['nullable', 'image', 'mimes:jpeg,png,jpg,webp', 'max:5120'],
+            'first_name'       => ['required', 'string', 'min:2', 'max:255'],
+            'last_name'        => ['required', 'string', 'min:2', 'max:255'],
+            'contact_number'   => ['nullable', 'numeric', 'digits:11'],
+            'email'            => ['required', 'email', 'min:2', 'max:255'],
+            'current_password' => ['nullable', 'string', 'min:6', 'max:255', 'current_password'],
+            'password'         => ["nullable", 'required_with:current_password', 'string', 'min:6', 'max:255', 'different:current_password', 'confirmed'],
         ];
     }
 }

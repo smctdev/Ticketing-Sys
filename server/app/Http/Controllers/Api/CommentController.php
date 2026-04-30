@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Auth;
 
 class CommentController extends Controller
 {
-    public function index($post_id)
+    public function index(string $post_id)
     {
         $comments = Comment::query()
             ->with('user.userDetail:user_details_id,profile_pic,fname,lname')
@@ -21,8 +21,8 @@ class CommentController extends Controller
             ->cursorPaginate(20);
 
         return response()->json([
-            'message'           => 'Comments fetched successfully',
-            'data'              => $comments
+            'message' => 'Comments fetched successfully',
+            'data'    => $comments
         ], 200);
     }
 
@@ -43,13 +43,13 @@ class CommentController extends Controller
 
         Comment::query()
             ->create([
-                'post_id'           => $request->post_id,
-                'comment'           => $request->comment,
-                'user_id'           => Auth::id()
+                'post_id' => $request->post_id,
+                'comment' => $request->comment,
+                'user_id' => Auth::id()
             ]);
 
         return response()->json([
-            'message'           => "Comment posted successfully",
+            'message' => "Comment posted successfully",
         ], 201);
     }
 
@@ -83,7 +83,7 @@ class CommentController extends Controller
         ]);
 
         return response()->json([
-            'message'           => "Comment updated successfully",
+            'message' => "Comment updated successfully",
         ], 200);
     }
 
@@ -97,7 +97,7 @@ class CommentController extends Controller
         $comment->delete();
 
         return response()->json([
-            'message'           => "Comment deleted successfully",
+            'message' => "Comment deleted successfully",
         ], 200);
     }
 }

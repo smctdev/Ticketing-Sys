@@ -23,7 +23,7 @@ class StoreSupplierRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'suppliers'         => ['required', 'string', 'min:2', 'max:255', Rule::unique('suppliers', 'suppliers')]
+            'suppliers' => ['required', 'string', 'min:2', 'max:255', Rule::unique('suppliers', 'suppliers')]
         ];
     }
 

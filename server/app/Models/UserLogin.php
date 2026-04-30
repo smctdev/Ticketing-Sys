@@ -302,4 +302,9 @@ class UserLogin extends Authenticatable
         return $this->hasMany(UserUnreadMessage::class, 'user_id', 'login_id')
             ->latest();
     }
+
+    public function feedbacks()
+    {
+        return $this->hasMany(Feedback::class, 'user_id', 'login_id');
+    }
 }

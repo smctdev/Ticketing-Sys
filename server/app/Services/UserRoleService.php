@@ -52,7 +52,7 @@ class UserRoleService
         }
 
         $userRole->update([
-            'role_name'     => Str::title($request->role_name)
+            'role_name' => Str::title($request->role_name)
         ]);
 
         activity()

@@ -9,14 +9,14 @@ use Illuminate\Support\Facades\Auth;
 
 class LikeController extends Controller
 {
-    public function __invoke($id)
+    public function __invoke(string $id)
     {
         $post = Post::findOrFail($id);
 
         $message = $post->toggleLikeUnlike(Auth::id());
 
         return response()->json([
-            'message'           => "Post {$message} successfully",
+            'message' => "Post {$message} successfully",
         ], 201);
     }
 }

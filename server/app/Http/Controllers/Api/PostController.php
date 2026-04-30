@@ -17,14 +17,17 @@ class PostController extends Controller
     public function index()
     {
         $posts = Post::query()
-            ->with('user.userDetail', 'userLikes')
+            ->with([
+                'user.userDetail',
+                'userLikes'
+            ])
             ->withCount('comments')
             ->orderByDesc('created_at')
             ->cursorPaginate(20);
 
         return response()->json([
-            'message'           => 'Posts fetched successfully',
-            'data'              => $posts
+            'message' => 'Posts fetched successfully',
+            'data'    => $posts
         ], 200);
     }
 
@@ -45,13 +48,13 @@ class PostController extends Controller
 
         $post = Post::query()
             ->create([
-                'category'          => $request->category,
-                'content'           => $request->content,
-                'user_id'           => Auth::id()
+                'category' => $request->category,
+                'content'  => $request->content,
+                'user_id'  => Auth::id()
             ]);
 
         return response()->json([
-            'message'           => "Post \"{$post->category}\" created successfully",
+            'message' => "Post \"{$post->category}\" created successfully",
         ], 201);
     }
 
@@ -81,12 +84,12 @@ class PostController extends Controller
         $post = Post::findOrFail($id);
 
         $post->update([
-            'category'          => $request->category,
-            'content'           => $request->content
+            'category' => $request->category,
+            'content'  => $request->content
         ]);
 
         return response()->json([
-            'message'           => "Post \"{$post->category}\" updated successfully",
+            'message' => "Post \"{$post->category}\" updated successfully",
         ], 200);
     }
 
@@ -100,7 +103,7 @@ class PostController extends Controller
         $post->delete();
 
         return response()->json([
-            'message'           => "Post \"{$post->category}\" deleted successfully",
+            'message' => "Post \"{$post->category}\" deleted successfully",
         ], 200);
     }
 }

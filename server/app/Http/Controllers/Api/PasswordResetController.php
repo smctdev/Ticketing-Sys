@@ -46,7 +46,7 @@ class PasswordResetController extends Controller
 
         return response()->json([
             'message' => 'Password updated successfully',
-            'user'    => $request->user()->load(
+            'user'    => $request->user()->load([
                 'userDetail',
                 'userRole',
                 'branch',
@@ -56,7 +56,7 @@ class PasswordResetController extends Controller
                 'assignedAreaManagers.branch:blist_id,b_code',
                 'accountingAssignedBranches:blist_id,b_code',
                 'unreadNotifications'
-            )
+            ])
                 ->loadCount('unreadNotifications')
         ], 200);
     }

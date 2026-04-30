@@ -59,12 +59,12 @@ class SubCategoryController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'sub_category_name'             => ['required', 'max:255', 'min:1', Rule::unique('sub_categories', 'sub_category_name')->where('ticket_category_id', $request->ticket_category_id)],
+            'sub_category_name' => ['required', 'max:255', 'min:1', Rule::unique('sub_categories', 'sub_category_name')->where('ticket_category_id', $request->ticket_category_id)],
         ]);
 
         $sub_category = SubCategory::create([
-            'ticket_category_id'            => $request->ticket_category_id,
-            'sub_category_name'             => Str::title($request->sub_category_name)
+            'ticket_category_id' => $request->ticket_category_id,
+            'sub_category_name'  => Str::title($request->sub_category_name)
         ]);
 
         activity()
@@ -73,7 +73,7 @@ class SubCategoryController extends Controller
             ->log("Added a sub category to category {$sub_category->ticketCategory->category_name}");
 
         return response()->json([
-            'message'                       => "Sub category added to {$sub_category->ticketCategory->category_name} successfully"
+            'message' => "Sub category added to {$sub_category->ticketCategory->category_name} successfully"
         ], 201);
     }
 
@@ -99,14 +99,14 @@ class SubCategoryController extends Controller
     public function update(Request $request, string $id)
     {
         $request->validate([
-            'sub_category_name'             => ['required', 'max:255', 'min:1', Rule::unique('sub_categories', 'sub_category_name')->where('ticket_category_id', $request->ticket_category_id)->ignore($id)]
+            'sub_category_name' => ['required', 'max:255', 'min:1', Rule::unique('sub_categories', 'sub_category_name')->where('ticket_category_id', $request->ticket_category_id)->ignore($id)]
         ]);
 
         $sub_category = SubCategory::query()
             ->findOrFail($id);
 
         $sub_category->update([
-            'sub_category_name'             => Str::title($request->sub_category_name)
+            'sub_category_name' => Str::title($request->sub_category_name)
         ]);
 
         activity()
@@ -115,7 +115,7 @@ class SubCategoryController extends Controller
             ->log("Updated a sub category to category {$sub_category->ticketCategory->category_name}");
 
         return response()->json([
-            'message'           => "Sub category of {$sub_category->ticketCategory->category_name} updated successfully"
+            'message' => "Sub category of {$sub_category->ticketCategory->category_name} updated successfully"
         ], 200);
     }
 
@@ -135,7 +135,7 @@ class SubCategoryController extends Controller
             ->log("Deleted a sub category to category {$sub_category->ticketCategory->category_name}");
 
         return response()->json([
-            'message'           => "Sub category of {$sub_category->ticketCategory->category_name} deleted successfully"
+            'message' => "Sub category of {$sub_category->ticketCategory->category_name} deleted successfully"
         ], 200);
     }
 }

@@ -5,7 +5,6 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\BranchList;
 use App\Models\TicketCategory;
-use Illuminate\Http\Request;
 
 class ForFilterDataController extends Controller
 {
@@ -25,10 +24,10 @@ class ForFilterDataController extends Controller
             ->pluck('category');
 
         return response()->json([
-            'message'               => "Data fetched successfully",
-            'branches'              => $branches,
-            'ticket_categories'     => $ticket_categories,
-            'branch_types'          => $branch_types
+            'message'           => "Data fetched successfully",
+            'branches'          => $branches,
+            'ticket_categories' => $ticket_categories,
+            'branch_types'      => $branch_types
         ]);
     }
 }

@@ -122,6 +122,7 @@ function ChatsPage() {
     message: MessageType;
     isLoadingDelete: boolean;
   }>({ isDeleting: false, message: {} as MessageType, isLoadingDelete: false });
+  const buttonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     setMessageRecords((prev) =>
@@ -251,6 +252,10 @@ function ChatsPage() {
       !isSubmitting
     ) {
       isEditingMessage.isEditing ? handleUpdate(e) : handleSubmit(e);
+    }
+
+    if (e.key === "Escape" && isEditingMessage.isEditing) {
+      buttonRef.current?.click();
     }
   };
 
@@ -477,6 +482,7 @@ function ChatsPage() {
               isEditingMessage={isEditingMessage}
               setIsEditingMessage={setIsEditingMessage}
               textAreaRef={textAreaRef}
+              buttonRef={buttonRef}
             />
             <form
               onSubmit={

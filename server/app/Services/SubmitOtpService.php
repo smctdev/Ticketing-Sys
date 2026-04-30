@@ -9,7 +9,10 @@ class SubmitOtpService
 {
     public function submitOtp($request)
     {
-        $user = UserDetail::with('userLoginCode', 'userLogin')
+        $user = UserDetail::with([
+            'userLoginCode',
+            'userLogin'
+        ])
             ->where('user_email', $request->email)
             ->first();
 

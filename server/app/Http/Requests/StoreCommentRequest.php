@@ -23,8 +23,8 @@ class StoreCommentRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'post_id'           => ['required', Rule::exists('posts', 'id')],
-            'comment'           => ['required', 'max:500', 'min:1']
+            'post_id' => ['required', Rule::exists('posts', 'id')],
+            'comment' => ['required', 'max:500', 'min:1']
         ];
     }
 }

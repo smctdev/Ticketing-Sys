@@ -3,18 +3,11 @@ import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/auth-context";
 import nameShortHand from "@/utils/name-short-hand";
 import Storage from "@/utils/storage";
-import { formatDistanceToNowStrict } from "date-fns";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { EditComment } from "./comment-dialogs/edit-comment";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
-import { TooltipArrow } from "@radix-ui/react-tooltip";
-import formattedDateAndTimeStrict from "@/utils/format-date-time-strict";
 import IsEdited from "./is-edited";
 import { DeleteComment } from "./comment-dialogs/delete-comment";
+import diffForHumans from "@/utils/diff-for-humans";
 
 interface Comment {
   id: number;
@@ -34,7 +27,7 @@ interface Comment {
 export default function CommentList({
   comment,
   setIsRefresh,
-  setIsRefreshComment
+  setIsRefreshComment,
 }: {
   comment: Comment;
   setIsRefresh: Dispatch<SetStateAction<boolean>>;
@@ -93,11 +86,11 @@ export default function CommentList({
           <span className="dark:text-white text-gray-500 font-bold">
             {comment?.user?.full_name}
           </span>
-          <span className="dark:text-white text-gray-500 font-bold text-[8px]">•</span>
+          <span className="dark:text-white text-gray-500 font-bold text-[8px]">
+            •
+          </span>
           <small className="dark:text-white text-gray-400 text-[10.3px] italic">
-            {formatDistanceToNowStrict(comment?.created_at, {
-              addSuffix: true,
-            })}
+            {diffForHumans(new Date(comment?.created_at))}
           </small>
           {comment?.is_edited && (
             <IsEdited date={new Date(comment?.updated_at)} />
@@ -116,7 +109,7 @@ export default function CommentList({
             type="button"
             size={"xs"}
             variant={"link"}
-            className="!px-0 text-blue-400 text-[10px] self-start"
+            className="px-0! text-blue-400 text-[10px] self-start"
             onClick={handleShowMore}
           >
             {isExpanded[comment?.id] ? "Show less" : "Show more"}
@@ -128,7 +121,7 @@ export default function CommentList({
               type="button"
               size={"xs"}
               variant={"link"}
-              className="!px-1 dark:text-white text-gray-500 text-[10px]"
+              className="px-1! dark:text-white text-gray-500 text-[10px]"
               onClick={handleOpenEditDialog(comment)}
             >
               Edit
@@ -137,7 +130,7 @@ export default function CommentList({
               type="button"
               size={"xs"}
               variant={"link"}
-              className="!px-1 dark:text-white text-gray-500 text-[10px]"
+              className="px-1! dark:text-white text-gray-500 text-[10px]"
               onClick={handleOpenDeleteDialog(comment?.id)}
             >
               Delete

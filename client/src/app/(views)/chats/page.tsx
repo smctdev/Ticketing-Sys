@@ -4,6 +4,13 @@ import { Pagination } from "@/components/pagination";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Empty,
+  EmptyDescription,
+  EmptyHeader,
+  EmptyMedia,
+  EmptyTitle,
+} from "@/components/ui/empty";
 import SearchInput from "@/components/ui/search-input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SEARCH_FILTER } from "@/constants/filter-by";
@@ -85,12 +92,18 @@ function ChatsPage() {
               ))}
             </div>
           ) : users.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-10 gap-3">
-              <MessageCircleOff size={50} />
-              <span className="text-center text-muted-foreground text-sm">
-                No conversations found.
-              </span>
-            </div>
+            <Empty>
+              <EmptyHeader>
+                <EmptyMedia>
+                  <MessageCircleOff className="size-12 text-muted-foreground/40" />
+                </EmptyMedia>
+                <EmptyTitle>No conversations found.</EmptyTitle>
+                <EmptyDescription>
+                  Conversation with users will appear here. Start by searching
+                  for a user to chat
+                </EmptyDescription>
+              </EmptyHeader>
+            </Empty>
           ) : (
             <ul className="divide-y">
               {users.map((row: any) => {

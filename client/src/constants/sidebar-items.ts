@@ -5,6 +5,7 @@ import {
   Home,
   LayoutDashboard,
   MessageCircleMore,
+  MessageSquareQuote,
   Notebook,
   ShieldUserIcon,
   TicketCheck,
@@ -36,6 +37,7 @@ export const SIDEBAR_ITEMS = [
     allowedFor: CAN_ACCESS_NO_AUDIT,
   },
   { title: "Reports", url: "/reports", icon: Notebook, allowedFor: CAN_ACCESS_ALL },
+  { title: "Feedbacks", url: "/feedbacks", icon: MessageSquareQuote, allowedFor: CAN_ACCESS_ALL },
 ];
 
 export const COLLAPSABLE_SIDEBAR_ITEMS = [

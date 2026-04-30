@@ -19,7 +19,12 @@ class AutomationController extends Controller
         $limit = request('limit');
         $search = request('search');
 
-        $automations = UserLogin::with('userRole', 'branch', 'userDetail', 'assignedBranches.branch:blist_id,b_code')
+        $automations = UserLogin::with([
+            'userRole',
+            'branch',
+            'userDetail',
+            'assignedBranches.branch:blist_id,b_code'
+        ])
             ->whereRelation(
                 "userRole",
                 "role_name",
@@ -32,21 +37,20 @@ class AutomationController extends Controller
             ->get();
 
         return response()->json([
-            'data'                   => $automations,
-            'remaining_branches'     => $remainingBranches
+            'data'               => $automations,
+            'remaining_branches' => $remainingBranches
         ], 200);
     }
 
     public function getAllAutomations()
     {
-        $automations = UserLogin::where(function ($query) {
-            $query->whereHas(
-                'userRole',
-                fn($user)
-                =>
-                $user->whereIn('role_name', [UserRoles::AUTOMATION, UserRoles::AUTOMATION_ADMIN, UserRoles::AUTOMATION_MANAGER])
-            );
-        })->get();
+        $automations = UserLogin::whereHas(
+            'userRole',
+            fn($user)
+            =>
+            $user->whereIn('role_name', [UserRoles::AUTOMATION, UserRoles::AUTOMATION_ADMIN, UserRoles::AUTOMATION_MANAGER])
+        )
+            ->get();
 
         return response()->json([
             'message' => 'All Automations Fetched Successfully',

@@ -18,7 +18,12 @@ class AreaManagerController extends Controller
         $limit = request('limit');
         $search = request('search');
 
-        $areaManagers = UserLogin::with('userRole', 'userDetail', 'assignedAreaManagers.branch:blist_id,b_code', 'branch')
+        $areaManagers = UserLogin::with([
+            'userRole',
+            'userDetail',
+            'assignedAreaManagers.branch:blist_id,b_code',
+            'branch'
+        ])
             ->search($search)
             ->whereHas(
                 "userRole",
@@ -32,8 +37,8 @@ class AreaManagerController extends Controller
             ->get();
 
         return response()->json([
-            'data'                      => $areaManagers,
-            'remaining_branches'        => $remainingBranches
+            'data'               => $areaManagers,
+            'remaining_branches' => $remainingBranches
         ], 200);
     }
 

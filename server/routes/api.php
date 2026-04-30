@@ -12,6 +12,7 @@ use App\Http\Controllers\Api\ChatController;
 use App\Http\Controllers\Api\CommentController;
 use App\Http\Controllers\Api\DashboardController;
 use App\Http\Controllers\Api\ExportReportsController;
+use App\Http\Controllers\Api\FeedbackController;
 use App\Http\Controllers\Api\ForFilterDataController;
 use App\Http\Controllers\Api\LikeController;
 use App\Http\Controllers\Api\LoginController;
@@ -224,7 +225,10 @@ Route::middleware([
     });
 
     Route::resource('chats', ChatController::class);
+
     Route::delete('unseen-message/{id}/flush', [ChatController::class, 'flushUnseenMessage']);
+
+    Route::apiResource('feedbacks', FeedbackController::class)->only(['index', 'store']);
 
     Route::prefix('super-admin')->group(function () {
         Route::get('activities', function (Request $request) {

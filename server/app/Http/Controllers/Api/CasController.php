@@ -19,7 +19,11 @@ class CasController extends Controller
         $limit = request('limit');
         $search = request('search');
 
-        $cas = UserLogin::with("assignedBranchCas.branch:blist_id,b_code", "userRole", "userDetail")
+        $cas = UserLogin::with([
+            "assignedBranchCas.branch:blist_id,b_code",
+            "userRole",
+            "userDetail"
+        ])
             ->search($search)
             ->whereRelation(
                 "userRole",
@@ -33,8 +37,8 @@ class CasController extends Controller
             ->get();
 
         return response()->json([
-            "data"                   => $cas,
-            "remaining_branches"     => $remainingBranches
+            "data"               => $cas,
+            "remaining_branches" => $remainingBranches
         ], 200);
     }
 

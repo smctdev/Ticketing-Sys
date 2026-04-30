@@ -15,10 +15,10 @@ class ManageUserService
     {
         $userCreated = DB::transaction(function () use ($request) {
             $user = UserDetail::create([
-                'fname'               => Str::title($request->first_name),
-                'lname'               => Str::title($request->last_name),
-                'user_contact'        => $request->contact_number,
-                'user_email'          => Str::lower($request->email),
+                'fname'        => Str::title($request->first_name),
+                'lname'        => Str::title($request->last_name),
+                'user_contact' => $request->contact_number,
+                'user_email'   => Str::lower($request->email),
             ]);
 
             $user->userLogin()->create([
@@ -47,17 +47,17 @@ class ManageUserService
 
         $userUpdated = DB::transaction(function () use ($request, $user) {
             $user->update([
-                'fname'             => Str::title($request->first_name),
-                'lname'             => Str::title($request->last_name),
-                'user_contact'      => $request->contact_number,
-                'user_email'        => Str::lower(Str::replace(' ', '', $request->email)),
+                'fname'        => Str::title($request->first_name),
+                'lname'        => Str::title($request->last_name),
+                'user_contact' => $request->contact_number,
+                'user_email'   => Str::lower(Str::replace(' ', '', $request->email)),
             ]);
 
             $data = [
-                'user_details_id'   => $user->user_details_id,
-                'username'          => Str::lower(Str::replace(' ', '_', $request->username)),
-                'user_role_id'      => $request->role,
-                'blist_id'          => implode(',', $request->branch_code)
+                'user_details_id' => $user->user_details_id,
+                'username'        => Str::lower(Str::replace(' ', '_', $request->username)),
+                'user_role_id'    => $request->role,
+                'blist_id'        => implode(',', $request->branch_code)
             ];
 
             if ($request->password) {

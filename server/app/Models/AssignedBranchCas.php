@@ -14,6 +14,7 @@ class AssignedBranchCas extends Model
     {
         return $this->belongsTo(UserLogin::class, 'login_id', 'login_id');
     }
+
     public function branch()
     {
         return $this->belongsTo(BranchList::class, 'blist_id', 'blist_id');

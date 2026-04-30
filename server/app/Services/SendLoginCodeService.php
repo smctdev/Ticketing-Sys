@@ -23,9 +23,9 @@ class SendLoginCodeService
         $user?->userLoginCode?->delete();
 
         $user->userLoginCode()->create([
-            'user_details_id'   => $user->user_details_id,
-            'code'              => $random_code,
-            'expires_at'        => now()->addMinutes(30)
+            'user_details_id' => $user->user_details_id,
+            'code'            => $random_code,
+            'expires_at'      => now()->addMinutes(30)
         ]);
 
         $name = "{$user?->fname} {$user?->lname}";

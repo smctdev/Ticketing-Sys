@@ -20,7 +20,7 @@ class NotificationController extends Controller
         $this->user->unreadNotifications->where('id', $id)->markAsRead();
 
         return response()->json([
-            'message'   => "Successfully marked as read",
+            'message' => "Successfully marked as read",
         ], 200);
     }
 
@@ -29,7 +29,7 @@ class NotificationController extends Controller
         $this->user->unreadNotifications->markAsRead();
 
         return response()->json([
-            'message'   => "Successfully marked all as read",
+            'message' => "Successfully marked all as read",
         ], 200);
     }
 }

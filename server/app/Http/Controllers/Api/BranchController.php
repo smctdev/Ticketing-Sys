@@ -7,7 +7,6 @@ use App\Http\Requests\StoreBranchRequest;
 use App\Http\Requests\UpdateBranchRequest;
 use App\Models\BranchDetail;
 use App\Models\BranchList;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
@@ -67,8 +66,8 @@ class BranchController extends Controller
             ->paginate($limit);
 
         return response()->json([
-            'message'       => 'Branches fetched successfully',
-            'data'          => $branches
+            'message' => 'Branches fetched successfully',
+            'data'    => $branches
         ], 200);
     }
 
@@ -76,20 +75,20 @@ class BranchController extends Controller
     {
         $topBranches = BranchList::withCount('editedTickets')
             ->whereHas('editedTickets')
-            ->get('blist_id');
+            ->get('blist_id')
+            ->map(fn($top) => [
+                'branch' => $top->b_name,
+                'count'  => $top->edited_tickets_count,
+            ]);
 
-        return response()->json(
-            $topBranches->map(fn($top) => [
-                'branch'    => $top->b_name,
-                'count'     => $top->edited_tickets_count,
-            ]),
-            200
-        );
+        return response()->json($topBranches, 200);
     }
 
     public function getAllBranchCategories()
     {
-        $branchCategories = BranchList::orderBy('category')->distinct()->pluck('category');
+        $branchCategories = BranchList::orderBy('category')
+            ->distinct()
+            ->pluck('category');
 
         return response()->json($branchCategories, 200);
     }
@@ -101,25 +100,33 @@ class BranchController extends Controller
         $search = request('search');
 
         $branchDetails = BranchDetail::with('branch')
-            ->when($search, fn($query)
-            => $query->whereHas('branch', fn($subQuery)
-            => $subQuery->where('b_code', 'LIKE', "%$search%")
-                ->orWhere('b_name', 'LIKE', "%$search%")
-                ->orWhere('category', 'LIKE', "%$search%")))
+            ->when(
+                $search,
+                fn($query)
+                =>
+                $query->whereHas(
+                    'branch',
+                    fn($subQuery)
+                    =>
+                    $subQuery->where('b_code', 'LIKE', "%$search%")
+                        ->orWhere('b_name', 'LIKE', "%$search%")
+                        ->orWhere('category', 'LIKE', "%$search%")
+                )
+            )
             ->orWhere('b_address', 'LIKE', "%$search%")
             ->orWhere('b_contact', 'LIKE', "%$search%")
             ->orWhere('b_email', 'LIKE', "%$search%")
             ->paginate($limit);
 
         return response()->json([
-            'count'             => $branchDetails->total(),
-            'rows'              => $branchDetails->map(fn($branchDetail) => [
-                "bdetails_id"   => $branchDetail->bdetails_id,
-                "blist_id"      => $branchDetail->blist_id,
-                "b_address"     => $branchDetail->b_address,
-                "b_contact"     => $branchDetail->b_contact,
-                "b_email"       => $branchDetail->b_email,
-                "Branch"        => $branchDetail->branch
+            'count'           => $branchDetails->total(),
+            'rows'            => $branchDetails->map(fn($branchDetail) => [
+                "bdetails_id" => $branchDetail->bdetails_id,
+                "blist_id"    => $branchDetail->blist_id,
+                "b_address"   => $branchDetail->b_address,
+                "b_contact"   => $branchDetail->b_contact,
+                "b_email"     => $branchDetail->b_email,
+                "Branch"      => $branchDetail->branch
             ])
         ], 200);
     }
@@ -142,15 +149,15 @@ class BranchController extends Controller
         $data = DB::transaction(function () use ($request) {
             $branch = BranchList::query()
                 ->create([
-                    'b_code'       => $request->branch_code,
-                    'b_name'       => $request->branch_name,
-                    'category'     => $request->category,
+                    'b_code'   => $request->branch_code,
+                    'b_name'   => $request->branch_name,
+                    'category' => $request->category,
                 ]);
 
             $branch->branchDetail()->create([
-                'b_address'        => $request->branch_address,
-                'b_contact'        => $request->branch_contact_number,
-                'b_email'          => $request->branch_email,
+                'b_address' => $request->branch_address,
+                'b_contact' => $request->branch_contact_number,
+                'b_email'   => $request->branch_email,
             ]);
 
             return $branch;
@@ -162,7 +169,7 @@ class BranchController extends Controller
             ->log("Created a branch");
 
         return response()->json([
-            'message'   => "Branch \"{$data->b_name}\" created successfully",
+            'message' => "Branch \"{$data->b_name}\" created successfully",
         ], 201);
     }
 
@@ -193,15 +200,15 @@ class BranchController extends Controller
             $branch = BranchList::findOrFail($id);
 
             $branch->update([
-                'b_code'       => $request->branch_code,
-                'b_name'       => $request->branch_name,
-                'category'     => $request->category,
+                'b_code'   => $request->branch_code,
+                'b_name'   => $request->branch_name,
+                'category' => $request->category,
             ]);
 
             $branch->branchDetail->update([
-                'b_address'    => $request->branch_address,
-                'b_contact'    => $request->branch_contact_number,
-                'b_email'      => $request->branch_email,
+                'b_address' => $request->branch_address,
+                'b_contact' => $request->branch_contact_number,
+                'b_email'   => $request->branch_email,
             ]);
 
             return $branch;
@@ -213,7 +220,7 @@ class BranchController extends Controller
             ->log("Updated a branch");
 
         return response()->json([
-            'message'   => "Branch \"{$data->b_name}\" updated successfully",
+            'message' => "Branch \"{$data->b_name}\" updated successfully",
         ], 200);
     }
 
@@ -234,7 +241,7 @@ class BranchController extends Controller
             ->log("Deleted a branch");
 
         return response()->json([
-            'message'   => "Branch \"{$branch->b_name}\" deleted successfully"
+            'message' => "Branch \"{$branch->b_name}\" deleted successfully"
         ], 200);
     }
 }

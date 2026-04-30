@@ -23,14 +23,14 @@ class StoreUserRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'first_name'            => ['required', 'min:2', 'max:255', 'string'],
-            'last_name'             => ['required', 'min:2', 'max:255', 'string'],
-            'contact_number'        => ['nullable', 'numeric', 'digits:11'],
-            'email'                 => ['required', 'min:2', 'max:255', 'string', 'email', 'lowercase', Rule::unique('user_details', 'user_email')],
-            'username'              => ['required', 'min:4', 'max:255', 'string', 'lowercase', Rule::unique('user_logins', 'username')],
-            'role'                  => ['required', Rule::exists('user_roles', 'user_role_id')],
-            'branch_code'           => ['required', Rule::exists('branch_lists', 'blist_id')],
-            'password'              => ['required', 'min:6', 'max:18', 'string']
+            'first_name'     => ['required', 'min:2', 'max:255', 'string'],
+            'last_name'      => ['required', 'min:2', 'max:255', 'string'],
+            'contact_number' => ['nullable', 'numeric', 'digits:11'],
+            'email'          => ['required', 'min:2', 'max:255', 'string', 'email', 'lowercase', Rule::unique('user_details', 'user_email')],
+            'username'       => ['required', 'min:4', 'max:255', 'string', 'lowercase', Rule::unique('user_logins', 'username')],
+            'role'           => ['required', Rule::exists('user_roles', 'user_role_id')],
+            'branch_code'    => ['required', Rule::exists('branch_lists', 'blist_id')],
+            'password'       => ['required', 'min:6', 'max:18', 'string']
         ];
     }
 }

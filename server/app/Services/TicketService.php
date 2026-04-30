@@ -39,7 +39,7 @@ class TicketService
         $take,
         $accountingHeadCodes,
     ) {
-        return Ticket::with(
+        return Ticket::with([
             'userLogin.userDetail',
             'userLogin.userRole',
             'userLogin.branch',
@@ -71,7 +71,7 @@ class TicketService
             'editedBy.userDetail',
             'editedBy.userRole',
             'editedBy.branch',
-        )
+        ])
             ->when(
                 $status !== 'ALL',
                 fn($q)
@@ -250,7 +250,7 @@ class TicketService
 
     public function getDashboardData()
     {
-        return Ticket::with(
+        return Ticket::with([
             'ticketDetail.ticketCategory',
             'ticketDetail.supplier',
             'assignedPerson.userDetail',
@@ -263,7 +263,7 @@ class TicketService
             'branch',
             'userLogin.userDetail',
             'pendingUser.userDetail'
-        )
+        ])
             ->where('login_id', $this->user->login_id)
             ->orderByDesc(
                 TicketDetail::select('date_created')
@@ -361,7 +361,10 @@ class TicketService
             )
             ->first();
 
-        $assignedAutomation = AssignedBranch::with('assignedAutomation', 'branch')
+        $assignedAutomation = AssignedBranch::with([
+            'assignedAutomation',
+            'branch'
+        ])
             ->where(
                 fn($q)
                 =>
@@ -433,7 +436,7 @@ class TicketService
             function () use ($request, $user, $assignedAutomation, $automationAdmin, $automationManager, $assignedBranchHead, $assignedAccountingStaff, $assignedAccountingHead, $directToAccounting) {
                 $paths = [];
                 $file = $request->file('ticket_support');
-                $branch = BranchList::find($request->ticket_for);
+                $branch = BranchList::findOrFail($request->ticket_for);
 
                 foreach ($file as $f) {
                     $fileName =  time() . '-' . $f->getClientOriginalName();
@@ -441,17 +444,17 @@ class TicketService
                 }
 
                 $ticketDetail = TicketDetail::create([
-                    'ticket_type'               => $request->ticket_type,
-                    'ticket_category_id'        => $request->ticket_category,
-                    'sub_category_id'           => $request->ticket_sub_category,
-                    'ticket_transaction_date'   => $request->ticket_transaction_date,
-                    'td_support'                => $paths,
-                    'date_created'              => now(),
-                    'time'                      => now()->format('h:i:s A'),
-                    'td_purpose'                => $request->purpose,
-                    'td_from'                   => $request->from,
-                    'td_to'                     => $request->to,
-                    'td_ref_number'             => $request->ticket_reference_number
+                    'ticket_type'             => $request->ticket_type,
+                    'ticket_category_id'      => $request->ticket_category,
+                    'sub_category_id'         => $request->ticket_sub_category,
+                    'ticket_transaction_date' => $request->ticket_transaction_date,
+                    'td_support'              => $paths,
+                    'date_created'            => now(),
+                    'time'                    => now()->format('h:i:s A'),
+                    'td_purpose'              => $request->purpose,
+                    'td_from'                 => $request->from,
+                    'td_to'                   => $request->to,
+                    'td_ref_number'           => $request->ticket_reference_number
                 ]);
 
                 do {
@@ -463,30 +466,30 @@ class TicketService
                 );
 
                 $ticketToBeDisplay = match (true) {
-                    $user->isStaff()                                => $this->branchHeads() > 1 ? $request->branch_head_id : $assignedBranchHead->login_id,
-                    $user->isBranchHead() && $directToAccounting    => $assignedAccountingStaff->login_id,
-                    $user->isBranchHead()                           => $automationManager->login_id,
-                    $user->isAccountingStaff()                      => $assignedAccountingHead->login_id,
-                    $assignedAutomation                             => $assignedAutomation->assignedAutomation->login_id,
-                    default                                         => $automationAdmin->login_id
+                    $user->isStaff()                             => $this->branchHeads() > 1 ? $request->branch_head_id : $assignedBranchHead->login_id,
+                    $user->isBranchHead() && $directToAccounting => $assignedAccountingStaff->login_id,
+                    $user->isBranchHead()                        => $automationManager->login_id,
+                    $user->isAccountingStaff()                   => $assignedAccountingHead->login_id,
+                    $assignedAutomation                          => $assignedAutomation->assignedAutomation->login_id,
+                    default                                      => $automationAdmin->login_id
                 };
 
                 $assignedPerson = match (true) {
-                    $assignedAutomation?->exists()  => $assignedAutomation->assignedAutomation->login_id,
-                    default                         => $automationAdmin->login_id,
+                    $assignedAutomation?->exists() => $assignedAutomation->assignedAutomation->login_id,
+                    default                        => $automationAdmin->login_id,
                 };
 
                 $ticket = $ticketDetail->ticket()->create(
                     [
-                        'ticket_code'       => $code,
-                        'login_id'          => $user->login_id,
-                        'branch_id'         => $user->hasMultipleBranches() ? $branch->blist_id : $user->blist_id,
-                        'branch_name'       => $user->hasMultipleBranches() ? $branch->b_name : $user->branch->b_name,
-                        'status'            => TicketStatus::PENDING,
-                        'isCounted'         => 1,
-                        'isApproved'        => 0,
-                        'assigned_person'   => $assignedPerson,
-                        'displayTicket'     => $ticketToBeDisplay,
+                        'ticket_code'     => $code,
+                        'login_id'        => $user->login_id,
+                        'branch_id'       => $user->hasMultipleBranches() ? $branch->blist_id : $user->blist_id,
+                        'branch_name'     => $user->hasMultipleBranches() ? $branch->b_name : $user->branch->b_name,
+                        'status'          => TicketStatus::PENDING,
+                        'isCounted'       => 1,
+                        'isApproved'      => 0,
+                        'assigned_person' => $assignedPerson,
+                        'displayTicket'   => $ticketToBeDisplay,
                     ]
                 );
 
@@ -556,12 +559,12 @@ class TicketService
 
                 if (count($existingPaths) === count($removedFile) && !$request->hasFile('ticket_support')) {
                     $request->validate([
-                        'ticket_support'             => ['required', 'array'],
-                        'ticket_support.*'           => ['file', 'max:5120'],
+                        'ticket_support'          => ['required', 'array'],
+                        'ticket_support.*'        => ['file', 'max:5120'],
                     ], [
-                        'ticket_support.required'    => 'At least one support file is required.',
-                        'ticket_support.*.file'      => 'Each support upload must be a valid file.',
-                        'ticket_support.*.max'       => 'Please upload a file less than 1MB.',
+                        'ticket_support.required' => 'At least one support file is required.',
+                        'ticket_support.*.file'   => 'Each support upload must be a valid file.',
+                        'ticket_support.*.max'    => 'Please upload a file less than 1MB.',
                     ]);
                 }
 
@@ -578,19 +581,19 @@ class TicketService
                 }
 
                 $ticketDetail->update([
-                    'ticket_type'               => $request->ticket_type,
-                    'ticket_category_id'        => $request->ticket_category,
-                    'sub_category_id'           => $request->ticket_sub_category,
-                    'ticket_transaction_date'   => $request->ticket_transaction_date,
-                    'td_support'                => $newPaths,
-                    'td_purpose'                => $request->purpose,
-                    'td_from'                   => $request->from,
-                    'td_to'                     => $request->to,
-                    'td_ref_number'             => $request->ticket_reference_number,
+                    'ticket_type'             => $request->ticket_type,
+                    'ticket_category_id'      => $request->ticket_category,
+                    'sub_category_id'         => $request->ticket_sub_category,
+                    'ticket_transaction_date' => $request->ticket_transaction_date,
+                    'td_support'              => $newPaths,
+                    'td_purpose'              => $request->purpose,
+                    'td_from'                 => $request->from,
+                    'td_to'                   => $request->to,
+                    'td_ref_number'           => $request->ticket_reference_number,
                 ]);
 
                 $to_update = [
-                    'status'                    => TicketStatus::PENDING,
+                    'status' => TicketStatus::PENDING,
                 ];
 
                 if ($ticketDetail->ticket->pendingUser->isBranchHead()) {
@@ -829,9 +832,9 @@ class TicketService
             $ticketDetail = TicketDetail::findOrFail($id);
 
             $requestData = [
-                'td_note_bh'        => $request->td_note_bh,
-                'date_completed'    => now(),
-                'time'              => now()->format('h:i:s A'),
+                'td_note_bh'     => $request->td_note_bh,
+                'date_completed' => now(),
+                'time'           => now()->format('h:i:s A'),
             ];
 
             $ticketDetail->update($requestData);
@@ -870,8 +873,8 @@ class TicketService
         $ticket = Ticket::where('ticket_code', $ticketCode)->first();
 
         $ticket->update([
-            'status'            => TicketStatus::PENDING,
-            'displayTicket'     => $ticket->assignedPerson->login_id
+            'status'        => TicketStatus::PENDING,
+            'displayTicket' => $ticket->assignedPerson->login_id
         ]);
 
         $ticket->pendingUser->notify(new TicketNotification(
@@ -895,7 +898,7 @@ class TicketService
         $ticket = Ticket::where('ticket_code', $ticketCode)->first();
 
         $ticket->update([
-            'isCounted'         => $ticket->isCounted === 1 ? 0 : 1
+            'isCounted' => $ticket->isCounted === 1 ? 0 : 1
         ]);
 
         activity()
@@ -915,7 +918,7 @@ class TicketService
         $old_note = $ticket->ticketDetail->td_note_bh;
 
         $ticket->ticketDetail->update([
-            'td_note_bh'           => $request->note
+            'td_note_bh' => $request->note
         ]);
 
         $new_note = $ticket->ticketDetail->td_note_bh;

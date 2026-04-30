@@ -24,16 +24,7 @@ class UserRoleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'role_name'     => [
-                'required',
-                Rule::unique(
-                    'user_roles',
-                    'role_name'
-                )->ignore($this->id, 'user_role_id'),
-                'min:4',
-                'max:50',
-                Rule::enum(UserRoles::class)
-            ]
+            'role_name' => ['required', Rule::unique('user_roles', 'role_name')->ignore($this->id, 'user_role_id'), 'min:4', 'max:50', Rule::enum(UserRoles::class)]
         ];
     }
 }

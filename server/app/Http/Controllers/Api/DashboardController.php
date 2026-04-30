@@ -155,14 +155,14 @@ class DashboardController extends Controller
             ->count();
 
         return [
-            'total_users'               => $total_users,
-            'total_automation'          => $total_automation,
-            'total_accounting_head'     => $total_accounting_head,
-            'total_branch_head'         => $total_branch_head,
-            'total_staff'               => $total_staff,
-            'total_cas'                 => $total_cas,
-            'total_accounting_staff'    => $total_accounting_staff,
-            'total_area_manager'        => $total_area_manager
+            'total_users'            => $total_users,
+            'total_automation'       => $total_automation,
+            'total_accounting_head'  => $total_accounting_head,
+            'total_branch_head'      => $total_branch_head,
+            'total_staff'            => $total_staff,
+            'total_cas'              => $total_cas,
+            'total_accounting_staff' => $total_accounting_staff,
+            'total_area_manager'     => $total_area_manager
         ];
     }
 
@@ -188,9 +188,9 @@ class DashboardController extends Controller
         $percentageThanLastMonth = $ticketsLastMonth === 0 ? 0 : ($ticketsThisMonth - $ticketsLastMonth) / $ticketsLastMonth * 100;
 
         return [
-            "tickets_this_month"              => $ticketsThisMonth,
-            "tickets_last_month"              => $ticketsLastMonth,
-            "tickets_percentage_this_month"   => number_format($percentageThanLastMonth, 2, ".", ",")
+            "tickets_this_month"            => $ticketsThisMonth,
+            "tickets_last_month"            => $ticketsLastMonth,
+            "tickets_percentage_this_month" => number_format($percentageThanLastMonth, 2, ".", ",")
         ];
     }
 
@@ -217,9 +217,9 @@ class DashboardController extends Controller
         $percentageThanLastWeek = $ticketsLastWeek === 0 ? 0 : ($ticketsThisWeek - $ticketsLastWeek) / $ticketsLastWeek * 100;
 
         return [
-            "tickets_this_week"                 => $ticketsThisWeek,
-            "tickets_last_week"                 => $ticketsLastWeek,
-            "tickets_percentage_this_week"      => number_format($percentageThanLastWeek, 2, ".", ",")
+            "tickets_this_week"            => $ticketsThisWeek,
+            "tickets_last_week"            => $ticketsLastWeek,
+            "tickets_percentage_this_week" => number_format($percentageThanLastWeek, 2, ".", ",")
         ];
     }
 
@@ -241,10 +241,10 @@ class DashboardController extends Controller
             ->count();
 
         return [
-            "overall_tickets"   => $overallTickets,
-            "tickets_pending"   => $ticketsPending,
-            "tickets_rejected"  => $ticketsRejected,
-            "tickets_edited"    => $ticketsEdited
+            "overall_tickets"  => $overallTickets,
+            "tickets_pending"  => $ticketsPending,
+            "tickets_rejected" => $ticketsRejected,
+            "tickets_edited"   => $ticketsEdited
         ];
     }
 
@@ -261,34 +261,34 @@ class DashboardController extends Controller
     public function adminDashboardData()
     {
         return response()->json([
-            "total_users"                           => $this->userCount(),
-            "tickets_completed_this_month_data"     => $this->ticketCompletedCount(),
-            "tickets_completed_this_week_data"      => $this->ticketThisWeekCount(),
-            "tickets"                               => $this->ticketsData(),
-            'branches'                              => $this->totalBranches(),
-            'suppliers'                             => $this->totalSuppliers(),
-            'automation_records'                    => $this->index()
+            "total_users"                       => $this->userCount(),
+            "tickets_completed_this_month_data" => $this->ticketCompletedCount(),
+            "tickets_completed_this_week_data"  => $this->ticketThisWeekCount(),
+            "tickets"                           => $this->ticketsData(),
+            'branches'                          => $this->totalBranches(),
+            'suppliers'                         => $this->totalSuppliers(),
+            'automation_records'                => $this->index()
         ], 200);
     }
 
     public function userDashboardData($ticketService)
     {
         return response()->json([
-            "message"                   => "Dashboard data fetched successfully",
-            "data"                      => $ticketService->getDashboardData(),
-            "total_tickets"             => $ticketService->getTotalTickets(),
-            "total_edited_tickets"      => $ticketService->getTotalEditedTickets(),
-            "total_rejected_tickets"    => $ticketService->getTotalRejectedTickets(),
-            "total_pending_tickets"     => $ticketService->getTotalPendingTickets(),
-            'recent_tickets'            => $ticketService->getRecentTickets(),
+            "message"                => "Dashboard data fetched successfully",
+            "data"                   => $ticketService->getDashboardData(),
+            "total_tickets"          => $ticketService->getTotalTickets(),
+            "total_edited_tickets"   => $ticketService->getTotalEditedTickets(),
+            "total_rejected_tickets" => $ticketService->getTotalRejectedTickets(),
+            "total_pending_tickets"  => $ticketService->getTotalPendingTickets(),
+            'recent_tickets'         => $ticketService->getRecentTickets(),
         ], 200);
     }
 
     public function automationDashboardData($ticketService)
     {
         return response()->json([
-            'ticket_totals'     => $ticketService->ticketTotals(),
-            'recent_tickets'    => $ticketService->recentTicketRecordsData()
+            'ticket_totals'  => $ticketService->ticketTotals(),
+            'recent_tickets' => $ticketService->recentTicketRecordsData()
         ]);
     }
 

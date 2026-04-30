@@ -28,7 +28,7 @@ class UpdateTicketCategoryRequest extends FormRequest
             'group_code'        => ['required'],
             'show_hide'         => ['required'],
             'other_category'    => ['required_if:group_code,others', 'string', 'min:2', 'max:255', Rule::unique('group_categories', 'group_code')->ignore($this->ticket_category, 'group_code')],
-            'category_type'     => ['required', Rule::in('netsuite_ticket', 'sql_ticket')],
+            'category_type'     => ['required', Rule::in(['netsuite_ticket', 'sql_ticket'])],
         ];
     }
 }

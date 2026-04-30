@@ -30,7 +30,6 @@ class Post extends Model
 
     public function toggleLikeUnlike($userId)
     {
-
         if ($this->userLikes()->where('user_id', $userId)->exists()) {
 
             $this->userLikes()->detach($userId);

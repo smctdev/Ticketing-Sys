@@ -59,7 +59,7 @@ class ProfileController extends Controller
         $request->validated();
 
         $user = Auth::user()
-            ->load(
+            ->load([
                 'userDetail',
                 'userRole',
                 'branch',
@@ -68,15 +68,15 @@ class ProfileController extends Controller
                 'assignedBranchCas.branch:blist_id,b_code',
                 'assignedAreaManagers.branch:blist_id,b_code',
                 'unreadNotifications'
-            );
+            ]);
 
         $path = "";
 
         $updatedData = [
-            'fname'         => Str::title($request->first_name),
-            'lname'         => Str::title($request->last_name),
-            'user_email'    => Str::lower($request->email),
-            'user_contact'  => $request->contact_number,
+            'fname'        => Str::title($request->first_name),
+            'lname'        => Str::title($request->last_name),
+            'user_email'   => Str::lower($request->email),
+            'user_contact' => $request->contact_number,
         ];
 
         if ($request->hasFile('profile_picture')) {

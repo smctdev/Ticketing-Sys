@@ -36,7 +36,7 @@ class LogoutController extends Controller
         $request->session()->regenerateToken();
 
         return response()->json([
-            'message'   => 'Successfully logged out'
+            'message' => 'Successfully logged out'
         ], 204);
     }
 

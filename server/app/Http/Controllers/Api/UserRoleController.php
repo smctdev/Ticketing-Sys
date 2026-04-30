@@ -20,8 +20,8 @@ class UserRoleController extends Controller
         $userRoles = $userRoleService->getUserRole($search, $limit);
 
         return response()->json([
-            'message'       => "User roles fetched successfully",
-            'data'          => $userRoles
+            'message' => "User roles fetched successfully",
+            'data'    => $userRoles
         ], 200);
     }
 
@@ -43,7 +43,7 @@ class UserRoleController extends Controller
         $userRole = $userRoleService->storeUserRole($request);
 
         return response()->json([
-            'message'       => "User role \"{$userRole->role_name->value}\" created successfully",
+            'message' => "User role \"{$userRole->role_name->value}\" created successfully",
         ], 201);
     }
 
@@ -73,7 +73,7 @@ class UserRoleController extends Controller
         $userRole = $userRoleService->updateUserRole($request, $id);
 
         return response()->json([
-            'message'       => "User role \"{$userRole->role_name->value}\" updated successfully",
+            'message' => "User role \"{$userRole->role_name->value}\" updated successfully",
         ], 200);
     }
 
@@ -85,15 +85,15 @@ class UserRoleController extends Controller
         $userRole = $userRoleService->deleteUserRole($id);
 
         return response()->json([
-            'message'       => "User role \"{$userRole->role_name->value}\" deleted successfully",
+            'message' => "User role \"{$userRole->role_name->value}\" deleted successfully",
         ], 200);
     }
 
     public function allUserRoles(UserRoleService $userRoleService)
     {
         return response()->json([
-            'message'       => "Guest user roles fetched successfully",
-            'data'          => $userRoleService->allUserRoles()
+            'message' => "Guest user roles fetched successfully",
+            'data'    => $userRoleService->allUserRoles()
         ], 200);
     }
 }

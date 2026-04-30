@@ -51,7 +51,7 @@ class ChatService
                     ->where('receiver_id', Auth::id());
             })
             ->latest()
-            ->simplePaginate(50);
+            ->simplePaginate(20);
 
         return [
             'data'            => $messages,
@@ -85,7 +85,10 @@ class ChatService
 
         $message->attachments()->createMany($attachments);
 
-        return $message->load('attachments:id,message_id,path', 'replyFrom:id,body');
+        return $message->load([
+            'attachments:id,message_id,path',
+            'replyFrom:id,body'
+        ]);
     }
 
     public function updateMessage($request, $chat)
@@ -94,6 +97,9 @@ class ChatService
             'body' => $request->body
         ]);
 
-        return $chat->load('attachments:id,message_id,path', 'replyFrom:id,body');
+        return $chat->load([
+            'attachments:id,message_id,path',
+            'replyFrom:id,body'
+        ]);
     }
 }

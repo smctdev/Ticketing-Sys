@@ -36,7 +36,7 @@ class ReportsService
 
         $accountingHeadCodes = $user->assignedCategories->pluck('group_code');
 
-        $tickets = Ticket::with(
+        $tickets = Ticket::with([
             'userLogin.userDetail',
             'userLogin.userRole',
             'userLogin.branch',
@@ -65,7 +65,7 @@ class ReportsService
             'lastApprover.userRole',
             'lastApprover.branch',
             'branch',
-        )
+        ])
             ->when(
                 $ticket_type !== "ALL",
                 fn($query)
@@ -181,29 +181,29 @@ class ReportsService
         ]))->map(function ($group) {
             $first = $group->first();
             return [
-                'tickets'                       => $group,
-                'branch_name'                   => $first->branch_name,
-                'counted'                       => $first->isCounted,
-                'branch_code'                   => $first->branch->b_code,
-                'branch_category'               => $first->branch->category,
-                'category_name'                 => $first->ticketDetail->ticketCategory->category_name,
-                'category_shortcut'             => $first->ticketDetail->ticketCategory->category_shortcut,
-                'ticket_count'                  => $group->count(),
-                "Branch"                        => $first->branch,
-                "TicketDetails"                 => [
-                    "ticket_details_id"         => $first->ticketDetail?->ticket_details_id,
-                    "ticket_transaction_date"   => $first->ticketDetail?->ticket_transaction_date,
-                    "td_ref_number"             => $first->ticketDetail?->td_ref_number,
-                    "td_purpose"                => $first->ticketDetail?->td_purpose,
-                    "td_from"                   => $first->ticketDetail?->td_from,
-                    "td_to"                     => $first->ticketDetail?->td_to,
-                    "td_note"                   => $first->ticketDetail?->td_note,
-                    "td_support"                => $first->ticketDetail?->td_support,
-                    "supplier"                  => $first->ticketDetail?->supplier,
-                    "date_created"              => $first->ticketDetail?->date_created,
-                    "time"                      => $first->ticketDetail?->time,
-                    "date_completed"            => $first->ticketDetail?->date_completed,
-                    "Category"                  => $first->ticketDetail?->ticketCategory,
+                'tickets'                     => $group,
+                'branch_name'                 => $first->branch_name,
+                'counted'                     => $first->isCounted,
+                'branch_code'                 => $first->branch->b_code,
+                'branch_category'             => $first->branch->category,
+                'category_name'               => $first->ticketDetail->ticketCategory->category_name,
+                'category_shortcut'           => $first->ticketDetail->ticketCategory->category_shortcut,
+                'ticket_count'                => $group->count(),
+                "Branch"                      => $first->branch,
+                "TicketDetails"               => [
+                    "ticket_details_id"       => $first->ticketDetail?->ticket_details_id,
+                    "ticket_transaction_date" => $first->ticketDetail?->ticket_transaction_date,
+                    "td_ref_number"           => $first->ticketDetail?->td_ref_number,
+                    "td_purpose"              => $first->ticketDetail?->td_purpose,
+                    "td_from"                 => $first->ticketDetail?->td_from,
+                    "td_to"                   => $first->ticketDetail?->td_to,
+                    "td_note"                 => $first->ticketDetail?->td_note,
+                    "td_support"              => $first->ticketDetail?->td_support,
+                    "supplier"                => $first->ticketDetail?->supplier,
+                    "date_created"            => $first->ticketDetail?->date_created,
+                    "time"                    => $first->ticketDetail?->time,
+                    "date_completed"          => $first->ticketDetail?->date_completed,
+                    "Category"                => $first->ticketDetail?->ticketCategory,
                 ],
             ];
         })
@@ -243,7 +243,7 @@ class ReportsService
 
         $accountingHeadCodes = $user->assignedCategories->pluck('group_code');
 
-        $tickets = Ticket::with(
+        $tickets = Ticket::with([
             'userLogin.userDetail',
             'userLogin.userRole',
             'userLogin.branch',
@@ -272,7 +272,7 @@ class ReportsService
             'lastApprover.userRole',
             'lastApprover.branch',
             'branch',
-        )
+        ])
             ->when(
                 $ticket_type !== "ALL",
                 fn($query)

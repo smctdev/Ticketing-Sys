@@ -25,7 +25,7 @@ class CategoryController extends Controller
             ->withCount('subCategories')
             ->where('show_hide', 'show')
             ->where('category_type', $category_type)
-            ->orderBy('category_shortcut', 'asc')
+            ->orderBy('category_shortcut')
             ->get();
 
         return response()->json([
@@ -42,7 +42,7 @@ class CategoryController extends Controller
 
         return response()->json($assignedCategories, 200);
     }
-    public function assignedCategoryGroup($id)
+    public function assignedCategoryGroup(string $id)
     {
         $assignedCategoryGroup = AssignedCategory::with('categoryGroupCode')
             ->where('login_id', $id)
@@ -137,7 +137,7 @@ class CategoryController extends Controller
             ->log("Created a category");
 
         return response()->json([
-            'message'       => "Category \"{$category->category_name}\" created successfully"
+            'message' => "Category \"{$category->category_name}\" created successfully"
         ], 201);
     }
 
@@ -193,13 +193,13 @@ class CategoryController extends Controller
             ->log("Updated a category");
 
         return response()->json([
-            'message'       => "Category \"{$ticketCategory->category_name}\" updated successfully"
+            'message' => "Category \"{$ticketCategory->category_name}\" updated successfully"
         ], 200);
     }
 
-    public function showHide(Request $request, $id)
+    public function showHide(Request $request, string $id)
     {
-        $ticketCategory = TicketCategory::find($id);
+        $ticketCategory = TicketCategory::findOrFail($id);
 
         if (!$ticketCategory) {
             return response()->json("Category not found", 404);
@@ -217,7 +217,7 @@ class CategoryController extends Controller
             ->log("Updated a category show/hide");
 
         return response()->json([
-            "message"   => "Category {$ticketCategory->show_hide} successfully"
+            "message" => "Category {$ticketCategory->show_hide} successfully"
         ], 200);
     }
 
@@ -236,7 +236,7 @@ class CategoryController extends Controller
             ->log("Deleted a category");
 
         return response()->json([
-            'message'   => "Category \"{$ticketCategory->category_name}\" deleted successfully"
+            'message' => "Category \"{$ticketCategory->category_name}\" deleted successfully"
         ], 200);
     }
 }

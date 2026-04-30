@@ -22,7 +22,7 @@ class SendLoginCodeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'email'     => ['required', 'email', 'max:100', 'min:5']
+            'email' => ['required', 'email', 'max:100', 'min:5']
         ];
     }
 }

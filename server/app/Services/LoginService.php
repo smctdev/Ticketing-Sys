@@ -21,8 +21,8 @@ class LoginService
         }
 
         $credentials = Auth::guard('web')->attempt([
-            'username'       => $user->userDetail->user_email === $request->usernameOrEmail ? $user->username : $request->usernameOrEmail,
-            'password'       => $request->password,
+            'username' => $user->userDetail->user_email === $request->usernameOrEmail ? $user->username : $request->usernameOrEmail,
+            'password' => $request->password,
         ]);
 
         if ($credentials) {

@@ -44,8 +44,8 @@ class ExportReportsController extends Controller
         );
 
         return response()->json([
-            'message'    => 'Reports to exported fetched successfully',
-            'data'       => $data
+            'message' => 'Reports to exported fetched successfully',
+            'data'    => $data
         ], 200);
     }
 }

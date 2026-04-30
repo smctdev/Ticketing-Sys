@@ -18,7 +18,13 @@ class AccountingController extends Controller
         $search = request('search');
         $limit = request('limit');
 
-        $accountings = UserLogin::with('userRole', 'branch', 'userDetail', 'assignedCategories.categoryGroupCode', 'accountingAssignedBranches:blist_id,b_code')
+        $accountings = UserLogin::with([
+            'userRole',
+            'branch',
+            'userDetail',
+            'assignedCategories.categoryGroupCode',
+            'accountingAssignedBranches:blist_id,b_code'
+        ])
             ->search($search)
             ->whereHas(
                 "userRole",
@@ -31,8 +37,8 @@ class AccountingController extends Controller
         $allGroupCategory = GroupCategory::all();
 
         return response()->json([
-            'data'               => $accountings,
-            'group_categories'   => $allGroupCategory
+            'data'             => $accountings,
+            'group_categories' => $allGroupCategory
         ], 200);
     }
 
