@@ -232,7 +232,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
         user: user?.full_name,
         isTyping: false,
       });
-    }, 2000);
+    }, 1000);
   };
 
   const handleSendNotify = () => {

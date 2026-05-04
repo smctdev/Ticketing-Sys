@@ -396,20 +396,21 @@ function ChatsPage() {
               {typing.isTyping &&
                 typing.target_id === user?.login_id &&
                 typing.typer_id === Number(id) && (
-                  <span className="flex items-center gap-3 justify-center text-[10px]">
-                    <span className="flex gap-1">
-                      {Array.from({ length: 3 }).map((_, index) => (
-                        <span
-                          key={index}
-                          className="w-1 h-1 rounded-full bg-chat-receiver-background animate-bounce"
-                          style={{
-                            animationDelay: `${index * 0.2}s`,
-                          }}
-                        />
-                      ))}
-                    </span>
-                    <span>{typing.user} is typing...</span>
-                  </span>
+                  <div className="self-start">
+                    <div className="p-4 rounded-2xl rounded-bl-sm text-sm wrap-break-word whitespace-break-spaces leading-relaxed bg-chat-receiver-background dark:text-white shadow-lg shadow-chat-background/50">
+                      <span className="flex gap-1">
+                        {Array.from({ length: 3 }).map((_, index) => (
+                          <span
+                            key={index}
+                            className="w-1.5 h-1.5 rounded-full bg-chat-background animate-bounce"
+                            style={{
+                              animationDelay: `${index * 0.2}s`,
+                            }}
+                          />
+                        ))}
+                      </span>
+                    </div>
+                  </div>
                 )}
               {messages?.length > 0 ? (
                 <>
