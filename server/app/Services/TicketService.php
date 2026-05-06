@@ -759,7 +759,9 @@ class TicketService
 
             $errorForNoBranchesOrAccountingStaff = $isLastMonth && $isSql && !$accountingStaff;
 
-            if ($errorForNoBranchesOrAccountingStaff && $this->user->isBranchHead()) {
+            $ticketGroupCategoryFromAutomation = $ticketDetail->ticketCategory?->groupCategory?->group_code === 'Automation';
+
+            if ($errorForNoBranchesOrAccountingStaff && $this->user->isBranchHead() && !$ticketGroupCategoryFromAutomation) {
                 abort(400, 'No assigned accounting staff for this branch and category.');
             }
 
