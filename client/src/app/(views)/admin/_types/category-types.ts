@@ -25,20 +25,23 @@ export interface GroupCategoryDataType {
 
 export interface EditCategoryProps {
   data: CategoryDataType;
-  setIsRefresh: Dispatch<SetStateAction<boolean>>;
   groupCategories: GroupCategoryDataType[];
   isLoadingGroupCategories: boolean;
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
+  fetchData: () => Promise<void>;
+  fetchCategories: () => Promise<void>;
 }
 
 export interface DeleteCategoryProps {
   data: CategoryDataType;
-  setIsRefresh: Dispatch<SetStateAction<boolean>>;
+  fetchData: () => Promise<void>;
+  fetchCategories: () => Promise<void>;
 }
 
 export interface AddCategoryProps {
-  setIsRefresh: Dispatch<SetStateAction<boolean>>;
   groupCategories: GroupCategoryDataType[];
   isLoadingGroupCategories: boolean;
+  fetchData: () => Promise<void>;
+  fetchCategories: () => Promise<void>;
 }

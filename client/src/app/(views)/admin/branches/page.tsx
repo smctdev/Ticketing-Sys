@@ -75,7 +75,7 @@ function Branches() {
         </CardHeader>
         <CardContent>
           <DataTableComponent
-            data={data?.data?.data}
+            data={data}
             columns={[...BRANCHES_COLUMNS, ...BRANCHES_COLUMNS_ACTIONS]}
             loading={isLoading}
             handlePageChange={handlePageChange}

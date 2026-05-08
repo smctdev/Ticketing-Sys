@@ -64,7 +64,7 @@ function ChatsPage() {
     await api.delete(`unseen-message/${id}/flush`);
   };
 
-  const users: any[] = data?.data?.data ?? [];
+  const users: any[] = data ?? [];
 
   return (
     <div className="flex flex-col gap-3 m-7">

@@ -121,7 +121,7 @@ function AreaManagers() {
         </CardHeader>
         <CardContent>
           <DataTableComponent
-            data={data?.data?.data}
+            data={data}
             columns={[
               ...AREA_MANAGERS_COLUMNS,
               ...AREA_MANAGERS_COLUMNS_ACTIONS,

@@ -7,6 +7,7 @@ use App\Enums\UserRoles;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\TicketRequest;
 use App\Http\Requests\UpdateTicketRequest;
+use App\Http\Resources\TicketResource;
 use App\Models\Ticket;
 use App\Models\TicketDetail;
 use App\Models\UserLogin;
@@ -65,7 +66,7 @@ class TicketController extends Controller
 
         return response()->json([
             "message" => "Tickets fetched successfully",
-            "data"    => $tickets
+            "data"    => $tickets->through(fn($ticket) => $ticket->toResource(TicketResource::class))
         ], 200);
     }
 
@@ -187,6 +188,7 @@ class TicketController extends Controller
 
         return response()->json([
             "message" => "Ticket with ticket code of {$data?->ticket_code} created successfully",
+            'data'    => $data->toResource(TicketResource::class)
         ], 201);
     }
 
@@ -255,6 +257,7 @@ class TicketController extends Controller
 
         return response()->json([
             "message" => "Ticket with ticket code of {$data->ticket_code} updated successfully",
+            "data"    => $data->toResource(TicketResource::class)
         ], 200);
     }
 
@@ -304,23 +307,21 @@ class TicketController extends Controller
     {
         $user = Auth::user();
 
-        $field = match (true) {
-            $user->isAutomation()        => 'td_note_bh',
-            $user->isAutomationManager() => 'td_note',
-            $user->isAccountingStaff()   => 'td_note_accounting',
-        };
+        $field = $user->isAutomation() ? 'td_note_bh' : ($user->isAutomationManager() ? 'td_note' : ($user->isAccountingStaff() ? 'td_note_accounting' : ''));
 
-        $validateData = [
-            $field => ["nullable", Rule::requiredIf(!$user->isAccountingHead() && !$user->isBranchHead()), 'max:5000', 'min:1']
-        ];
+        if ($field) {
+            $validateData = [
+                $field => ["nullable", Rule::requiredIf(!$user->isAccountingHead() && !$user->isBranchHead()), 'max:5000', 'min:1']
+            ];
 
-        $validateDataMessage = [
-            "{$field}.required" => 'Note is required',
-            "{$field}.max"      => 'Note must be less than 5000 characters',
-            "{$field}.min"      => 'Note must be at least 1 character',
-        ];
+            $validateDataMessage = [
+                "{$field}.required" => 'Note is required',
+                "{$field}.max"      => 'Note must be less than 5000 characters',
+                "{$field}.min"      => 'Note must be at least 1 character',
+            ];
 
-        $request->validate($validateData, $validateDataMessage);
+            $request->validate($validateData, $validateDataMessage);
+        }
 
         $data = $ticketService->reviseTicket($id, $request);
 
@@ -444,7 +445,9 @@ class TicketController extends Controller
             $data->ticket_code,
             $user->userDetail->profile_pic,
             $user->full_name,
-            $user->login_id
+            $user->login_id,
+            'created',
+            $data->toResource(TicketResource::class)
         ));
 
         activity()
@@ -454,13 +457,13 @@ class TicketController extends Controller
 
         return response()->json([
             'message' => "Ticket with ticket code of {$ticketCode} has been transferred to {$data->assignedPerson->full_name} automation successfully",
+            'data'    => $data->toResource(TicketResource::class)
         ], 200);
     }
 
 
     public function directToAutomation(TicketDetail $ticket_detail)
     {
-
         if ($ticket_detail->ticket->status !== TicketStatus::PENDING) {
             abort(400, 'You can not direct this ticket because it has been edited or rejected');
         }
@@ -473,13 +476,14 @@ class TicketController extends Controller
             'displayTicket' => $user?->login_id
         ]);
 
-
         $user->notify(new TicketNotification(
             "Hello, new ticket {$ticket_detail->ticket->ticket_code} has been assigned to you",
             $ticket_detail->ticket->ticket_code,
             $user->userDetail->profile_pic,
             $user->full_name,
-            $user->login_id
+            $user->login_id,
+            'created',
+            $ticket_detail->ticket->toResource(TicketResource::class)
         ));
 
         activity()

@@ -28,14 +28,13 @@ import { CreateTicket } from "./_components/create-ticket";
 import { useAuth } from "@/context/auth-context";
 import { canCreateTicket } from "@/utils/permissions";
 import SearchInput from "@/components/ui/search-input";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import echo from "@/lib/echo";
 import { EditTicket } from "./_components/edit-ticket";
 import { DeleteTicket } from "./_components/delete-ticket";
 import { toast } from "sonner";
 import { Tooltip, TooltipContent } from "@/components/ui/tooltip";
 import { TooltipArrow, TooltipTrigger } from "@radix-ui/react-tooltip";
-import { useIsRefresh } from "@/context/is-refresh-context";
 import { TransferTicketToAutomation } from "./_components/transfer-ticket-to-automation";
 import { Label } from "@/components/ui/label";
 import Swal from "sweetalert2";
@@ -47,7 +46,6 @@ import { CAN_ACCESS_ALL } from "@/constants/roles";
 
 function Tickets() {
   const { user, isAdmin } = useAuth();
-  const { isRefresh, setIsRefresh: refresh } = useIsRefresh();
   const [ticketType, setTicketType] = useState<
     "netsuite_ticket" | "sql_ticket"
   >("netsuite_ticket");
@@ -65,23 +63,23 @@ function Tickets() {
     error: ticketsError,
     fetchData,
     setIsLoading,
+    setData,
   } = useFetch({
     url: "/tickets",
     isPaginated: true,
     filters: TICKETS_FILTER,
-    canBeRefreshGlobal: isRefresh,
   });
   const {
     data: categories,
     isLoading: isLoadingCategories,
-    setIsRefresh: setIsRefreshCategories,
+    fetchData: fetchCategories,
   } = useFetch({
     url: `/categories?category_type=${ticketType}`,
   });
   const {
     data: branchHeads,
     isLoading: isLoadingBranchHeads,
-    setIsRefresh: setIsRefreshBranchHeads,
+    fetchData: fetchBranchHeads,
   } = useFetch({
     url: `user-branch-heads`,
   });
@@ -96,14 +94,46 @@ function Tickets() {
   const [isCounted, setIsCounted] = useState<string>("");
   const [isRefreshing, setIsRefreshing] = useState<boolean>(false);
   const role = user?.user_role?.role_name;
+  const ticketRef = useRef<any>(null);
 
   useEffect(() => {
-    if (!echo || !user) return;
+    if (!echo || !user || filterBy?.search) return;
 
     echo
       .private(`approver-of-ticket-${user?.login_id}`)
       .notification((notification: any) => {
-        fetchData();
+        if (
+          ticketRef.current === notification.data.ticket_code &&
+          notification.action === "created"
+        )
+          return;
+        ticketRef.current = notification.data.ticket_code;
+        setData((prev: any) => {
+          const exists = prev.some(
+            (item: any) =>
+              item.ticket_details_id === notification.ticket.ticket_details_id,
+          );
+          if (notification.action === "updated") {
+            return exists
+              ? prev.map((item: any) =>
+                  item.ticket_details_id ===
+                  notification.ticket.ticket_details_id
+                    ? notification.ticket
+                    : item,
+                )
+              : [notification.ticket, ...prev];
+          }
+
+          if (notification.action === "edited") {
+            return prev.filter(
+              (item: any) =>
+                item.ticket_details_id !==
+                notification.ticket.ticket_details_id,
+            );
+          }
+
+          return [notification.ticket, ...prev];
+        });
       });
 
     echo.channel("ticket-deleted").listen("DeleteTicketEvent", (event: any) => {
@@ -115,14 +145,17 @@ function Tickets() {
         setIsOpenDialog(false);
         setIsOpenView(false);
       }
-      fetchData();
+
+      setData((prev: any) =>
+        prev.filter((item: any) => item.ticket_code !== event.ticket_code),
+      );
     });
 
     return () => {
       echo.leave(`approver-of-ticket-${user?.login_id}`);
       echo.leave("ticket-deleted");
     };
-  }, [echo, user, selectedTicketData]);
+  }, [echo, user, selectedTicketData, filterBy?.search]);
 
   const isTurnToApprove = (userId: number | string | null) => {
     return userId === user?.login_id;
@@ -173,7 +206,7 @@ function Tickets() {
             </TooltipContent>
           </Tooltip>
           {(user?.login_id === row?.login_id || isAdmin) && (
-            <DeleteTicket data={row} fetchData={fetchData} />
+            <DeleteTicket data={row} setData={setData} />
           )}
           {isAdmin && (
             <Tooltip>
@@ -226,7 +259,6 @@ function Tickets() {
         confirmButtonText: "Yes, mark as edit it!",
       }).then(async (result) => {
         if (result.isConfirmed) {
-          refresh(true);
           Swal.fire({
             title: "Marking as edit...",
             text: "Please wait while the ticket is being marking as edit...",
@@ -259,6 +291,7 @@ function Tickets() {
               setNote("");
               setError(null);
               setIsCounted("");
+              fetchData();
               Swal.close();
             }
           } catch (error: any) {
@@ -288,8 +321,6 @@ function Tickets() {
               });
               setError(null);
             }
-          } finally {
-            refresh(false);
           }
         } else {
           setIsOpenView(true);
@@ -310,7 +341,6 @@ function Tickets() {
         confirmButtonText: "Yes, approve it!",
       }).then(async (result) => {
         if (result.isConfirmed) {
-          refresh(true);
           Swal.fire({
             title: "Approving...",
             text: "Please wait while the ticket is being approve...",
@@ -341,6 +371,7 @@ function Tickets() {
               });
               setNote("");
               setError(null);
+              fetchData();
               Swal.close();
             }
           } catch (error: any) {
@@ -377,8 +408,6 @@ function Tickets() {
               });
               setError(null);
             }
-          } finally {
-            refresh(false);
           }
         } else {
           setIsOpenView(true);
@@ -399,7 +428,6 @@ function Tickets() {
         confirmButtonText: "Yes, revise it!",
       }).then(async (result) => {
         if (result.isConfirmed) {
-          refresh(true);
           Swal.fire({
             title: "Revising...",
             text: "Please wait while the ticket is being revised...",
@@ -434,6 +462,7 @@ function Tickets() {
               });
               setNote("");
               setError(null);
+              fetchData();
               Swal.close();
             }
           } catch (error: any) {
@@ -463,8 +492,6 @@ function Tickets() {
               });
               setError(null);
             }
-          } finally {
-            refresh(false);
           }
         } else {
           setIsOpenView(true);
@@ -485,7 +512,6 @@ function Tickets() {
         confirmButtonText: "Yes, direct it!",
       }).then(async (result) => {
         if (result.isConfirmed) {
-          refresh(true);
           Swal.fire({
             title: "Directing to automation...",
             text: "Please wait while the ticket is being directing to automation...",
@@ -507,6 +533,7 @@ function Tickets() {
               });
               setNote("");
               setError(null);
+              fetchData();
               Swal.close();
             }
           } catch (error: any) {
@@ -536,8 +563,6 @@ function Tickets() {
               });
               setError(null);
             }
-          } finally {
-            refresh(false);
           }
         } else {
           setIsOpenView(true);
@@ -547,9 +572,9 @@ function Tickets() {
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    setIsRefreshBranchHeads(true);
     try {
       await fetchData();
+      await fetchBranchHeads();
     } finally {
       setIsRefreshing(false);
     }
@@ -657,10 +682,11 @@ function Tickets() {
                   categories={categories}
                   user={user}
                   setTicketType={setTicketType}
-                  setIsRefreshCategories={setIsRefreshCategories}
-                  branchHeads={branchHeads?.data}
-                  setIsRefreshBranchHeads={setIsRefreshBranchHeads}
-                  fetchData={fetchData}
+                  fetchCategories={fetchCategories}
+                  branchHeads={branchHeads}
+                  fetchBranchHeads={fetchBranchHeads}
+                  setData={setData}
+                  perPage={pagination.perPage}
                 />
               )}
             </div>
@@ -668,7 +694,7 @@ function Tickets() {
         </CardHeader>
         <CardContent>
           <DataTableComponent
-            data={data?.data?.data}
+            data={data}
             columns={[...TICKETS_COLUMNS, ...TICKET_COLUMNS_ACTIONS]}
             loading={isLoading || isRefreshing}
             handlePageChange={handlePageChange}
@@ -687,16 +713,16 @@ function Tickets() {
 
       {isOpenDialog && (
         <EditTicket
-          fetchData={fetchData}
+          setData={setData}
           ticketData={selectedTicketData}
           categories={categories}
           user={user}
           setIsOpenDialog={setIsOpenDialog}
           open={isOpenDialog}
           setTicketType={setTicketType}
-          setIsRefreshCategories={setIsRefreshCategories}
-          branchHeads={branchHeads?.data}
-          setIsRefreshBranchHeads={setIsRefreshBranchHeads}
+          fetchCategories={fetchCategories}
+          branchHeads={branchHeads}
+          fetchBranchHeads={fetchBranchHeads}
         />
       )}
 
@@ -723,6 +749,7 @@ function Tickets() {
           data={selectedTicketData}
           open={isOpenToTransfer}
           setOpen={setIsOpenToTransfer}
+          setData={setData}
         />
       )}
     </div>

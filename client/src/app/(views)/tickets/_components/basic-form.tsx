@@ -43,7 +43,7 @@ export default function BasicForm({
   const oldFilesLength = oldFiles?.length ?? 0;
 
   const ticketSubCategories = useMemo(() => {
-    return categories?.data?.find(
+    return categories?.find(
       (category: any) =>
         Number(category.ticket_category_id) ===
         Number(formInput.ticket_category),
@@ -114,12 +114,12 @@ export default function BasicForm({
               <SelectItem value="Select ticket category" disabled>
                 Select ticket category
               </SelectItem>
-              {categories?.data?.length === 0 ? (
+              {categories?.length === 0 ? (
                 <SelectItem value="No ticket categories found">
                   No ticket categories found
                 </SelectItem>
               ) : (
-                categories?.data?.map((ticket_category: any, index: number) => (
+                categories?.map((ticket_category: any, index: number) => (
                   <SelectItem
                     key={index}
                     value={String(ticket_category.ticket_category_id)}

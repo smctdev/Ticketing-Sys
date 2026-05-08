@@ -29,8 +29,8 @@ class CategoryController extends Controller
             ->get();
 
         return response()->json([
-            'message'       => "Categories fetched successfully",
-            'data'          => $categories
+            'message' => "Categories fetched successfully",
+            'data'    => $categories
         ], 200);
     }
 
@@ -89,8 +89,8 @@ class CategoryController extends Controller
             ->paginate($limit);
 
         return response()->json([
-            'message'       => 'Ticket categories fetched successfully',
-            'data'          => $ticketCategories
+            'message' => 'Ticket categories fetched successfully',
+            'data'    => $ticketCategories
         ], 200);
     }
 

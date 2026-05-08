@@ -59,7 +59,7 @@ function UserRoles() {
         </CardHeader>
         <CardContent>
           <DataTableComponent
-            data={data?.data?.data}
+            data={data}
             columns={[...USER_ROLES_COLUMNS, ...USER_ROLES_COLUMNS_ACTIONS]}
             loading={isLoading}
             handlePageChange={handlePageChange}

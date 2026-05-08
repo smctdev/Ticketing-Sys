@@ -50,7 +50,7 @@ class UpdateTicketRequest extends FormRequest
             'purpose'                 => ['required', 'max:1000', 'min:2'],
             'from'                    => ['required', 'max:255', 'min:2'],
             'to'                      => ['required', 'max:255', 'min:2'],
-            'ticket_reference_number' => ['required_if:ticket_type,sql_ticket', 'max:255', 'min:2'],
+            'ticket_reference_number' => ['required', 'max:255', 'min:2'],
             'branch_head_id'          => [Rule::requiredIf($this->branchHeads() > 1)]
         ];
     }

@@ -13,7 +13,6 @@ import { FormEvent, useState } from "react";
 import { api } from "@/lib/api";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { toast } from "sonner";
-import { useIsRefresh } from "@/context/is-refresh-context";
 
 export function IsForCounted({
   ticketCode,
@@ -21,18 +20,17 @@ export function IsForCounted({
   setOpen,
   setIsOpen,
   type,
+  fetchData,
 }: any) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const { setIsRefresh } = useIsRefresh();
 
   const handleIsForCounted = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
-    setIsRefresh(true);
     try {
       const response = await api.patch(
-        `/counted-or-not-counted/${ticketCode}/counted-or-not-counted`
+        `/counted-or-not-counted/${ticketCode}/counted-or-not-counted`,
       );
       if (response.status === 200) {
         setError(null);
@@ -42,13 +40,13 @@ export function IsForCounted({
           description: response.data.message,
           position: "bottom-center",
         });
+        fetchData();
       }
     } catch (error: any) {
       console.error(error);
       setError(error.response.data.message);
     } finally {
       setIsLoading(false);
-      setIsRefresh(false);
     }
   };
 

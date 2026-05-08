@@ -20,7 +20,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useIsRefresh } from "@/context/is-refresh-context";
 import useFetch from "@/hooks/use-fetch";
 import { api } from "@/lib/api";
 import { AlertCircle, Loader2, Save } from "lucide-react";
@@ -42,12 +41,14 @@ type DialogProps = {
       login_id: string | number;
     };
   };
+  setData: Dispatch<SetStateAction<any>>;
 };
 
 export function TransferTicketToAutomation({
   open,
   setOpen,
   data,
+  setData,
 }: DialogProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -56,7 +57,6 @@ export function TransferTicketToAutomation({
   const { data: automations, isLoading: automationsLoading } = useFetch({
     url: "/all-automations",
   });
-  const { setIsRefresh } = useIsRefresh();
 
   useEffect(() => {
     if (!data) return;
@@ -67,13 +67,12 @@ export function TransferTicketToAutomation({
   const handleTransfer = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
-    setIsRefresh(true);
     try {
       const response = await api.patch(
         `/transfer-ticket/${data.ticket_code}/to-automation`,
         {
           automation,
-        }
+        },
       );
 
       if (response.status === 200) {
@@ -84,6 +83,16 @@ export function TransferTicketToAutomation({
           description: response.data.message,
           position: "bottom-center",
         });
+
+        if (response.data.message === "Nothing changed") return;
+
+        setData((prev: any) =>
+          prev.map((item: any) =>
+            item.ticket_details_id === response.data.data.ticket_details_id
+              ? response.data.data
+              : item,
+          ),
+        );
       }
     } catch (error: any) {
       console.error(error);
@@ -96,7 +105,6 @@ export function TransferTicketToAutomation({
       }
     } finally {
       setIsLoading(false);
-      setIsRefresh(false);
     }
   };
 
@@ -135,17 +143,15 @@ export function TransferTicketToAutomation({
                   <SelectContent>
                     <SelectGroup>
                       <SelectLabel>Automations</SelectLabel>
-                      {automations?.data.length > 0 ? (
-                        automations.data.map(
-                          (automation: any, index: number) => (
-                            <SelectItem
-                              value={String(automation.login_id)}
-                              key={index}
-                            >
-                              {automation.full_name}
-                            </SelectItem>
-                          )
-                        )
+                      {automations.length > 0 ? (
+                        automations.map((automation: any, index: number) => (
+                          <SelectItem
+                            value={String(automation.login_id)}
+                            key={index}
+                          >
+                            {automation.full_name}
+                          </SelectItem>
+                        ))
                       ) : (
                         <SelectItem value="No automation found." disabled>
                           No automation found.

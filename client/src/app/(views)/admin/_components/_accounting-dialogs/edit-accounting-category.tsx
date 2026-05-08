@@ -120,12 +120,12 @@ export default function EditAccountingCategoryDialog({
                 </MultiSelectTrigger>
                 <MultiSelectContent>
                   <MultiSelectGroup>
-                    {data?.data?.length === 0 ? (
+                    {data?.length === 0 ? (
                       <MultiSelectItem value="No categories yet." disabled>
                         No categories yet.
                       </MultiSelectItem>
                     ) : (
-                      data?.data?.map((category: any, index: number) => (
+                      data?.map((category: any, index: number) => (
                         <MultiSelectItem key={index} value={`${category.id}`}>
                           {category.group_code}
                         </MultiSelectItem>

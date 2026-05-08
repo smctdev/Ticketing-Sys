@@ -19,7 +19,6 @@ import formattedDate from "@/utils/format-date";
 import { formatDate } from "date-fns";
 import { useAuth } from "@/context/auth-context";
 import { toast } from "sonner";
-import { useIsRefresh } from "@/context/is-refresh-context";
 import {
   Tooltip,
   TooltipContent,
@@ -32,7 +31,6 @@ function Reports() {
   const [isLoadingToExport, setIsLoadingToExport] = useState<boolean>(false);
   const [isGenerating, setIsGenerating] = useState<boolean>(false);
   const { user } = useAuth();
-  const { isRefresh } = useIsRefresh();
   const {
     data,
     isLoading,
@@ -46,11 +44,11 @@ function Reports() {
     handleReset,
     handleSearchTerm,
     error,
+    fetchData
   } = useFetch({
     url: "/reports",
     isPaginated: true,
     filters: { ...REPORTS_FILTER, ...SEARCH_FILTER },
-    canBeRefreshGlobal: isRefresh,
   });
   const [isOpenDrawer, setIsOpenDrawer] = useState<boolean>(false);
   const [selectedData, setSelectedData] = useState<null | any>(null);
@@ -469,7 +467,7 @@ function Reports() {
         </CardHeader>
         <CardContent>
           <DataTableComponent
-            data={data?.data?.data}
+            data={data}
             columns={[...REPORTS_COLUMNS, ...REPORTS_COLUMNS_ACTIONS]}
             loading={isLoading}
             handlePageChange={handlePageChange}
@@ -492,6 +490,7 @@ function Reports() {
           data={selectedData}
           open={isOpenDrawer}
           setIsOpen={setIsOpenDrawer}
+          fetchData={fetchData}
         />
       )}
     </div>

@@ -8,7 +8,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { AlertCircleIcon, Loader2, Plus, X } from "lucide-react";
+import { AlertCircleIcon, Loader2, Plus } from "lucide-react";
 import { ChangeEvent, FormEvent, useEffect, useRef, useState } from "react";
 import { TICKET_FORM_DATA } from "@/constants/ticket-form-data";
 import { TicketFormDataType } from "@/types/ticket-form-data-type";
@@ -16,18 +16,18 @@ import formattedDateFull from "@/utils/format-date-full";
 import { api } from "@/lib/api";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { toast } from "sonner";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import BasicForm from "./basic-form";
-import SqlForm from "./sql-form";
 
 export function CreateTicket({
   categories,
   user,
   setTicketType,
-  setIsRefreshCategories,
+  fetchCategories,
   branchHeads,
-  setIsRefreshBranchHeads,
-  fetchData,
+  fetchBranchHeads,
+  setData,
+  perPage,
 }: any) {
   const [formInput, setFormInput] =
     useState<TicketFormDataType>(TICKET_FORM_DATA);
@@ -72,8 +72,8 @@ export function CreateTicket({
     }));
 
     if (is_ticket_type) {
-      setIsRefreshCategories(true);
-      setIsRefreshBranchHeads(true);
+      fetchCategories();
+      fetchBranchHeads();
       setTicketType(value);
       setFormInput((formData) => ({
         ...formData,
@@ -92,7 +92,6 @@ export function CreateTicket({
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
-    setIsRefreshBranchHeads(true);
     try {
       const formData = new FormData();
       formData.append(
@@ -153,7 +152,10 @@ export function CreateTicket({
           description: response.data.message,
           position: "bottom-center",
         });
-        fetchData();
+        setData((prev: any) =>
+          [response.data.data, ...prev]?.slice(0, perPage),
+        );
+        fetchBranchHeads();
       }
     } catch (error: any) {
       console.error(error);
@@ -166,7 +168,6 @@ export function CreateTicket({
       }
     } finally {
       setIsLoading(false);
-      setIsRefreshBranchHeads(true);
     }
   };
 

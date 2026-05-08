@@ -121,7 +121,7 @@ function Cas() {
         </CardHeader>
         <CardContent>
           <DataTableComponent
-            data={data?.data?.data}
+            data={data}
             columns={[...CAS_COLUMNS, ...CAS_COLUMNS_ACTIONS]}
             loading={isLoading}
             handlePageChange={handlePageChange}

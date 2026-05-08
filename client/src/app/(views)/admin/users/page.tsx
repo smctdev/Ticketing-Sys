@@ -66,28 +66,28 @@ function Users() {
   const branchMemo = useMemo(() => {
     return branchIsLoading
       ? "isLoading"
-      : branchData?.data?.length === 0
+      : branchData?.length === 0
         ? "isEmpty"
-        : branchData?.data;
-  }, [branchData?.data]);
+        : branchData;
+  }, [branchData]);
 
   const userRoleMemo = useMemo(() => {
     return userRoleIsLoading ? (
       <SelectItem disabled value="Loading...">
         Loading...
       </SelectItem>
-    ) : userRoleData?.data?.length === 0 ? (
+    ) : userRoleData?.length === 0 ? (
       <SelectItem disabled value="No roles yet.">
         No roles yet.
       </SelectItem>
     ) : (
-      userRoleData?.data?.map((item: UserRoleTypes, index: number) => (
+      userRoleData?.map((item: UserRoleTypes, index: number) => (
         <SelectItem key={index} value={String(item.user_role_id)}>
           {item.role_name}
         </SelectItem>
       ))
     );
-  }, [userRoleData?.data]);
+  }, [userRoleData]);
 
   return (
     <div className="flex flex-col gap-3">
@@ -108,7 +108,7 @@ function Users() {
         </CardHeader>
         <CardContent>
           <DataTableComponent
-            data={data?.data?.data}
+            data={data}
             columns={[...USERS_COLUMNS, ...USERS_COLUMNS_ACTIONS]}
             loading={isLoading}
             handlePageChange={handlePageChange}

@@ -16,7 +16,11 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { toast } from "sonner";
 import { DeleteCategoryProps } from "../../_types/category-types";
 
-export function DeleteCategory({ data, setIsRefresh }: DeleteCategoryProps) {
+export function DeleteCategory({
+  data,
+  fetchData,
+  fetchCategories,
+}: DeleteCategoryProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -24,10 +28,9 @@ export function DeleteCategory({ data, setIsRefresh }: DeleteCategoryProps) {
   const handleDeleteCategory = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
-    setIsRefresh(true);
     try {
       const response = await api.delete(
-        `/admin/categories/${data.ticket_category_id}/delete`
+        `/admin/categories/${data.ticket_category_id}/delete`,
       );
       if (response.status === 200) {
         setError(null);
@@ -36,13 +39,14 @@ export function DeleteCategory({ data, setIsRefresh }: DeleteCategoryProps) {
           description: response.data.message,
           position: "bottom-center",
         });
+        fetchData();
+        fetchCategories();
       }
     } catch (error: any) {
       console.error(error);
       setError(error.response.data.message);
     } finally {
       setIsLoading(false);
-      setIsRefresh(false);
     }
   };
 

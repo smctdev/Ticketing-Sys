@@ -1,6 +1,5 @@
 import { PAGINATION } from "@/constants/pagination";
 import { TICKET_STATUS } from "@/constants/ticket-status";
-import { useIsRefresh } from "@/context/is-refresh-context";
 import { api } from "@/lib/api";
 import { PaginationType } from "@/types/pagination-type";
 import {
@@ -19,7 +18,6 @@ export default function useFetch({
   url,
   isPaginated = false,
   filters = false,
-  canBeRefreshGlobal = false,
 }: UseFetchDataType): UseFetchType {
   const searchParams = useSearchParams();
   const pathname = usePathname();
@@ -41,7 +39,6 @@ export default function useFetch({
     [],
   );
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
-  const { setIsRefresh: setRefresh } = useIsRefresh();
   const errorRef = useRef<boolean>(false);
   const router = useRouter();
 
@@ -67,7 +64,6 @@ export default function useFetch({
     filterBy.created_start_date,
     filterBy.ticket_type,
     isRefresh,
-    canBeRefreshGlobal,
     status,
   ]);
 
@@ -85,7 +81,9 @@ export default function useFetch({
         params: isPaginated ? payload : {},
       });
       if (response.status === 200) {
-        setData(response.data);
+        setData(
+          isPaginated ? response.data?.data?.data : response.data?.data || [],
+        );
         setPagination((pagination) => ({
           ...pagination,
           totalRecords: response?.data?.data?.total,
@@ -98,6 +96,8 @@ export default function useFetch({
             active: link.active,
           })),
         );
+        setError(null);
+        setErrorStatus(null);
       }
     } catch (error: any) {
       console.error("Error fetching data:", error);
@@ -114,7 +114,6 @@ export default function useFetch({
         );
         errorRef.current = true;
       }
-
       if (error?.response?.status === 429 && !errorRef.current) {
         toast.error(error?.code, {
           position: "bottom-center",
@@ -132,13 +131,13 @@ export default function useFetch({
     } finally {
       setIsLoading(false);
       setIsRefresh(false);
+
       if (isPaginated) {
         setPagination((pagination) => ({
           ...pagination,
           isLoading: false,
         }));
       }
-      setRefresh(false);
     }
   };
 
@@ -180,6 +179,7 @@ export default function useFetch({
     }));
     setIsLoading(true);
     setIsFiltered(true);
+
     if (router && status) {
       router.replace(pathname);
     }
@@ -214,6 +214,7 @@ export default function useFetch({
 
   const handleReset = () => {
     setFilterBy(filters);
+
     if (isFiltered) {
       setIsLoading(true);
       setIsFiltered(false);
@@ -223,6 +224,7 @@ export default function useFetch({
   const handleNextPage = () => {
     if (pagination.page === pagination.last_page || pagination.isLoading)
       return;
+
     setPagination((pagination) => ({
       ...pagination,
       page: pagination.page + 1,
@@ -232,6 +234,7 @@ export default function useFetch({
 
   const handlePrevPage = () => {
     if (pagination.page === 1 || pagination.isLoading) return;
+
     setPagination((pagination) => ({
       ...pagination,
       page: pagination.page - 1,
@@ -241,6 +244,7 @@ export default function useFetch({
 
   const handleJumpToPage = (page: number | null) => {
     if (pagination.page === page || pagination.isLoading) return;
+
     setPagination((pagination) => ({
       ...pagination,
       page,
@@ -270,5 +274,6 @@ export default function useFetch({
     handlePrevPage,
     paginationLinks,
     handleJumpToPage,
+    setData,
   };
 }

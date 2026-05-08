@@ -28,7 +28,7 @@ import {
 import { Eye } from "lucide-react";
 import CarouselLayout from "@/components/carousel-layout";
 
-export function ViewReportDetails({ data, open, setIsOpen }: any) {
+export function ViewReportDetails({ data, open, setIsOpen, fetchData }: any) {
   const [ticketCode, setTicketCode] = useState<string>("");
   const [isReturnOpen, setIsReturnOpen] = useState<boolean>(false);
   const [isForCountedOpen, setIsForCountedOpen] = useState<boolean>(false);
@@ -189,6 +189,7 @@ export function ViewReportDetails({ data, open, setIsOpen }: any) {
           setOpen={setIsReturnOpen}
           open={isReturnOpen}
           setIsOpen={setIsOpen}
+          fetchData={fetchData}
         />
       )}
 
@@ -199,6 +200,7 @@ export function ViewReportDetails({ data, open, setIsOpen }: any) {
           open={isForCountedOpen}
           setIsOpen={setIsOpen}
           type={type}
+          fetchData={fetchData}
         />
       )}
 
@@ -210,6 +212,7 @@ export function ViewReportDetails({ data, open, setIsOpen }: any) {
           setIsOpen={setIsOpen}
           noteValue={noteValue}
           setNoteValue={setNoteValue}
+          fetchData={fetchData}
         />
       )}
 

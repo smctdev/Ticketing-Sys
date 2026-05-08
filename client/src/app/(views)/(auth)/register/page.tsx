@@ -92,8 +92,8 @@ const Register = () => {
   };
 
   const dataMemo = useMemo(() => {
-    return data?.data?.length > 0 ? (
-      data?.data?.map((branch: any, index: number) => (
+    return data?.length > 0 ? (
+      data?.map((branch: any, index: number) => (
         <SelectItem value={String(branch.blist_id)} key={index}>
           {branch.b_code.toUpperCase()}
         </SelectItem>

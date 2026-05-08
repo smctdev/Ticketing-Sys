@@ -13,25 +13,23 @@ import { FormEvent, useState } from "react";
 import { api } from "@/lib/api";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { toast } from "sonner";
-import { useIsRefresh } from "@/context/is-refresh-context";
 
 export function ReturnToAutomation({
   ticketCode,
   open,
   setOpen,
   setIsOpen,
+  fetchData,
 }: any) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const { setIsRefresh } = useIsRefresh();
 
   const handleReturnToAutomation = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
-    setIsRefresh(true);
     try {
       const response = await api.patch(
-        `/return-to-automation/${ticketCode}/return`
+        `/return-to-automation/${ticketCode}/return`,
       );
       if (response.status === 200) {
         setError(null);
@@ -41,13 +39,13 @@ export function ReturnToAutomation({
           description: response.data.message,
           position: "bottom-center",
         });
+        fetchData();
       }
     } catch (error: any) {
       console.error(error);
       setError(error.response.data.message);
     } finally {
       setIsLoading(false);
-      setIsRefresh(false);
     }
   };
 

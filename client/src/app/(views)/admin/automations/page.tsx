@@ -121,7 +121,7 @@ function Automations() {
         </CardHeader>
         <CardContent>
           <DataTableComponent
-            data={data?.data?.data}
+            data={data}
             columns={[...AUTOMATIONS_COLUMNS, ...AUTOMATIONS_COLUMNS_ACTIONS]}
             loading={isLoading}
             handlePageChange={handlePageChange}

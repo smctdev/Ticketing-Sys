@@ -34,18 +34,20 @@ function Categories() {
     filterBy,
     pagination,
     handleShort,
-    setIsRefresh,
+    fetchData,
     isRefresh,
   } = useFetch({
     url: "/admin/ticket-categories",
     isPaginated: true,
     filters: SEARCH_FILTER,
   });
-  const { data: groupCategories, isLoading: isLoadingGroupCategories } =
-    useFetch({
-      url: "/group-categories",
-      canBeRefreshGlobal: isRefresh,
-    });
+  const {
+    data: groupCategories,
+    isLoading: isLoadingGroupCategories,
+    fetchData: fetchCategories,
+  } = useFetch({
+    url: "/group-categories",
+  });
   const [selectedData, setSelectedData] = useState<null | any>(null);
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
 
@@ -75,7 +77,11 @@ function Categories() {
           >
             <PenIcon size={18} />
           </button>
-          <DeleteCategory setIsRefresh={setIsRefresh} data={row} />
+          <DeleteCategory
+            data={row}
+            fetchData={fetchData}
+            fetchCategories={fetchCategories}
+          />
           <Link
             href={`/admin/categories/${row?.ticket_category_id}/sub-categories`}
           >
@@ -96,7 +102,6 @@ function Categories() {
   ];
 
   const handleShowHide = (id: number) => async (e: any) => {
-    setIsRefresh(true);
     try {
       const response = await api.patch(`/ticket-category/${id}/show-hide`, {
         show_hide: e,
@@ -106,11 +111,11 @@ function Categories() {
           description: response.data.message,
           position: "bottom-center",
         });
+        fetchData();
+        fetchCategories();
       }
     } catch (error) {
       console.error(error);
-    } finally {
-      setIsRefresh(false);
     }
   };
 
@@ -129,15 +134,16 @@ function Categories() {
           <div className="flex gap-2 items-center">
             <SearchInput onChange={handleSearchTerm(1000)} />
             <AddCategory
-              setIsRefresh={setIsRefresh}
-              groupCategories={groupCategories?.data}
+              groupCategories={groupCategories}
               isLoadingGroupCategories={isLoadingGroupCategories}
+              fetchData={fetchData}
+              fetchCategories={fetchCategories}
             />
           </div>
         </CardHeader>
         <CardContent>
           <DataTableComponent
-            data={data?.data?.data}
+            data={data}
             columns={[
               ...TICKET_CATEGORIES_COLUMNS,
               ...TICKET_CATEGORIES_COLUMNS_ACTIONS,
@@ -157,11 +163,12 @@ function Categories() {
       </Card>
       <EditCategory
         data={selectedData}
-        setIsRefresh={setIsRefresh}
-        groupCategories={groupCategories?.data}
+        groupCategories={groupCategories}
         isLoadingGroupCategories={isLoadingGroupCategories}
         open={isDialogOpen}
         setOpen={setIsDialogOpen}
+        fetchData={fetchData}
+        fetchCategories={fetchCategories}
       />
     </div>
   );

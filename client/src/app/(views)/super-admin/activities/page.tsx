@@ -82,7 +82,7 @@ function ActivityPage() {
         </CardHeader>
         <CardContent>
           <DataTableComponent
-            data={data?.data?.data}
+            data={data}
             columns={ACTIVITIES_COLUMNS}
             loading={isLoading || isRefresh}
             handlePageChange={handlePageChange}

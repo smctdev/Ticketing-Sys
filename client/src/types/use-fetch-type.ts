@@ -30,6 +30,7 @@ export interface UseFetchType {
   handlePrevPage: () => void;
   handleJumpToPage: (page: number | null) => void;
   paginationLinks: PaginationLinksType[];
+  setData: Dispatch<SetStateAction<any>>;
 }
 
 export interface FilterByType {
@@ -42,5 +43,4 @@ export interface UseFetchDataType {
   url: string;
   isPaginated?: boolean;
   filters?: any;
-  canBeRefreshGlobal?: boolean;
 }

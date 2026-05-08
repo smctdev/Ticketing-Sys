@@ -32,9 +32,10 @@ import {
 import { SelectGroup } from "@radix-ui/react-select";
 
 export function AddCategory({
-  setIsRefresh,
   groupCategories,
   isLoadingGroupCategories,
+  fetchData,
+  fetchCategories,
 }: AddCategoryProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -46,7 +47,6 @@ export function AddCategory({
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     setIsLoading(true);
-    setIsRefresh(true);
     try {
       const response = await api.post("/admin/categories", formInput);
       if (response.status === 201) {
@@ -58,6 +58,8 @@ export function AddCategory({
         });
         setErrors(null);
         setError(null);
+        fetchData();
+        fetchCategories();
       }
     } catch (error: any) {
       console.error(error);
@@ -70,7 +72,6 @@ export function AddCategory({
       }
     } finally {
       setIsLoading(false);
-      setIsRefresh(false);
     }
   };
 
@@ -172,7 +173,9 @@ export function AddCategory({
               <SelectContent>
                 <SelectGroup>
                   <SelectLabel>Category type</SelectLabel>
-                  <SelectItem value="netsuite_ticket">Netsuite Ticket</SelectItem>
+                  <SelectItem value="netsuite_ticket">
+                    Netsuite Ticket
+                  </SelectItem>
                   <SelectItem value="sql_ticket">SQL Ticket</SelectItem>
                 </SelectGroup>
               </SelectContent>
@@ -206,7 +209,7 @@ export function AddCategory({
                         >
                           {groupCategory?.group_code}
                         </SelectItem>
-                      )
+                      ),
                     )
                   ) : (
                     <SelectItem value="No group categories found" disabled>

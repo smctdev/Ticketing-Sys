@@ -32,11 +32,12 @@ import {
 
 export function EditCategory({
   data,
-  setIsRefresh,
   groupCategories,
   isLoadingGroupCategories,
   open,
   setOpen,
+  fetchData,
+  fetchCategories,
 }: EditCategoryProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [formInput, setFormInput] =
@@ -57,7 +58,6 @@ export function EditCategory({
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     setIsLoading(true);
-    setIsRefresh(true);
     try {
       const response = await api.patch(
         `/admin/categories/${data.ticket_category_id}/update`,
@@ -72,6 +72,8 @@ export function EditCategory({
         });
         setErrors(null);
         setError(null);
+        fetchData();
+        fetchCategories();
       }
     } catch (error: any) {
       console.error(error);
@@ -84,7 +86,6 @@ export function EditCategory({
       }
     } finally {
       setIsLoading(false);
-      setIsRefresh(false);
     }
   };
 

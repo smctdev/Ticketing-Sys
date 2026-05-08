@@ -201,7 +201,7 @@ function Accountings() {
         </CardHeader>
         <CardContent>
           <DataTableComponent
-            data={data?.data?.data}
+            data={data}
             columns={[...ACCOUNTINGS_COLUMNS, ...ACCOUNTINGS_COLUMNS_ACTIONS]}
             loading={isLoading}
             handlePageChange={handlePageChange}

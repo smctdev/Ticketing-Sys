@@ -261,34 +261,41 @@ class DashboardController extends Controller
     public function adminDashboardData()
     {
         return response()->json([
-            "total_users"                       => $this->userCount(),
-            "tickets_completed_this_month_data" => $this->ticketCompletedCount(),
-            "tickets_completed_this_week_data"  => $this->ticketThisWeekCount(),
-            "tickets"                           => $this->ticketsData(),
-            'branches'                          => $this->totalBranches(),
-            'suppliers'                         => $this->totalSuppliers(),
-            'automation_records'                => $this->index()
+            'data' => [
+                "total_users"                       => $this->userCount(),
+                "tickets_completed_this_month_data" => $this->ticketCompletedCount(),
+                "tickets_completed_this_week_data"  => $this->ticketThisWeekCount(),
+                "tickets"                           => $this->ticketsData(),
+                'branches'                          => $this->totalBranches(),
+                'suppliers'                         => $this->totalSuppliers(),
+                'automation_records'                => $this->index()
+            ]
         ], 200);
     }
 
     public function userDashboardData($ticketService)
     {
         return response()->json([
-            "message"                => "Dashboard data fetched successfully",
-            "data"                   => $ticketService->getDashboardData(),
-            "total_tickets"          => $ticketService->getTotalTickets(),
-            "total_edited_tickets"   => $ticketService->getTotalEditedTickets(),
-            "total_rejected_tickets" => $ticketService->getTotalRejectedTickets(),
-            "total_pending_tickets"  => $ticketService->getTotalPendingTickets(),
-            'recent_tickets'         => $ticketService->getRecentTickets(),
+            "message"                    => "Dashboard data fetched successfully",
+            "data"                       => [
+                "data"                   => $ticketService->getDashboardData(),
+                "total_tickets"          => $ticketService->getTotalTickets(),
+                "total_edited_tickets"   => $ticketService->getTotalEditedTickets(),
+                "total_rejected_tickets" => $ticketService->getTotalRejectedTickets(),
+                "total_pending_tickets"  => $ticketService->getTotalPendingTickets(),
+                'recent_tickets'         => $ticketService->getRecentTickets(),
+
+            ],
         ], 200);
     }
 
     public function automationDashboardData($ticketService)
     {
         return response()->json([
-            'ticket_totals'  => $ticketService->ticketTotals(),
-            'recent_tickets' => $ticketService->recentTicketRecordsData()
+            'data'               => [
+                'ticket_totals'  => $ticketService->ticketTotals(),
+                'recent_tickets' => $ticketService->recentTicketRecordsData()
+            ]
         ]);
     }
 

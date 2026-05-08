@@ -13,7 +13,6 @@ import { FormEvent, useEffect, useState } from "react";
 import { api } from "@/lib/api";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { toast } from "sonner";
-import { useIsRefresh } from "@/context/is-refresh-context";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@radix-ui/react-dropdown-menu";
 
@@ -24,12 +23,12 @@ export function EditNote({
   setIsOpen,
   noteValue,
   setNoteValue,
+  fetchData,
 }: any) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [note, setNote] = useState<string>("");
   const [errors, setErrors] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
-  const { setIsRefresh } = useIsRefresh();
 
   useEffect(() => {
     setNote(noteValue);
@@ -38,7 +37,6 @@ export function EditNote({
   const handleEditNote = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
-    setIsRefresh(true);
     try {
       const response = await api.patch(`/edit-note/${ticketCode}/update`, {
         note,
@@ -53,6 +51,7 @@ export function EditNote({
         });
         setNote("");
         setNoteValue("");
+        fetchData();
       }
     } catch (error: any) {
       console.error(error);
@@ -66,7 +65,6 @@ export function EditNote({
       }
     } finally {
       setIsLoading(false);
-      setIsRefresh(false);
     }
   };
 

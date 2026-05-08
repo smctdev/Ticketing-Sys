@@ -117,12 +117,12 @@ export default function EditAccountingDialog({
                 </MultiSelectTrigger>
                 <MultiSelectContent>
                   <MultiSelectGroup>
-                    {data?.data?.length === 0 ? (
+                    {data?.length === 0 ? (
                       <MultiSelectItem value="No branches yet." disabled>
                         No branches yet.
                       </MultiSelectItem>
                     ) : (
-                      data?.data?.map((branch: any, index: number) => (
+                      data?.map((branch: any, index: number) => (
                         <MultiSelectItem
                           key={index}
                           value={`${branch.blist_id}`}

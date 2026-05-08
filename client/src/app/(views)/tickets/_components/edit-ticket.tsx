@@ -19,16 +19,16 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import BasicForm from "./basic-form";
 
 export function EditTicket({
-  fetchData,
+  setData,
   ticketData,
   categories,
   user,
   setIsOpenDialog,
   open,
   setTicketType,
-  setIsRefreshCategories,
+  fetchCategories,
   branchHeads,
-  setIsRefreshBranchHeads,
+  fetchBranchHeads,
 }: any) {
   const [formInput, setFormInput] =
     useState<TicketFormDataType>(TICKET_FORM_DATA);
@@ -100,7 +100,7 @@ export function EditTicket({
     }));
 
     if (is_ticket_type) {
-      setIsRefreshCategories(true);
+      fetchCategories();
       setTicketType(value);
       setFormInput((formData) => ({
         ...formData,
@@ -126,7 +126,6 @@ export function EditTicket({
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
-    setIsRefreshBranchHeads(true);
     try {
       const formData = new FormData();
       formData.append(
@@ -188,7 +187,14 @@ export function EditTicket({
           description: response.data.message,
           position: "bottom-center",
         });
-        fetchData()
+        setData((prev: any) =>
+          prev.map((item: any) =>
+            item.ticket_details_id === ticketData.ticket_details_id
+              ? response.data.data
+              : item,
+          ),
+        );
+        fetchBranchHeads();
       }
     } catch (error: any) {
       console.error(error);
@@ -201,7 +207,6 @@ export function EditTicket({
       }
     } finally {
       setIsLoading(false);
-      setIsRefreshBranchHeads(false);
     }
   };
 

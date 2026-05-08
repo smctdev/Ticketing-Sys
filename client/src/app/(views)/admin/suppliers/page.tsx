@@ -57,7 +57,7 @@ function Suppliers() {
         </CardHeader>
         <CardContent>
           <DataTableComponent
-            data={data?.data?.data}
+            data={data}
             columns={[...SUPPLIERS_COLUMNS, ...SUPPLIERS_COLUMNS_ACTIONS]}
             loading={isLoading}
             handlePageChange={handlePageChange}

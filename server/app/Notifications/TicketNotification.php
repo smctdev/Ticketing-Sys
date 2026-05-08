@@ -25,7 +25,9 @@ class TicketNotification extends Notification implements ShouldQueue, ShouldBroa
         protected string $ticket_code,
         protected string | null $user_profile,
         protected string $full_name,
-        public int $login_id
+        public int $login_id,
+        protected string | null $action = null,
+        public object | null $data = null
     ) {
         //
     }
@@ -81,6 +83,8 @@ class TicketNotification extends Notification implements ShouldQueue, ShouldBroa
                     'full_name'             => $this->full_name,
                     'ticket_code'           => $this->ticket_code,
                 ],
+                'ticket'                    => $this->data,
+                'action'                    => $this->action ?? null,
                 'read_at'                   => null,
                 'created_at'                => now(),
                 'updated_at'                => now(),

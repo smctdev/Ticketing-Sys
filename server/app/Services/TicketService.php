@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Enums\TicketStatus;
 use App\Enums\UserRoles;
 use App\Events\DeleteTicketEvent;
+use App\Http\Resources\TicketResource;
 use App\Models\AssignedBranch;
 use App\Models\BranchList;
 use App\Models\Ticket;
@@ -154,81 +155,7 @@ class TicketService
                 $query->whereNot('status', TicketStatus::EDITED)
             )
             ->orderBy('ticket_id', 'desc')
-            ->paginate($take)
-            ->through(fn($ticket)             => [
-                'login_id'                    => $ticket->login_id,
-                'ticket_id'                   => $ticket->ticket_id,
-                'ticket_details_id'           => $ticket->ticket_details_id,
-                'ticket_code'                 => $ticket->ticket_code,
-                'status'                      => $ticket->status,
-                'assigned_person'             => !$ticket->assignedPerson ? null : [
-                    'login_id'                => $ticket->assignedPerson->login_id,
-                    'full_name'               => $ticket->assignedPerson->full_name,
-                ],
-                'ticket_detail'               => !$ticket->ticketDetail ? null : [
-                    'ticket_details_id'       => $ticket->ticketDetail->ticket_details_id,
-                    'ticket_type'             => $ticket->ticketDetail->ticket_type,
-                    'ticket_transaction_date' => $ticket->ticketDetail->ticket_transaction_date,
-                    'td_ref_number'           => $ticket->ticketDetail->td_ref_number,
-                    'td_from'                 => $ticket->ticketDetail->td_from,
-                    'td_to'                   => $ticket->ticketDetail->td_to,
-                    'td_purpose'              => $ticket->ticketDetail->td_purpose,
-                    'td_note'                 => $ticket->ticketDetail->td_note,
-                    'td_note_bh'              => $ticket->ticketDetail->td_note_bh,
-                    'td_note_accounting'      => $ticket->ticketDetail->td_note_accounting,
-                    'td_support'              => $ticket->ticketDetail->td_support,
-                    'ticket_category_id'      => $ticket->ticketDetail->ticketCategory->ticket_category_id,
-                    'sub_category_id'         => $ticket->ticketDetail?->subCategory?->id,
-                    'ticket_category'         => !$ticket->ticketDetail->ticketCategory ? null : [
-                        'category_name'       => $ticket->ticketDetail->ticketCategory->category_name
-                    ],
-                    'date_created'            => $ticket->ticketDetail->date_created,
-                    'sub_category'            => !$ticket->ticketDetail?->subCategory ? null : [
-                        'sub_category_name'   => $ticket->ticketDetail?->subCategory?->sub_category_name
-                    ]
-                ],
-                'displayTicket'               => $ticket->displayTicket,
-                'user_login'                  => !$ticket->userLogin ? null : [
-                    'login_id'                => $ticket->userLogin->login_id,
-                    'full_name'               => $ticket->userLogin->full_name,
-                    'branch'                  => !$ticket->userLogin->branch ? null : [
-                        'b_name'              => $ticket->userLogin->branch->b_name,
-                        'b_code'              => $ticket->userLogin->branch->b_code,
-                    ],
-                ],
-                'branch'                      => !$ticket->branch ? null : [
-                    'b_name'                  => $ticket->branch->b_name,
-                    'b_code'                  => $ticket->branch->b_code,
-                ],
-                'pending_user'                => !$ticket->pendingUser ? null : [
-                    'login_id'                => $ticket->pendingUser->login_id,
-                    'full_name'               => $ticket->pendingUser->full_name,
-                    'user_role'               => !$ticket->pendingUser->userRole ? null : [
-                        'role_name'           => $ticket->pendingUser->userRole->role_name
-                    ],
-                    'user_detail'             => !$ticket->pendingUser->userDetail ? null : [
-                        'user_email'          => $ticket->pendingUser->userDetail->user_email,
-                        'profile_pic'         => $ticket->pendingUser->userDetail->profile_pic,
-                    ],
-                    'branch'                  => !$ticket->pendingUser->branch ? null : [
-                        'b_name'              => $ticket->pendingUser->branch->b_name,
-                        'b_code'              => $ticket->pendingUser->branch->b_code,
-                    ],
-                    'branches'                => $ticket->pendingUser->branches,
-                ],
-                'approve_by_head'             => !$ticket?->approveByHead ? null : [
-                    'full_name'               => $ticket?->approveByHead?->full_name,
-                ],
-                'approve_by_acctg_staff'      => !$ticket?->approveByAcctgStaff ? null : [
-                    'full_name'               => $ticket?->approveByAcctgStaff?->full_name,
-                ],
-                'approve_by_acctg_sup'        => !$ticket?->approveByAcctgSup ? null : [
-                    'full_name'               => $ticket?->approveByAcctgSup?->full_name,
-                ],
-                'edited_by'                   => !$ticket?->editedBy ? null : [
-                    'full_name'               => $ticket->editedBy->full_name,
-                ],
-            ]);
+            ->paginate($take);
     }
 
     private function branchHeads()
@@ -269,7 +196,8 @@ class TicketService
                 TicketDetail::select('date_created')
                     ->whereColumn('tickets.ticket_details_id', 'ticket_details.ticket_details_id')
             )
-            ->paginate(10);
+            ->paginate(10)
+            ->through(fn($ticket) => $ticket->toResource(TicketResource::class));
     }
 
     public function getTotalTickets()
@@ -479,26 +407,26 @@ class TicketService
                     default                        => $automationAdmin->login_id,
                 };
 
-                $ticket = $ticketDetail->ticket()->create(
-                    [
-                        'ticket_code'     => $code,
-                        'login_id'        => $user->login_id,
-                        'branch_id'       => $user->hasMultipleBranches() ? $branch->blist_id : $user->blist_id,
-                        'branch_name'     => $user->hasMultipleBranches() ? $branch->b_name : $user->branch->b_name,
-                        'status'          => TicketStatus::PENDING,
-                        'isCounted'       => 1,
-                        'isApproved'      => 0,
-                        'assigned_person' => $assignedPerson,
-                        'displayTicket'   => $ticketToBeDisplay,
-                    ]
-                );
+                $ticket = $ticketDetail->ticket()->create([
+                    'ticket_code'     => $code,
+                    'login_id'        => $user->login_id,
+                    'branch_id'       => $user->hasMultipleBranches() ? $branch->blist_id : $user->blist_id,
+                    'branch_name'     => $user->hasMultipleBranches() ? $branch->b_name : $user->branch->b_name,
+                    'status'          => TicketStatus::PENDING,
+                    'isCounted'       => 1,
+                    'isApproved'      => 0,
+                    'assigned_person' => $assignedPerson,
+                    'displayTicket'   => $ticketToBeDisplay,
+                ]);
 
                 $ticket->pendingUser->notify(new TicketNotification(
                     "New ticket from {$ticket->branch->b_name} - ({$ticket->branch->b_code})",
                     $ticket->ticket_code,
                     $user->userDetail->profile_pic,
                     $user->full_name,
-                    $ticket->pendingUser->login_id
+                    $ticket->pendingUser->login_id,
+                    'created',
+                    $ticket->toResource(TicketResource::class)
                 ));
 
                 return $ticket;
@@ -607,7 +535,9 @@ class TicketService
                     $ticketDetail->ticket->ticket_code,
                     $this->user->userDetail->profile_pic,
                     $this->user->full_name,
-                    $ticketDetail->ticket->pendingUser->login_id
+                    $ticketDetail->ticket->pendingUser->login_id,
+                    'updated',
+                    $ticketDetail->ticket->toResource(TicketResource::class)
                 ));
 
                 return $ticketDetail->ticket;
@@ -662,16 +592,14 @@ class TicketService
     {
         $ticketDetail = TicketDetail::findOrFail($id);
 
-        $note_data = match (true) {
-            $this->user->isAutomation()        => ['td_note_bh'         => $request->td_note_bh],
-            $this->user->isAutomationManager() => ['td_note'            => $request->td_note],
-            $this->user->isAccountingStaff()   => ['td_note_accounting' => $request->td_note_accounting],
-        };
+        $note_data = $this->user->isAutomation() ? ['td_note_bh' => $request->td_note_bh] : ($this->user->isAutomationManager() ? ['td_note' => $request->td_note] : ($this->user->isAccountingStaff() ? ['td_note_accounting' => $request->td_note_accounting] : null));
 
-        $ticketDetail->update($note_data);
+        if ($note_data) {
+            $ticketDetail->update($note_data);
+        }
 
         $ticketDetail->ticket->update([
-            'status'        => TicketStatus::REJECTED
+            'status' => TicketStatus::REJECTED
         ]);
 
         $this->readNotificationOnAction($ticketDetail->ticket->ticket_code);
@@ -681,7 +609,9 @@ class TicketService
             $ticketDetail->ticket->ticket_code,
             $this->user->userDetail->profile_pic,
             $this->user->full_name,
-            $ticketDetail->ticket->userLogin->login_id
+            $ticketDetail->ticket->userLogin->login_id,
+            'updated',
+            $ticketDetail->ticket->toResource(TicketResource::class)
         ));
 
         activity()
@@ -806,7 +736,9 @@ class TicketService
                 $ticketDetail->ticket->ticket_code,
                 $this->user->userDetail->profile_pic,
                 $this->user->full_name,
-                $ticketDetail->ticket->userLogin->login_id
+                $ticketDetail->ticket->userLogin->login_id,
+                'updated',
+                $ticketDetail->ticket->toResource(TicketResource::class)
             ));
 
             $ticketDetail->ticket->pendingUser->notify(new TicketNotification(
@@ -814,7 +746,9 @@ class TicketService
                 $ticketDetail->ticket->ticket_code,
                 $this->user->userDetail->profile_pic,
                 $this->user->full_name,
-                $ticketDetail->ticket->pendingUser->login_id
+                $ticketDetail->ticket->pendingUser->login_id,
+                'created',
+                $ticketDetail->ticket->toResource(TicketResource::class)
             ));
 
             return $ticketDetail;
@@ -856,7 +790,9 @@ class TicketService
                 $ticketDetail->ticket->ticket_code,
                 $this->user->userDetail->profile_pic,
                 $this->user->full_name,
-                $ticketDetail->ticket->userLogin->login_id
+                $ticketDetail->ticket->userLogin->login_id,
+                'edited',
+                $ticketDetail->ticket->toResource(TicketResource::class)
             ));
 
             return $ticketDetail;
@@ -884,7 +820,9 @@ class TicketService
             $ticket->ticket_code,
             $this->user->userDetail->profile_pic,
             $this->user->full_name,
-            $ticket->pendingUser->login_id
+            $ticket->pendingUser->login_id,
+            'created',
+            $ticket->toResource(TicketResource::class)
         ));
 
         activity()
