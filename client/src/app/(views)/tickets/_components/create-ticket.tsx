@@ -23,7 +23,7 @@ export function CreateTicket({
   categories,
   user,
   setTicketType,
-  fetchCategories,
+  refreshCategories,
   branchHeads,
   fetchBranchHeads,
   setData,
@@ -72,7 +72,7 @@ export function CreateTicket({
     }));
 
     if (is_ticket_type) {
-      fetchCategories();
+      refreshCategories(true);
       fetchBranchHeads();
       setTicketType(value);
       setFormInput((formData) => ({

@@ -68,7 +68,7 @@ function Tickets() {
     isPaginated: true,
     filters: TICKETS_FILTER,
   });
-  const { data: categories, fetchData: fetchCategories } = useFetch({
+  const { data: categories, setIsRefresh: refreshCategories } = useFetch({
     url: `/categories?category_type=${ticketType}`,
   });
   const { data: branchHeads, fetchData: fetchBranchHeads } = useFetch({
@@ -673,7 +673,7 @@ function Tickets() {
                   categories={categories}
                   user={user}
                   setTicketType={setTicketType}
-                  fetchCategories={fetchCategories}
+                  refreshCategories={refreshCategories}
                   branchHeads={branchHeads}
                   fetchBranchHeads={fetchBranchHeads}
                   setData={setData}
@@ -711,7 +711,7 @@ function Tickets() {
           setIsOpenDialog={setIsOpenDialog}
           open={isOpenDialog}
           setTicketType={setTicketType}
-          fetchCategories={fetchCategories}
+          refreshCategories={refreshCategories}
           branchHeads={branchHeads}
           fetchBranchHeads={fetchBranchHeads}
         />

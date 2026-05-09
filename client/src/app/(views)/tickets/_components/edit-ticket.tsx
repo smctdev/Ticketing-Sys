@@ -26,7 +26,7 @@ export function EditTicket({
   setIsOpenDialog,
   open,
   setTicketType,
-  fetchCategories,
+  refreshCategories,
   branchHeads,
   fetchBranchHeads,
 }: any) {
@@ -100,7 +100,7 @@ export function EditTicket({
     }));
 
     if (is_ticket_type) {
-      fetchCategories();
+      refreshCategories(true);
       setTicketType(value);
       setFormInput((formData) => ({
         ...formData,
