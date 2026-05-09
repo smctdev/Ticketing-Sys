@@ -16,7 +16,7 @@ import { api } from "@/lib/api";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { toast } from "sonner";
 
-export function DeleteUserRole({ data, setIsRefresh }: DeleteUserRoleProps) {
+export function DeleteUserRole({ data, fetchData }: DeleteUserRoleProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -24,10 +24,9 @@ export function DeleteUserRole({ data, setIsRefresh }: DeleteUserRoleProps) {
   const handleDeleteRole = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
-    setIsRefresh(true);
     try {
       const response = await api.delete(
-        `/admin/user-roles/${data.user_role_id}/delete`
+        `/admin/user-roles/${data.user_role_id}/delete`,
       );
       if (response.status === 200) {
         setError(null);
@@ -36,13 +35,13 @@ export function DeleteUserRole({ data, setIsRefresh }: DeleteUserRoleProps) {
           description: response.data.message,
           position: "bottom-center",
         });
+        fetchData();
       }
     } catch (error: any) {
       console.error(error);
       setError(error.response.data.message);
     } finally {
       setIsLoading(false);
-      setIsRefresh(false);
     }
   };
 

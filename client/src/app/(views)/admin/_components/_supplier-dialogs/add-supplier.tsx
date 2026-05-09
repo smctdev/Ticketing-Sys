@@ -21,7 +21,7 @@ import {
 } from "../../_types/supplier-types";
 import { SUPPLIER_DATA } from "../../_constants/form-data-inputs";
 
-export function AddSupplier({ setIsRefresh }: AddSupplierProps) {
+export function AddSupplier({ fetchData }: AddSupplierProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [formInput, setFormInput] =
@@ -32,7 +32,6 @@ export function AddSupplier({ setIsRefresh }: AddSupplierProps) {
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     setIsLoading(true);
-    setIsRefresh(true);
     try {
       const response = await api.post("/admin/suppliers", formInput);
       if (response.status === 201) {
@@ -44,6 +43,7 @@ export function AddSupplier({ setIsRefresh }: AddSupplierProps) {
         });
         setErrors(null);
         setError(null);
+        fetchData();
       }
     } catch (error: any) {
       console.error(error);
@@ -56,7 +56,6 @@ export function AddSupplier({ setIsRefresh }: AddSupplierProps) {
       }
     } finally {
       setIsLoading(false);
-      setIsRefresh(false);
     }
   };
 

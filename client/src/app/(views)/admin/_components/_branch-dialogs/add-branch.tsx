@@ -18,7 +18,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { BRANCH_DATA } from "../../_constants/form-data-inputs";
 import { AddBranchProps, BranchFormDataType } from "../../_types/branch-types";
 
-export function AddBranch({ setIsRefresh }: AddBranchProps) {
+export function AddBranch({ fetchData }: AddBranchProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [formInput, setFormInput] = useState<BranchFormDataType>(BRANCH_DATA);
@@ -28,7 +28,6 @@ export function AddBranch({ setIsRefresh }: AddBranchProps) {
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     setIsLoading(true);
-    setIsRefresh(true);
     try {
       const response = await api.post("/branches", formInput);
       if (response.status === 201) {
@@ -40,6 +39,7 @@ export function AddBranch({ setIsRefresh }: AddBranchProps) {
         });
         setErrors(null);
         setError(null);
+        fetchData();
       }
     } catch (error: any) {
       console.error(error);
@@ -52,7 +52,6 @@ export function AddBranch({ setIsRefresh }: AddBranchProps) {
       }
     } finally {
       setIsLoading(false);
-      setIsRefresh(false);
     }
   };
 

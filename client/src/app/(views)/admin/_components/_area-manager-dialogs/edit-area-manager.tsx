@@ -29,7 +29,7 @@ export default function EditAreaManagerDialog({
   user,
   open,
   setOpen,
-  setIsRefresh,
+  fetchData,
 }: any) {
   const [formInputs, setFormInputs] = useState<string[]>([]);
   const [errors, setErrors] = useState<any>(null);
@@ -41,7 +41,7 @@ export default function EditAreaManagerDialog({
 
   useEffect(() => {
     setFormInputs(
-      user?.assigned_area_managers?.map((item: any) => String(item.blist_id))
+      user?.assigned_area_managers?.map((item: any) => String(item.blist_id)),
     );
   }, [user?.assigned_area_managers]);
 
@@ -52,11 +52,10 @@ export default function EditAreaManagerDialog({
   const handleSaveChanges = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
-    setIsRefresh(true);
     try {
       const response = await api.patch(
         `/area-manager/${user?.login_id}/update`,
-        { branch_codes: formInputs }
+        { branch_codes: formInputs },
       );
 
       if (response.status === 200) {
@@ -67,6 +66,7 @@ export default function EditAreaManagerDialog({
           description: response.data.message,
           position: "bottom-center",
         });
+        fetchData();
       }
     } catch (error: any) {
       console.error(error);
@@ -79,7 +79,6 @@ export default function EditAreaManagerDialog({
       }
     } finally {
       setIsLoading(false);
-      setIsRefresh(false);
     }
   };
 

@@ -20,7 +20,7 @@ import { toast } from "sonner";
 interface EditCommentProps {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
-  setIsRefresh: Dispatch<SetStateAction<boolean>>;
+  fetchComments: () => Promise<void>;
   comment: {
     comment: string;
     id: number;
@@ -30,7 +30,7 @@ interface EditCommentProps {
 export function EditComment({
   open,
   setOpen,
-  setIsRefresh,
+  fetchComments,
   comment,
 }: EditCommentProps) {
   const { user } = useAuth();
@@ -40,7 +40,6 @@ export function EditComment({
 
   const handleUpdateComment = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setIsRefresh(true);
     setIsLoading(true);
     try {
       const response = await api.patch(`/comments/${comment?.id}/update`, {
@@ -54,11 +53,11 @@ export function EditComment({
         });
         setErrors(null);
         setOpen(false);
+        fetchComments();
       }
     } catch (error: any) {
       console.error(error.response.data.errors);
     } finally {
-      setIsRefresh(false);
       setIsLoading(false);
     }
   };
@@ -94,7 +93,7 @@ export function EditComment({
                       setCommentValue(
                         e.target.value.length > 500
                           ? e.target.value.slice(0, 500)
-                          : e.target.value
+                          : e.target.value,
                       )
                     }
                     className={`max-h-26 resize-none break-all ${

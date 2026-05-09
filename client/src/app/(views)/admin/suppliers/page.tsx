@@ -23,7 +23,7 @@ function Suppliers() {
     filterBy,
     pagination,
     handleShort,
-    setIsRefresh,
+    fetchData,
   } = useFetch({
     url: "/suppliers",
     isPaginated: true,
@@ -35,8 +35,8 @@ function Suppliers() {
       name: "Action",
       cell: (row: any) => (
         <div className="flex gap-2">
-          <EditSupplier setIsRefresh={setIsRefresh} data={row} />
-          <DeleteSupplier setIsRefresh={setIsRefresh} data={row} />
+          <EditSupplier fetchData={fetchData} data={row} />
+          <DeleteSupplier fetchData={fetchData} data={row} />
         </div>
       ),
       sortable: false,
@@ -52,7 +52,7 @@ function Suppliers() {
           </CardTitle>
           <div className="flex items-center gap-2">
             <SearchInput onChange={handleSearchTerm(1000)} />
-            <AddSupplier setIsRefresh={setIsRefresh} />
+            <AddSupplier fetchData={fetchData} />
           </div>
         </CardHeader>
         <CardContent>

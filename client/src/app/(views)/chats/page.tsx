@@ -40,7 +40,7 @@ function ChatsPage() {
     data,
     isLoading,
     handleSearchTerm,
-    setIsRefresh,
+    fetchData,
     paginationLinks,
     handlePrevPage,
     handleNextPage,
@@ -57,7 +57,7 @@ function ChatsPage() {
   }, []);
 
   useEffect(() => {
-    setIsRefresh(true);
+    fetchData();
   }, [messageRecords]);
 
   const handleFlushUnseenMessages = (id: number) => async () => {

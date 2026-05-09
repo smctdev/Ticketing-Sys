@@ -25,7 +25,7 @@ function Automations() {
     filterBy,
     pagination,
     handleShort,
-    setIsRefresh,
+    fetchData,
   } = useFetch({
     url: "/automations",
     isPaginated: true,
@@ -81,11 +81,11 @@ function Automations() {
             Swal.showLoading();
           },
         });
-        setIsRefresh(true);
         try {
           const response = await api.delete(`/automation/${id}/delete`);
 
           if (response.status === 200) {
+            fetchData();
             Swal.close();
             toast.success("Success", {
               description: response.data.message,
@@ -100,8 +100,6 @@ function Automations() {
             text: error.response.data.message,
             confirmButtonText: "Close",
           });
-        } finally {
-          setIsRefresh(false);
         }
       }
     });
@@ -142,7 +140,7 @@ function Automations() {
           user={user}
           open={isDialogOpen}
           setOpen={setIsDialogOpen}
-          setIsRefresh={setIsRefresh}
+          fetchData={fetchData}
         />
       )}
     </div>

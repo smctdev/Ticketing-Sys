@@ -24,10 +24,12 @@ class ForFilterDataController extends Controller
             ->pluck('category');
 
         return response()->json([
-            'message'           => "Data fetched successfully",
-            'branches'          => $branches,
-            'ticket_categories' => $ticket_categories,
-            'branch_types'      => $branch_types
+            'message'               => "Data fetched successfully",
+            "data"                  => [
+                'branches'          => $branches,
+                'ticket_categories' => $ticket_categories,
+                'branch_types'      => $branch_types
+            ]
         ]);
     }
 }

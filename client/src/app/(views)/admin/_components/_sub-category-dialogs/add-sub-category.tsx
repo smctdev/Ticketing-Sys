@@ -22,7 +22,7 @@ import {
 } from "../../_types/sub-category-types";
 
 export function AddSubCategory({
-  setIsRefresh,
+  fetchData,
   ticketCategoryId,
 }: AddSubCategoryProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -35,7 +35,6 @@ export function AddSubCategory({
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     setIsLoading(true);
-    setIsRefresh(true);
     try {
       const response = await api.post("/admin/sub-categories", {
         ticket_category_id: ticketCategoryId,
@@ -50,6 +49,7 @@ export function AddSubCategory({
         });
         setErrors(null);
         setError(null);
+        fetchData();
       }
     } catch (error: any) {
       console.error(error);
@@ -62,7 +62,6 @@ export function AddSubCategory({
       }
     } finally {
       setIsLoading(false);
-      setIsRefresh(false);
     }
   };
 

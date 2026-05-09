@@ -26,12 +26,12 @@ interface Comment {
 
 export default function CommentList({
   comment,
-  setIsRefresh,
-  setIsRefreshComment,
+  fetchData,
+  fetchComments,
 }: {
   comment: Comment;
-  setIsRefresh: Dispatch<SetStateAction<boolean>>;
-  setIsRefreshComment: Dispatch<SetStateAction<boolean>>;
+  fetchData: () => Promise<void>;
+  fetchComments: () => Promise<void>;
 }) {
   const { user } = useAuth();
   const isPostOwner =
@@ -143,7 +143,7 @@ export default function CommentList({
         <EditComment
           open={isOpenEditDialog}
           setOpen={setIsOpenEditDialog}
-          setIsRefresh={setIsRefreshComment}
+          fetchComments={fetchComments}
           comment={selectedComment}
         />
       )}
@@ -153,8 +153,8 @@ export default function CommentList({
           id={commentId}
           open={isOpenDeleteDialog}
           setOpen={setIsOpenDeleteDialog}
-          setIsRefresh={setIsRefresh}
-          setIsRefreshComment={setIsRefreshComment}
+          fetchData={fetchData}
+          fetchComments={fetchComments}
         />
       )}
     </div>

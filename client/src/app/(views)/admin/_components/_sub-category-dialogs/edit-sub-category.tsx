@@ -21,7 +21,7 @@ import {
   SubCategoryFormDataType,
 } from "../../_types/sub-category-types";
 
-export function EditSubCategory({ data, setIsRefresh }: EditSubCategoryProps) {
+export function EditSubCategory({ data, fetchData }: EditSubCategoryProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [formInput, setFormInput] =
@@ -38,14 +38,13 @@ export function EditSubCategory({ data, setIsRefresh }: EditSubCategoryProps) {
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     setIsLoading(true);
-    setIsRefresh(true);
     try {
       const response = await api.patch(
         `/admin/sub-categories/${data.id}/update`,
         {
           ticket_category_id: data.ticket_category_id,
           ...formInput,
-        }
+        },
       );
       if (response.status === 200) {
         setIsOpen(false);
@@ -56,6 +55,7 @@ export function EditSubCategory({ data, setIsRefresh }: EditSubCategoryProps) {
         });
         setErrors(null);
         setError(null);
+        fetchData();
       }
     } catch (error: any) {
       console.error(error);
@@ -68,7 +68,6 @@ export function EditSubCategory({ data, setIsRefresh }: EditSubCategoryProps) {
       }
     } finally {
       setIsLoading(false);
-      setIsRefresh(false);
     }
   };
 

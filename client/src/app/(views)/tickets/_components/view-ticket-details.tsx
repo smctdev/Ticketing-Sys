@@ -35,7 +35,6 @@ import ticketTypeUpperCase from "@/utils/ticket-type-upper-case";
 import {
   BookmarkCheck,
   CalendarDays,
-  CheckCircle2,
   Eye,
   FileSpreadsheet,
   Hash,

@@ -21,7 +21,7 @@ import {
   SupplierFormDataType,
 } from "../../_types/supplier-types";
 
-export function EditSupplier({ data, setIsRefresh }: EditSupplierProps) {
+export function EditSupplier({ data, fetchData }: EditSupplierProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [formInput, setFormInput] =
@@ -38,11 +38,10 @@ export function EditSupplier({ data, setIsRefresh }: EditSupplierProps) {
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     setIsLoading(true);
-    setIsRefresh(true);
     try {
       const response = await api.patch(
         `/admin/suppliers/${data.id}/update`,
-        formInput
+        formInput,
       );
       if (response.status === 200) {
         setIsOpen(false);
@@ -53,6 +52,7 @@ export function EditSupplier({ data, setIsRefresh }: EditSupplierProps) {
         });
         setErrors(null);
         setError(null);
+        fetchData();
       }
     } catch (error: any) {
       console.error(error);
@@ -65,7 +65,6 @@ export function EditSupplier({ data, setIsRefresh }: EditSupplierProps) {
       }
     } finally {
       setIsLoading(false);
-      setIsRefresh(false);
     }
   };
 

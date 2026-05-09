@@ -11,14 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Loader2Icon, PenIcon, Save } from "lucide-react";
-import {
-  ChangeEvent,
-  Dispatch,
-  FormEvent,
-  SetStateAction,
-  useEffect,
-  useState,
-} from "react";
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { USER_FORM_ITEMS } from "../../_constants/form-items";
 import { UserFormItemsTypes } from "@/types/form-group";
 import {
@@ -41,14 +34,14 @@ import {
 } from "@/components/ui/multi-select";
 
 interface EditUserProps {
-  setIsRefresh: Dispatch<SetStateAction<boolean>>;
+  fetchData: () => Promise<void>;
   data: any;
   branchMemo: any;
   userRoleMemo: any;
 }
 
 export function EditUser({
-  setIsRefresh,
+  fetchData,
   data,
   branchMemo,
   userRoleMemo,
@@ -68,7 +61,8 @@ export function EditUser({
       email: data.user_detail.user_email,
       username: data.username,
       role: data.user_role_id,
-      branch_code: data.branches.map((branch: any) => String(branch.blist_id)) ?? "",
+      branch_code:
+        data.branches.map((branch: any) => String(branch.blist_id)) ?? "",
     }));
   }, [isOpenDialog]);
 
@@ -98,11 +92,10 @@ export function EditUser({
   const formSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
-    setIsRefresh(true);
     try {
       const response = await api.patch(
         `/users/${data.user_details_id}/update`,
-        formItems
+        formItems,
       );
       if (response.status === 200) {
         setErrors(null);
@@ -112,6 +105,7 @@ export function EditUser({
           position: "bottom-center",
         });
         setIsOpenDialog(false);
+        fetchData();
       }
     } catch (error: any) {
       console.error(error);
@@ -120,7 +114,6 @@ export function EditUser({
       }
     } finally {
       setIsLoading(false);
-      setIsRefresh(false);
     }
   };
 

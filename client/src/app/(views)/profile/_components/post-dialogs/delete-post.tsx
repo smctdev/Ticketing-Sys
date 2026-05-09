@@ -17,20 +17,14 @@ interface DeletePostProps {
   id: number;
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
-  setIsRefresh: Dispatch<SetStateAction<boolean>>;
+  fetchData: () => Promise<void>;
 }
 
-export function DeletePost({
-  id,
-  open,
-  setOpen,
-  setIsRefresh,
-}: DeletePostProps) {
+export function DeletePost({ id, open, setOpen, fetchData }: DeletePostProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
 
   const handleDeletePost = async () => {
-    setIsRefresh(true);
     setIsLoading(true);
     try {
       const response = await api.delete(`/posts/${id}/delete`);
@@ -42,6 +36,7 @@ export function DeletePost({
         });
         setOpen(false);
         setError("");
+        fetchData();
       }
     } catch (error: any) {
       console.error(error);
@@ -50,7 +45,6 @@ export function DeletePost({
       }
     } finally {
       setIsLoading(false);
-      setIsRefresh(false);
     }
   };
 

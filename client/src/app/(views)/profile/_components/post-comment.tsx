@@ -46,20 +46,20 @@ export function PostComment({
   data,
   open,
   setOpen,
-  setIsRefresh,
+  fetchData,
   isCommentOpen,
 }: {
   data: any;
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
-  setIsRefresh: Dispatch<SetStateAction<boolean>>;
+  fetchData: () => Promise<void>;
   isCommentOpen?: boolean;
 }) {
   const { user } = useAuth();
   const {
     data: comments,
     isLoading,
-    setIsRefresh: setIsRefreshComment,
+    fetchData: fetchComments,
     handleCursor,
     cursor,
   } = useFetchCursor({ url: `/comments/${data?.id}/comments` });
@@ -69,8 +69,6 @@ export function PostComment({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const handleSubmitComment = async () => {
-    setIsRefreshComment(true);
-    setIsRefresh(true);
     setIsSubmitting(true);
     try {
       const response = await api.post("/comments", {
@@ -85,6 +83,8 @@ export function PostComment({
         });
         setErrors(null);
         textareaRef.current?.focus();
+        fetchData();
+        fetchComments();
       }
     } catch (error: any) {
       console.error(error);
@@ -96,8 +96,6 @@ export function PostComment({
         });
       }
     } finally {
-      setIsRefreshComment(false);
-      setIsRefresh(false);
       setIsSubmitting(false);
     }
   };
@@ -117,7 +115,7 @@ export function PostComment({
         <div className="max-h-[70vh] overflow-y-auto">
           <PostList
             post={data}
-            setIsRefresh={setIsRefresh}
+            fetchData={fetchData}
             isCommentOpen={isCommentOpen}
             handleCommentChange={handleCommentChange}
           />
@@ -144,8 +142,8 @@ export function PostComment({
                     <CommentList
                       key={index}
                       comment={comment}
-                      setIsRefreshComment={setIsRefreshComment}
-                      setIsRefresh={setIsRefresh}
+                      fetchData={fetchData}
+                      fetchComments={fetchComments}
                     />
                   ))}
                 </div>
@@ -217,7 +215,7 @@ export function PostComment({
                   setComment(
                     e.target.value.length > 500
                       ? e.target.value.slice(0, 500)
-                      : e.target.value
+                      : e.target.value,
                   )
                 }
                 className={`max-h-26 resize-none break-all ${
@@ -228,7 +226,9 @@ export function PostComment({
               <div className="absolute bottom-1 right-4">
                 <small
                   className={`${
-                    comment.length >= 500 ? "text-red-500" : "dark:text-white text-gray-400"
+                    comment.length >= 500
+                      ? "text-red-500"
+                      : "dark:text-white text-gray-400"
                   } text-xs`}
                 >
                   {comment.length}/500

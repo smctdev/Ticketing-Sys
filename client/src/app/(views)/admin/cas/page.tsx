@@ -25,7 +25,7 @@ function Cas() {
     filterBy,
     pagination,
     handleShort,
-    setIsRefresh,
+    fetchData,
   } = useFetch({
     url: "/cas",
     isPaginated: true,
@@ -81,11 +81,11 @@ function Cas() {
             Swal.showLoading();
           },
         });
-        setIsRefresh(true);
         try {
           const response = await api.delete(`/cas/${id}/delete`);
 
           if (response.status === 200) {
+            fetchData();
             Swal.close();
             toast.success("Success", {
               description: response.data.message,
@@ -100,8 +100,6 @@ function Cas() {
             text: error.response.data.message,
             confirmButtonText: "Close",
           });
-        } finally {
-          setIsRefresh(false);
         }
       }
     });
@@ -142,7 +140,7 @@ function Cas() {
           user={user}
           open={isDialogOpen}
           setOpen={setIsDialogOpen}
-          setIsRefresh={setIsRefresh}
+          fetchData={fetchData}
         />
       )}
     </div>

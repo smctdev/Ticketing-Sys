@@ -29,7 +29,7 @@ export default function EditAccountingCategoryDialog({
   user,
   open,
   setOpen,
-  setIsRefresh,
+  fetchData,
 }: any) {
   const [formInputs, setFormInputs] = useState<string[]>([]);
   const [errors, setErrors] = useState<any>(null);
@@ -41,7 +41,7 @@ export default function EditAccountingCategoryDialog({
 
   useEffect(() => {
     setFormInputs(
-      user?.assigned_categories?.map((item: any) => String(item.group_code))
+      user?.assigned_categories?.map((item: any) => String(item.group_code)),
     );
   }, [user?.assigned_categories]);
 
@@ -52,13 +52,12 @@ export default function EditAccountingCategoryDialog({
   const handleSaveChanges = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
-    setIsRefresh(true);
     try {
       const response = await api.patch(
         `/accounting-category/${user?.login_id}/update`,
         {
           category_ids: formInputs,
-        }
+        },
       );
 
       if (response.status === 200) {
@@ -69,6 +68,7 @@ export default function EditAccountingCategoryDialog({
           description: response.data.message,
           position: "bottom-center",
         });
+        fetchData();
       }
     } catch (error: any) {
       console.error(error);
@@ -81,7 +81,6 @@ export default function EditAccountingCategoryDialog({
       }
     } finally {
       setIsLoading(false);
-      setIsRefresh(false);
     }
   };
 

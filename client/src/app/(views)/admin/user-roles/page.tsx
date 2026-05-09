@@ -24,7 +24,7 @@ function UserRoles() {
     filterBy,
     pagination,
     handleShort,
-    setIsRefresh,
+    fetchData,
   } = useFetch({
     url: "/admin/user-roles",
     isPaginated: true,
@@ -36,8 +36,8 @@ function UserRoles() {
       name: "Action",
       cell: (row: UserRoleDataType) => (
         <div className="flex gap-2">
-          <EditUserRole data={row} setIsRefresh={setIsRefresh} />
-          <DeleteUserRole data={row} setIsRefresh={setIsRefresh} />
+          <EditUserRole data={row} fetchData={fetchData} />
+          <DeleteUserRole data={row} fetchData={fetchData} />
         </div>
       ),
       sortable: false,
@@ -54,7 +54,7 @@ function UserRoles() {
           </CardTitle>
           <div className="flex gap-2 items-center">
             <SearchInput onChange={handleSearchTerm(1000)} />
-            <AddUserRole setIsRefresh={setIsRefresh} />
+            <AddUserRole fetchData={fetchData} />
           </div>
         </CardHeader>
         <CardContent>

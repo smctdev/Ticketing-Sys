@@ -11,6 +11,7 @@ import withAuthPage from "@/lib/hoc/with-auth-page";
 import formattedDateAndTimeStrict from "@/utils/format-date-time-strict";
 import { ActivityIcon } from "lucide-react";
 import NotifyAllUser from "../_components/notify-all-user";
+import { useState } from "react";
 
 function ActivityPage() {
   const {
@@ -21,9 +22,9 @@ function ActivityPage() {
     isLoading,
     filterBy,
     handleSearchTerm,
-    setIsRefresh,
-    isRefresh,
+    fetchData,
   } = useFetch({ url: "/super-admin/activities", isPaginated: true });
+  const [isRefresh, setIsRefresh] = useState<boolean>(false);
 
   const ACTIVITIES_COLUMNS = [
     {
@@ -72,7 +73,16 @@ function ActivityPage() {
             />
             <ButtonLoader
               type="button"
-              onClick={() => setIsRefresh(true)}
+              onClick={async () => {
+                setIsRefresh(true);
+                try {
+                  await fetchData();
+                } catch (error) {
+                  console.error(error);
+                } finally {
+                  setIsRefresh(false);
+                }
+              }}
               isLoading={isRefresh}
             >
               Refresh

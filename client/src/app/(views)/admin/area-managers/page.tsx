@@ -25,7 +25,7 @@ function AreaManagers() {
     filterBy,
     pagination,
     handleShort,
-    setIsRefresh,
+    fetchData,
   } = useFetch({
     url: "/area-managers",
     isPaginated: true,
@@ -81,11 +81,11 @@ function AreaManagers() {
             Swal.showLoading();
           },
         });
-        setIsRefresh(true);
         try {
           const response = await api.delete(`/area-manager/${id}/delete`);
 
           if (response.status === 200) {
+            fetchData();
             Swal.close();
             toast.success("Success", {
               description: response.data.message,
@@ -100,8 +100,6 @@ function AreaManagers() {
             text: error.response.data.message,
             confirmButtonText: "Close",
           });
-        } finally {
-          setIsRefresh(false);
         }
       }
     });
@@ -145,7 +143,7 @@ function AreaManagers() {
           user={user}
           open={isDialogOpen}
           setOpen={setIsDialogOpen}
-          setIsRefresh={setIsRefresh}
+          fetchData={fetchData}
         />
       )}
     </div>

@@ -25,12 +25,7 @@ import { AlertCircle, Loader2, Save } from "lucide-react";
 import { FormEvent, useEffect, useState } from "react";
 import { toast } from "sonner";
 
-export default function EditCasDialog({
-  user,
-  open,
-  setOpen,
-  setIsRefresh,
-}: any) {
+export default function EditCasDialog({ user, open, setOpen, fetchData }: any) {
   const [formInputs, setFormInputs] = useState<string[]>([]);
   const [errors, setErrors] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
@@ -41,7 +36,7 @@ export default function EditCasDialog({
 
   useEffect(() => {
     setFormInputs(
-      user?.assigned_branch_cas?.map((item: any) => String(item.blist_id))
+      user?.assigned_branch_cas?.map((item: any) => String(item.blist_id)),
     );
   }, [user?.assigned_branch_cas]);
 
@@ -52,7 +47,6 @@ export default function EditCasDialog({
   const handleSaveChanges = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
-    setIsRefresh(true);
     try {
       const response = await api.patch(`/cas/${user?.login_id}/update`, {
         branch_codes: formInputs,
@@ -66,6 +60,7 @@ export default function EditCasDialog({
           description: response.data.message,
           position: "bottom-center",
         });
+        fetchData();
       }
     } catch (error: any) {
       console.error(error);
@@ -78,7 +73,6 @@ export default function EditCasDialog({
       }
     } finally {
       setIsLoading(false);
-      setIsRefresh(false);
     }
   };
 

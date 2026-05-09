@@ -11,14 +11,14 @@ export interface SupplierDataType {
 
 export interface EditSupplierProps {
   data: SupplierDataType;
-  setIsRefresh: Dispatch<SetStateAction<boolean>>;
+  fetchData: () => Promise<void>;
 }
 
 export interface DeleteSupplierProps {
   data: SupplierDataType;
-  setIsRefresh: Dispatch<SetStateAction<boolean>>;
+  fetchData: () => Promise<void>;
 }
 
 export interface AddSupplierProps {
-  setIsRefresh: Dispatch<SetStateAction<boolean>>;
+  fetchData: () => Promise<void>;
 }

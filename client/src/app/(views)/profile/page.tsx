@@ -34,7 +34,7 @@ function Profile() {
     data: posts,
     isLoading,
     cursor,
-    setIsRefresh,
+    fetchData,
     handleCursor,
   } = useFetchCursor({ url: "/posts" });
 
@@ -191,7 +191,7 @@ function Profile() {
           </div>
 
           <div className="lg:col-span-2 w-full space-y-3">
-            <CreatePost setIsRefresh={setIsRefresh} />
+            <CreatePost fetchData={fetchData} />
             {cursor?.prev_cursor && (
               <div className="flex justify-center">
                 <ButtonLoader
@@ -208,7 +208,7 @@ function Profile() {
               <PostLoader />
             ) : posts?.length > 0 ? (
               posts.map((post: any, index: number) => (
-                <PostList key={index} post={post} setIsRefresh={setIsRefresh} />
+                <PostList key={index} post={post} fetchData={fetchData} />
               ))
             ) : (
               <p className="dark:text-white text-gray-500 w-full text-center text-xl font-bold mt-10">
@@ -226,7 +226,9 @@ function Profile() {
                   Load more post
                 </ButtonLoader>
               ) : (
-                <span className="dark:text-white text-gray-400">All posts loaded</span>
+                <span className="dark:text-white text-gray-400">
+                  All posts loaded
+                </span>
               )}
             </div>
           </div>

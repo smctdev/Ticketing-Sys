@@ -42,7 +42,7 @@ function SubCategories() {
     filterBy,
     pagination,
     handleShort,
-    setIsRefresh,
+    fetchData,
   } = useFetch({
     url: `/admin/sub-categories/${id[0]}/ticket-category-items`,
     isPaginated: true,
@@ -65,8 +65,8 @@ function SubCategories() {
       name: "Action",
       cell: (row: any) => (
         <div className="flex gap-2">
-          <EditSubCategory setIsRefresh={setIsRefresh} data={row} />
-          <DeleteSubCategory setIsRefresh={setIsRefresh} data={row} />
+          <EditSubCategory fetchData={fetchData} data={row} />
+          <DeleteSubCategory fetchData={fetchData} data={row} />
         </div>
       ),
       sortable: false,
@@ -102,7 +102,7 @@ function SubCategories() {
             <SearchInput onChange={handleSearchTerm(1000)} />
             <AddSubCategory
               ticketCategoryId={id[0]}
-              setIsRefresh={setIsRefresh}
+              fetchData={fetchData}
             />
           </div>
         </CardHeader>

@@ -19,7 +19,7 @@ import { BranchFormDataType, EditBranchProps } from "../../_types/branch-types";
 
 export function EditBranch({
   data,
-  setIsRefresh,
+  fetchData,
   open,
   setOpen,
 }: EditBranchProps) {
@@ -42,11 +42,10 @@ export function EditBranch({
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     setIsLoading(true);
-    setIsRefresh(true);
     try {
       const response = await api.patch(
         `/branches/${data.blist_id}/update`,
-        formInput
+        formInput,
       );
       if (response.status === 200) {
         setOpen(false);
@@ -57,6 +56,7 @@ export function EditBranch({
         });
         setErrors(null);
         setError(null);
+        fetchData();
       }
     } catch (error: any) {
       console.error(error);
@@ -69,7 +69,6 @@ export function EditBranch({
       }
     } finally {
       setIsLoading(false);
-      setIsRefresh(false);
     }
   };
 

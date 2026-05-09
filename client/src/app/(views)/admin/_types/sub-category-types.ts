@@ -12,15 +12,15 @@ export interface SubCategoryDataType {
 
 export interface EditSubCategoryProps {
   data: SubCategoryDataType;
-  setIsRefresh: Dispatch<SetStateAction<boolean>>;
+  fetchData: () => Promise<void>;
 }
 
 export interface DeleteSubCategoryProps {
   data: SubCategoryDataType;
-  setIsRefresh: Dispatch<SetStateAction<boolean>>;
+  fetchData: () => Promise<void>;
 }
 
 export interface AddSubCategoryProps {
-  setIsRefresh: Dispatch<SetStateAction<boolean>>;
+  fetchData: () => Promise<void>;
   ticketCategoryId: string | number;
 }

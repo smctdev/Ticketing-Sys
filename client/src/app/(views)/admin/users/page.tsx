@@ -29,7 +29,7 @@ function Users() {
     filterBy,
     pagination,
     handleShort,
-    setIsRefresh,
+    fetchData,
   } = useFetch({
     url: "/users",
     isPaginated: true,
@@ -50,13 +50,13 @@ function Users() {
       cell: (row: any) => (
         <div className="flex gap-2">
           <EditUser
-            setIsRefresh={setIsRefresh}
+            fetchData={fetchData}
             data={row}
             branchMemo={branchMemo}
             userRoleMemo={userRoleMemo}
           />
 
-          <DeleteUser data={row} setIsRefresh={setIsRefresh} />
+          <DeleteUser data={row} fetchData={fetchData} />
         </div>
       ),
       sortable: false,
@@ -100,7 +100,7 @@ function Users() {
           <div className="flex items-center gap-2">
             <SearchInput onChange={handleSearchTerm(1000)} />
             <AddUser
-              setIsRefresh={setIsRefresh}
+              fetchData={fetchData}
               userRoleMemo={userRoleMemo}
               branchMemo={branchMemo}
             />

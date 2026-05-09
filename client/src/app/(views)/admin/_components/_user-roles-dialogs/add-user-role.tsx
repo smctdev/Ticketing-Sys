@@ -21,7 +21,7 @@ import {
   UserRoleFormDataType,
 } from "../../_types/user-roles-types";
 
-export function AddUserRole({ setIsRefresh }: AddUserRoleProps) {
+export function AddUserRole({ fetchData }: AddUserRoleProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [formInput, setFormInput] =
@@ -32,7 +32,6 @@ export function AddUserRole({ setIsRefresh }: AddUserRoleProps) {
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     setIsLoading(true);
-    setIsRefresh(true);
     try {
       const response = await api.post("/admin/user-roles", formInput);
       if (response.status === 201) {
@@ -44,6 +43,7 @@ export function AddUserRole({ setIsRefresh }: AddUserRoleProps) {
         });
         setErrors(null);
         setError(null);
+        fetchData();
       }
     } catch (error: any) {
       console.error(error);
@@ -56,7 +56,6 @@ export function AddUserRole({ setIsRefresh }: AddUserRoleProps) {
       }
     } finally {
       setIsLoading(false);
-      setIsRefresh(false);
     }
   };
 

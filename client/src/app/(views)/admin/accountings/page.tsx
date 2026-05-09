@@ -31,7 +31,7 @@ function Accountings() {
     filterBy,
     pagination,
     handleShort,
-    setIsRefresh,
+    fetchData,
   } = useFetch({
     url: "/accountings",
     isPaginated: true,
@@ -128,13 +128,13 @@ function Accountings() {
             Swal.showLoading();
           },
         });
-        setIsRefresh(true);
         try {
           const response = await api.delete(
-            `/accounting-category/${id}/delete`
+            `/accounting-category/${id}/delete`,
           );
 
           if (response.status === 200) {
+            fetchData();
             Swal.close();
             toast.success("Success", {
               description: response.data.message,
@@ -149,8 +149,6 @@ function Accountings() {
             text: error.response.data.message,
             confirmButtonText: "Close",
           });
-        } finally {
-          setIsRefresh(false);
         }
       } else if (result.isDenied) {
         Swal.fire({
@@ -161,11 +159,11 @@ function Accountings() {
             Swal.showLoading();
           },
         });
-        setIsRefresh(true);
         try {
           const response = await api.delete(`/accounting/${id}/delete`);
 
           if (response.status === 200) {
+            fetchData();
             Swal.close();
             toast.success("Success", {
               description: response.data.message,
@@ -180,8 +178,6 @@ function Accountings() {
             text: error.response.data.message,
             confirmButtonText: "Close",
           });
-        } finally {
-          setIsRefresh(false);
         }
       }
     });
@@ -222,7 +218,7 @@ function Accountings() {
           user={user}
           open={isDialogOpen}
           setOpen={setIsDialogOpen}
-          setIsRefresh={setIsRefresh}
+          fetchData={fetchData}
         />
       )}
 
@@ -231,7 +227,7 @@ function Accountings() {
           user={user}
           open={isDialogForBranchesOpen}
           setOpen={setIsDialogForBranchesOpen}
-          setIsRefresh={setIsRefresh}
+          fetchData={fetchData}
         />
       )}
     </div>

@@ -21,7 +21,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 
-export function EditUserRole({ data, setIsRefresh }: EditUserRoleProps) {
+export function EditUserRole({ data, fetchData }: EditUserRoleProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [formInput, setFormInput] =
@@ -38,11 +38,10 @@ export function EditUserRole({ data, setIsRefresh }: EditUserRoleProps) {
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     setIsLoading(true);
-    setIsRefresh(true);
     try {
       const response = await api.patch(
         `/admin/user-roles/${data.user_role_id}/update`,
-        formInput
+        formInput,
       );
       if (response.status === 200) {
         setIsOpen(false);
@@ -53,6 +52,7 @@ export function EditUserRole({ data, setIsRefresh }: EditUserRoleProps) {
         });
         setErrors(null);
         setError(null);
+        fetchData();
       }
     } catch (error: any) {
       console.error(error);
@@ -65,7 +65,6 @@ export function EditUserRole({ data, setIsRefresh }: EditUserRoleProps) {
       }
     } finally {
       setIsLoading(false);
-      setIsRefresh(false);
     }
   };
 

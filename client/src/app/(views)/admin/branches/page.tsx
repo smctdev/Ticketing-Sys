@@ -25,7 +25,7 @@ function Branches() {
     filterBy,
     pagination,
     handleShort,
-    setIsRefresh,
+    fetchData,
   } = useFetch({
     url: "/admin/branches",
     isPaginated: true,
@@ -33,7 +33,7 @@ function Branches() {
   });
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [selectedItem, setSelectedItem] = useState<BranchDetailDataType>(
-    {} as BranchDetailDataType
+    {} as BranchDetailDataType,
   );
 
   const BRANCHES_COLUMNS_ACTIONS = [
@@ -48,7 +48,7 @@ function Branches() {
           >
             <PenIcon size={18} />
           </button>
-          <DeleteBranch data={row} setIsRefresh={setIsRefresh} />
+          <DeleteBranch data={row} fetchData={fetchData} />
         </div>
       ),
       sortable: false,
@@ -70,7 +70,7 @@ function Branches() {
           </CardTitle>
           <div className="flex items-center gap-2">
             <SearchInput onChange={handleSearchTerm(1000)} />
-            <AddBranch setIsRefresh={setIsRefresh} />
+            <AddBranch fetchData={fetchData} />
           </div>
         </CardHeader>
         <CardContent>
@@ -91,7 +91,7 @@ function Branches() {
         </CardContent>
       </Card>
       <EditBranch
-        setIsRefresh={setIsRefresh}
+        fetchData={fetchData}
         data={selectedItem}
         open={isDialogOpen}
         setOpen={setIsDialogOpen}

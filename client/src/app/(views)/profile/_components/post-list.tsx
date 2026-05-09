@@ -37,14 +37,14 @@ interface Post {
 }
 interface PostListProps {
   post: Post;
-  setIsRefresh: Dispatch<SetStateAction<boolean>>;
+  fetchData: () => Promise<void>;
   isCommentOpen?: boolean;
   handleCommentChange?: () => void;
 }
 
 export default function PostList({
   post,
-  setIsRefresh,
+  fetchData,
   isCommentOpen,
   handleCommentChange,
 }: PostListProps) {
@@ -78,7 +78,6 @@ export default function PostList({
   }, [post?.content]);
 
   const handleLike = (postId: number) => async () => {
-    setIsRefresh(true);
     setIsLoadingLike({ [postId]: true });
     try {
       const response = await api.post(`/posts/${postId}/like-unline`);
@@ -87,11 +86,11 @@ export default function PostList({
           description: response.data.message,
           position: "bottom-center",
         });
+        fetchData();
       }
     } catch (error) {
       console.error(error);
     } finally {
-      setIsRefresh(false);
       setIsLoadingLike({ [postId]: false });
     }
   };
@@ -199,7 +198,7 @@ export default function PostList({
                 <Heart
                   className={`h-4 w-4 mr-1 ${
                     post?.user_likes.some(
-                      (userLike: any) => userLike.login_id === user?.login_id
+                      (userLike: any) => userLike.login_id === user?.login_id,
                     ) && "text-pink-500"
                   }`}
                 />
@@ -229,7 +228,7 @@ export default function PostList({
       {isOpenComment && (
         <PostComment
           data={post}
-          setIsRefresh={setIsRefresh}
+          fetchData={fetchData}
           open={isOpenComment}
           setOpen={setIsOpenComment}
           isCommentOpen={isOpenComment}
@@ -240,7 +239,7 @@ export default function PostList({
         <EditPost
           open={isOpenEditPostDialog}
           setOpen={setIsOpenEditPostDialog}
-          setIsRefresh={setIsRefresh}
+          fetchData={fetchData}
           data={selectedPost}
         />
       )}
@@ -250,7 +249,7 @@ export default function PostList({
           id={postId}
           open={isOpenDeletePostDialog}
           setOpen={setIsOpenDeletePostDialog}
-          setIsRefresh={setIsRefresh}
+          fetchData={fetchData}
         />
       )}
     </>

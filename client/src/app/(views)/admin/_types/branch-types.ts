@@ -27,16 +27,16 @@ export interface BranchDetailDataType {
 
 export interface EditBranchProps {
   data: BranchDetailDataType;
-  setIsRefresh: Dispatch<SetStateAction<boolean>>;
+  fetchData: () => Promise<void>;
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
 }
 
 export interface DeleteBranchProps {
   data: BranchDetailDataType;
-  setIsRefresh: Dispatch<SetStateAction<boolean>>;
+  fetchData: () => Promise<void>;
 }
 
 export interface AddBranchProps {
-  setIsRefresh: Dispatch<SetStateAction<boolean>>;
+  fetchData: () => Promise<void>;
 }

@@ -11,13 +11,7 @@ import {
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Loader2Icon, Plus } from "lucide-react";
-import {
-  ChangeEvent,
-  Dispatch,
-  FormEvent,
-  SetStateAction,
-  useState,
-} from "react";
+import { ChangeEvent, FormEvent, useState } from "react";
 import { USER_FORM_ITEMS } from "../../_constants/form-items";
 import { UserFormItemsTypes } from "@/types/form-group";
 import {
@@ -40,16 +34,12 @@ import {
 } from "@/components/ui/multi-select";
 
 interface AddUserProps {
-  setIsRefresh: Dispatch<SetStateAction<boolean>>;
+  fetchData: () => Promise<void>;
   userRoleMemo: any;
   branchMemo: any;
 }
 
-export function AddUser({
-  setIsRefresh,
-  userRoleMemo,
-  branchMemo,
-}: AddUserProps) {
+export function AddUser({ fetchData, userRoleMemo, branchMemo }: AddUserProps) {
   const [formItems, setFormItems] =
     useState<UserFormItemsTypes>(USER_FORM_ITEMS);
   const [errors, setErrors] = useState<any>(null);
@@ -82,7 +72,6 @@ export function AddUser({
   const formSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
-    setIsRefresh(true);
     try {
       const response = await api.post("/users", formItems);
       if (response.status === 201) {
@@ -93,6 +82,7 @@ export function AddUser({
           position: "bottom-center",
         });
         setIsOpenDialog(false);
+        fetchData();
       }
     } catch (error: any) {
       console.error(error);
@@ -101,7 +91,6 @@ export function AddUser({
       }
     } finally {
       setIsLoading(false);
-      setIsRefresh(false);
     }
   };
 

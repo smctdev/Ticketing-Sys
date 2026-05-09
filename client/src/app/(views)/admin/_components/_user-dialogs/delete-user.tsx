@@ -15,7 +15,7 @@ import { api } from "@/lib/api";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { toast } from "sonner";
 
-export function DeleteUser({ data, setIsRefresh }: any) {
+export function DeleteUser({ data, fetchData }: any) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -23,10 +23,9 @@ export function DeleteUser({ data, setIsRefresh }: any) {
   const handleDeleteUser = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
-    setIsRefresh(true);
     try {
       const response = await api.delete(
-        `/users/${data.user_details_id}/delete`
+        `/users/${data.user_details_id}/delete`,
       );
       if (response.status === 200) {
         setError(null);
@@ -35,13 +34,13 @@ export function DeleteUser({ data, setIsRefresh }: any) {
           description: response.data.message,
           position: "bottom-center",
         });
+        fetchData();
       }
     } catch (error: any) {
       console.error(error);
       setError(error.response.data.message);
     } finally {
       setIsLoading(false);
-      setIsRefresh(false);
     }
   };
 

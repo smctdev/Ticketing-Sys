@@ -62,25 +62,16 @@ function Tickets() {
     handleReset,
     error: ticketsError,
     fetchData,
-    setIsLoading,
     setData,
   } = useFetch({
     url: "/tickets",
     isPaginated: true,
     filters: TICKETS_FILTER,
   });
-  const {
-    data: categories,
-    isLoading: isLoadingCategories,
-    fetchData: fetchCategories,
-  } = useFetch({
+  const { data: categories, fetchData: fetchCategories } = useFetch({
     url: `/categories?category_type=${ticketType}`,
   });
-  const {
-    data: branchHeads,
-    isLoading: isLoadingBranchHeads,
-    fetchData: fetchBranchHeads,
-  } = useFetch({
+  const { data: branchHeads, fetchData: fetchBranchHeads } = useFetch({
     url: `user-branch-heads`,
   });
   const [selectedTicketData, setSelectedTicketData] = useState<null | any>(

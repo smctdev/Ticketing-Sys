@@ -5,7 +5,6 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogTrigger,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
@@ -34,12 +33,12 @@ export function EditPost({
   open,
   setOpen,
   data,
-  setIsRefresh,
+  fetchData,
 }: {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
   data: Post;
-  setIsRefresh: Dispatch<SetStateAction<boolean>>;
+  fetchData: () => Promise<void>;
 }) {
   const [formInput, setFormInput] =
     useState<PostFormInputType>(POST_FORM_ITEMS);
@@ -60,7 +59,6 @@ export function EditPost({
 
   const handleUpdatePost = async () => {
     setIsLoading(true);
-    setIsRefresh(true);
     try {
       const response = await api.patch(`/posts/${data?.id}/update`, formInput);
 
@@ -72,6 +70,7 @@ export function EditPost({
         });
         setErrors(null);
         setOpen(false);
+        fetchData();
       }
     } catch (error: any) {
       console.error(error);
@@ -80,7 +79,6 @@ export function EditPost({
       }
     } finally {
       setIsLoading(false);
-      setIsRefresh(false);
     }
   };
 

@@ -11,14 +11,14 @@ export interface UserRoleDataType {
 
 export interface EditUserRoleProps {
   data: UserRoleDataType;
-  setIsRefresh: Dispatch<SetStateAction<boolean>>;
+  fetchData: () => Promise<void>;
 }
 
 export interface DeleteUserRoleProps {
   data: UserRoleDataType;
-  setIsRefresh: Dispatch<SetStateAction<boolean>>;
+  fetchData: () => Promise<void>;
 }
 
 export interface AddUserRoleProps {
-  setIsRefresh: Dispatch<SetStateAction<boolean>>;
+  fetchData: () => Promise<void>;
 }

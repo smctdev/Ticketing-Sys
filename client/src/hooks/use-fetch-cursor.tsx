@@ -23,6 +23,7 @@ interface CursorTypes {
   data: any[];
   setData: Dispatch<SetStateAction<any[]>>;
   handleCursor: (title: "next" | "prev") => () => void;
+  fetchData: () => Promise<void>;
 }
 
 export const useFetchCursor = ({ url }: { url: string }): CursorTypes => {
@@ -32,29 +33,29 @@ export const useFetchCursor = ({ url }: { url: string }): CursorTypes => {
   const [data, setData] = useState<any[]>([]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      const params = {
-        cursor: cursor.active_cursor,
-      };
-      try {
-        const response = await api.get(url, { params });
-        if (response.status === 200) {
-          setData(response.data.data.data);
-          setCursor((cursor) => ({
-            ...cursor,
-            prev_cursor: response.data.data.prev_cursor,
-            next_cursor: response.data.data.next_cursor,
-          }));
-        }
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
     fetchData();
   }, [isRefresh, cursor.active_cursor]);
+
+  const fetchData = async () => {
+    const params = {
+      cursor: cursor.active_cursor,
+    };
+    try {
+      const response = await api.get(url, { params });
+      if (response.status === 200) {
+        setData(response.data.data.data);
+        setCursor((cursor) => ({
+          ...cursor,
+          prev_cursor: response.data.data.prev_cursor,
+          next_cursor: response.data.data.next_cursor,
+        }));
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleCursor = (title: "next" | "prev") => () => {
     if (isLoading) return;
@@ -75,5 +76,6 @@ export const useFetchCursor = ({ url }: { url: string }): CursorTypes => {
     data,
     setData,
     handleCursor,
+    fetchData,
   };
 };

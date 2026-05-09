@@ -29,7 +29,7 @@ export default function EditAccountingDialog({
   user,
   open,
   setOpen,
-  setIsRefresh,
+  fetchData,
 }: any) {
   const [formInputs, setFormInputs] = useState<string[]>([]);
   const [errors, setErrors] = useState<any>(null);
@@ -41,7 +41,9 @@ export default function EditAccountingDialog({
 
   useEffect(() => {
     setFormInputs(
-      user?.accounting_assigned_branches?.map((item: any) => String(item.blist_id))
+      user?.accounting_assigned_branches?.map((item: any) =>
+        String(item.blist_id),
+      ),
     );
   }, [user?.accounting_assigned_branches]);
 
@@ -52,7 +54,6 @@ export default function EditAccountingDialog({
   const handleSaveChanges = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
-    setIsRefresh(true);
     try {
       const response = await api.patch(`/accounting/${user?.login_id}/update`, {
         branch_codes: formInputs,
@@ -66,6 +67,7 @@ export default function EditAccountingDialog({
           description: response.data.message,
           position: "bottom-center",
         });
+        fetchData();
       }
     } catch (error: any) {
       console.error(error);
@@ -78,7 +80,6 @@ export default function EditAccountingDialog({
       }
     } finally {
       setIsLoading(false);
-      setIsRefresh(false);
     }
   };
 

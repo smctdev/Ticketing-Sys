@@ -24,11 +24,7 @@ import { api } from "@/lib/api";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 
-export function CreatePost({
-  setIsRefresh,
-}: {
-  setIsRefresh: Dispatch<SetStateAction<boolean>>;
-}) {
+export function CreatePost({ fetchData }: { fetchData: () => Promise<void> }) {
   const [formInput, setFormInput] =
     useState<PostFormInputType>(POST_FORM_ITEMS);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -37,7 +33,6 @@ export function CreatePost({
 
   const handlePost = async () => {
     setIsLoading(true);
-    setIsRefresh(true);
     try {
       const response = await api.post("/posts", formInput);
 
@@ -49,6 +44,7 @@ export function CreatePost({
         });
         setErrors(null);
         setOpen(false);
+        fetchData();
       }
     } catch (error: any) {
       console.error(error);
@@ -57,7 +53,6 @@ export function CreatePost({
       }
     } finally {
       setIsLoading(false);
-      setIsRefresh(false);
     }
   };
 
@@ -94,26 +89,64 @@ export function CreatePost({
               <SelectContent>
                 <SelectGroup>
                   <SelectLabel>How are you feeling?</SelectLabel>
-                  <SelectItem value="😵 Feeling dizzy">😵 Feeling dizzy</SelectItem>
-                  <SelectItem value="😊 Feeling happy">😊 Feeling happy</SelectItem>
+                  <SelectItem value="😵 Feeling dizzy">
+                    😵 Feeling dizzy
+                  </SelectItem>
+                  <SelectItem value="😊 Feeling happy">
+                    😊 Feeling happy
+                  </SelectItem>
                   <SelectItem value="😢 Feeling sad">😢 Feeling sad</SelectItem>
-                  <SelectItem value="😠 Feeling angry">😠 Feeling angry</SelectItem>
-                  <SelectItem value="😴 Feeling tired">😴 Feeling tired</SelectItem>
-                  <SelectItem value="😨 Feeling scared">😨 Feeling scared</SelectItem>
-                  <SelectItem value="😤 Feeling frustrated">😤 Feeling frustrated</SelectItem>
-                  <SelectItem value="🤒 Feeling sick">🤒 Feeling sick</SelectItem>
-                  <SelectItem value="😰 Feeling stressed">😰 Feeling stressed</SelectItem>
-                  <SelectItem value="🥰 Feeling loved">🥰 Feeling loved</SelectItem>
-                  <SelectItem value="😎 Feeling confident">😎 Feeling confident</SelectItem>
-                  <SelectItem value="🤩 Feeling excited">🤩 Feeling excited</SelectItem>
-                  <SelectItem value="😔 Feeling lonely">😔 Feeling lonely</SelectItem>
-                  <SelectItem value="😇 Feeling grateful">😇 Feeling grateful</SelectItem>
-                  <SelectItem value="🤗 Feeling blessed">🤗 Feeling blessed</SelectItem>
-                  <SelectItem value="😶 Feeling numb">😶 Feeling numb</SelectItem>
-                  <SelectItem value="🥺 Feeling hopeful">🥺 Feeling hopeful</SelectItem>
-                  <SelectItem value="😏 Feeling playful">😏 Feeling playful</SelectItem>
-                  <SelectItem value="🤔 Feeling confused">🤔 Feeling confused</SelectItem>
-                  <SelectItem value="😌 Feeling relaxed">😌 Feeling relaxed</SelectItem>
+                  <SelectItem value="😠 Feeling angry">
+                    😠 Feeling angry
+                  </SelectItem>
+                  <SelectItem value="😴 Feeling tired">
+                    😴 Feeling tired
+                  </SelectItem>
+                  <SelectItem value="😨 Feeling scared">
+                    😨 Feeling scared
+                  </SelectItem>
+                  <SelectItem value="😤 Feeling frustrated">
+                    😤 Feeling frustrated
+                  </SelectItem>
+                  <SelectItem value="🤒 Feeling sick">
+                    🤒 Feeling sick
+                  </SelectItem>
+                  <SelectItem value="😰 Feeling stressed">
+                    😰 Feeling stressed
+                  </SelectItem>
+                  <SelectItem value="🥰 Feeling loved">
+                    🥰 Feeling loved
+                  </SelectItem>
+                  <SelectItem value="😎 Feeling confident">
+                    😎 Feeling confident
+                  </SelectItem>
+                  <SelectItem value="🤩 Feeling excited">
+                    🤩 Feeling excited
+                  </SelectItem>
+                  <SelectItem value="😔 Feeling lonely">
+                    😔 Feeling lonely
+                  </SelectItem>
+                  <SelectItem value="😇 Feeling grateful">
+                    😇 Feeling grateful
+                  </SelectItem>
+                  <SelectItem value="🤗 Feeling blessed">
+                    🤗 Feeling blessed
+                  </SelectItem>
+                  <SelectItem value="😶 Feeling numb">
+                    😶 Feeling numb
+                  </SelectItem>
+                  <SelectItem value="🥺 Feeling hopeful">
+                    🥺 Feeling hopeful
+                  </SelectItem>
+                  <SelectItem value="😏 Feeling playful">
+                    😏 Feeling playful
+                  </SelectItem>
+                  <SelectItem value="🤔 Feeling confused">
+                    🤔 Feeling confused
+                  </SelectItem>
+                  <SelectItem value="😌 Feeling relaxed">
+                    😌 Feeling relaxed
+                  </SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>

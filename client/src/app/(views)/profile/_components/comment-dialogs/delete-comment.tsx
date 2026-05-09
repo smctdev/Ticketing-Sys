@@ -17,23 +17,21 @@ interface DeleteCommentProps {
   id: number;
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
-  setIsRefresh: Dispatch<SetStateAction<boolean>>;
-  setIsRefreshComment: Dispatch<SetStateAction<boolean>>;
+  fetchData: () => Promise<void>;
+  fetchComments: () => Promise<void>;
 }
 
 export function DeleteComment({
   id,
   open,
   setOpen,
-  setIsRefresh,
-  setIsRefreshComment,
+  fetchData,
+  fetchComments,
 }: DeleteCommentProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
 
   const handleDeleteComment = async () => {
-    setIsRefresh(true);
-    setIsRefreshComment(true);
     setIsLoading(true);
     try {
       const response = await api.delete(`/comments/${id}/delete`);
@@ -45,6 +43,8 @@ export function DeleteComment({
         });
         setOpen(false);
         setError("");
+        fetchData();
+        fetchComments();
       }
     } catch (error: any) {
       console.error(error);
@@ -53,8 +53,6 @@ export function DeleteComment({
       }
     } finally {
       setIsLoading(false);
-      setIsRefresh(false);
-      setIsRefreshComment(false);
     }
   };
 
