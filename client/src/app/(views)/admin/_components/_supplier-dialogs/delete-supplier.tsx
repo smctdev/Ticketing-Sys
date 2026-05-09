@@ -16,7 +16,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { toast } from "sonner";
 import { DeleteSupplierProps } from "../../_types/supplier-types";
 
-export function DeleteSupplier({ data, setIsRefresh }: DeleteSupplierProps) {
+export function DeleteSupplier({ data, fetchData }: DeleteSupplierProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -24,7 +24,6 @@ export function DeleteSupplier({ data, setIsRefresh }: DeleteSupplierProps) {
   const handleDeleteSupplier = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
-    setIsRefresh(true);
     try {
       const response = await api.delete(`/admin/suppliers/${data.id}/delete`);
       if (response.status === 200) {
@@ -34,13 +33,13 @@ export function DeleteSupplier({ data, setIsRefresh }: DeleteSupplierProps) {
           description: response.data.message,
           position: "bottom-center",
         });
+        fetchData();
       }
     } catch (error: any) {
       console.error(error);
       setError(error.response.data.message);
     } finally {
       setIsLoading(false);
-      setIsRefresh(false);
     }
   };
 
