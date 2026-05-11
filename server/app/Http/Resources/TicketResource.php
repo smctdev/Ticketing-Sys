@@ -76,6 +76,7 @@ class TicketResource extends JsonResource
                 'branches'                => $this->pendingUser->branches,
             ],
             'approve_by_head'             => !$this?->approveByHead ? null : [
+                'login_id'                => $this?->approveByHead?->login_id,
                 'full_name'               => $this?->approveByHead?->full_name,
             ],
             'approve_by_acctg_staff'      => !$this?->approveByAcctgStaff ? null : [
@@ -86,6 +87,9 @@ class TicketResource extends JsonResource
             ],
             'edited_by'                   => !$this?->editedBy ? null : [
                 'full_name'               => $this->editedBy->full_name,
+            ],
+            'last_approver'               => !$this?->lastApprover ? null : [
+                'full_name'               => $this->lastApprover->full_name,
             ],
         ];
     }

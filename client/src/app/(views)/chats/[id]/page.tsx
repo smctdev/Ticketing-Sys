@@ -132,8 +132,6 @@ function ChatsPage() {
 
     submittedRef.current = true;
 
-    textAreaRef.current?.focus();
-
     handleSubmit({ preventDefault: () => {} } as any);
 
     router.replace(pathname);
@@ -523,6 +521,7 @@ function ChatsPage() {
                     e.key === "Enter" && !e.shiftKey && e.preventDefault()
                   }
                   ref={textAreaRef}
+                  autoFocus
                 />
               </div>
               <Button

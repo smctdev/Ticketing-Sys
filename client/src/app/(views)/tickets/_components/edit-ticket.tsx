@@ -63,9 +63,12 @@ export function EditTicket({
       from: ticketData.ticket_detail.td_from,
       to: ticketData.ticket_detail.td_to,
       ticket_reference_number: ticketData.ticket_detail.td_ref_number,
-      branch_head_id: String(ticketData?.displayTicket),
+      branch_head_id: String(
+        ticketData?.approve_by_head?.login_id || ticketData?.displayTicket,
+      ),
     });
-
+    setTicketType(ticketData.ticket_detail.ticket_type);
+    refreshCategories(true);
     setTimeout(() => {
       setFormInput((prev) => ({
         ...prev,

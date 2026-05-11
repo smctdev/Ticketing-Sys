@@ -48,7 +48,7 @@ export default function BasicForm({
         Number(category.ticket_category_id) ===
         Number(formInput.ticket_category),
     )?.sub_categories;
-  }, [formInput.ticket_category]);
+  }, [formInput.ticket_category, categories]);
 
   return (
     <>
