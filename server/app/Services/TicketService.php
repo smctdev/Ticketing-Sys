@@ -95,7 +95,8 @@ class TicketService
                         case UserRoles::AUTOMATION:
                         case UserRoles::AUTOMATION_ADMIN:
                             $subQuery->where('assigned_person', $user->login_id)
-                                ->where('status', TicketStatus::PENDING);
+                                ->where('status', TicketStatus::PENDING)
+                                ->where('displayTicket', Auth::id());
                             break;
                         case UserRoles::AUTOMATION_MANAGER:
                             $subQuery->whereNot('status', TicketStatus::EDITED)
@@ -104,15 +105,18 @@ class TicketService
                             break;
                         case UserRoles::BRANCH_HEAD:
                             $subQuery->whereNot('status', TicketStatus::EDITED)
-                                ->whereIn('branch_id', $userBranchIds);
+                                ->whereIn('branch_id', $userBranchIds)
+                                ->orWhere('displayTicket', Auth::id());
                             break;
                         case UserRoles::CAS:
                             $subQuery->where('status', TicketStatus::PENDING)
-                                ->whereIn('branch_id', $assignedBranchCas);
+                                ->whereIn('branch_id', $assignedBranchCas)
+                                ->orWhere('displayTicket', Auth::id());
                             break;
                         case UserRoles::AREA_MANAGER:
                             $subQuery->where('status', TicketStatus::PENDING)
-                                ->whereIn('branch_id', $assignedAreaManagers);
+                                ->whereIn('branch_id', $assignedAreaManagers)
+                                ->orWhere('displayTicket', Auth::id());
                             break;
                         case UserRoles::ACCOUNTING_HEAD:
                             $subQuery->where('status', TicketStatus::PENDING)
@@ -457,7 +461,7 @@ class TicketService
         $data = DB::transaction(
             function () use ($request, $id, $assignedBranchHead) {
 
-                $branch = BranchList::find($request->ticket_for);
+                $branch = BranchList::findOrFail($request->ticket_for);
 
                 $ticketDetail = TicketDetail::findOrFail($id);
 
