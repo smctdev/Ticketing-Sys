@@ -461,7 +461,7 @@ class TicketService
         $data = DB::transaction(
             function () use ($request, $id, $assignedBranchHead) {
 
-                $branch = BranchList::findOrFail($request->ticket_for);
+                // $branch = BranchList::findOrFail($request->ticket_for);
 
                 $ticketDetail = TicketDetail::findOrFail($id);
 
