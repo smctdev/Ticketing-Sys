@@ -310,10 +310,6 @@ class TicketService
             ->whereRaw("FIND_IN_SET(?, blist_id)", [$branchId])
             ->first();
 
-        if (!$assignedBranchHead) {
-            abort(400, 'No branch head assigned to your branch. Please contact your administrator.');
-        }
-
         $assignedAccountingStaff = UserLogin::query()
             ->with('assignedCategories.categoryGroupCode.ticketCategories')
             ->has('assignedCategories')
@@ -349,6 +345,10 @@ class TicketService
                 $request->ticket_category
             )
             ->first();
+
+        if (!$assignedBranchHead && !$user->isAccountingStaff()) {
+            abort(400, 'No branch head assigned to your branch. Please contact your administrator.');
+        }
 
         $transactionDate = Carbon::parse($request->ticket_transaction_date)->startOfDay();
 
@@ -397,7 +397,7 @@ class TicketService
                     $user->isStaff()                             => $this->branchHeads() > 1 ? $request->branch_head_id : $assignedBranchHead->login_id,
                     $user->isBranchHead() && $directToAccounting => $assignedAccountingStaff->login_id,
                     $user->isBranchHead()                        => $automationManager->login_id,
-                    $user->isAccountingStaff()                   => $assignedAccountingHead->login_id,
+                    $user->isAccountingStaff()                   => $assignedAccountingHead->login_id ?? $automationManager->login_id,
                     $assignedAutomation                          => $assignedAutomation->assignedAutomation->login_id,
                     default                                      => $automationAdmin->login_id
                 };

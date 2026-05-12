@@ -51,7 +51,10 @@ export default function Notification() {
   const originalTitle = useRef<string>(document.title);
 
   useEffect(() => {
-    if (totalUnreadNotifications < 1) return;
+    if (totalUnreadNotifications < 1) {
+      document.title = originalTitle.current;
+      return;
+    }
 
     document.title = `(${totalUnreadNotifications}) ${originalTitle.current}`;
   }, [totalUnreadNotifications]);

@@ -36,8 +36,8 @@ export default function SenderContent({
     <div className="py-2">
       {message?.reply_from && (
         <div className="flex justify-end items-end flex-col">
-          <span className="text-[10px] font-semibold">
-            You replied to a message
+          <span className="text-[10px] font-semibold flex items-center gap-1">
+            <Reply className="size-3" /> <span>You replied to a message</span>
           </span>
           <div
             className="max-w-4/5 w-fit px-4 py-2.5 rounded-2xl rounded-br-sm text-sm wrap-break-word whitespace-break-spaces leading-relaxed bg-chat-background/20 -mb-2 dark:text-white"

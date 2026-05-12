@@ -16,14 +16,12 @@ export function ChatSkeleton() {
       <div className="flex flex-col-reverse h-full px-6 py-4">
         <div className="space-y-4">
           <div className="flex justify-start items-end gap-2">
-            <Skeleton className="w-7 h-7 rounded-xl shrink-0 mb-1" />
             <div className="space-y-1">
               <Skeleton className="w-48 h-9 rounded-2xl rounded-bl-sm" />
               <Skeleton className="w-10 h-2 rounded" />
             </div>
           </div>
           <div className="flex justify-start items-end gap-2">
-            <Skeleton className="w-7 h-7 rounded-xl shrink-0 mb-1" />
             <div className="space-y-1">
               <Skeleton className="w-65 h-9 rounded-2xl rounded-bl-sm" />
               <Skeleton className="w-10 h-2 rounded" />
@@ -36,7 +34,6 @@ export function ChatSkeleton() {
             </div>
           </div>
           <div className="flex justify-start items-end gap-2">
-            <Skeleton className="w-7 h-7 rounded-xl shrink-0 mb-1" />
             <div className="space-y-1">
               <Skeleton className="w-56 h-9 rounded-2xl rounded-bl-sm" />
               <Skeleton className="w-10 h-2 rounded" />
