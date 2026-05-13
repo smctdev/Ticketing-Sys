@@ -235,6 +235,8 @@ function ChatsPage() {
         if (inputRef.current) {
           inputRef.current.value = "";
         }
+
+        document.title = `SMCT Ticketing | Chats | ${data?.user?.full_name}`;
       }
     } catch (error: any) {
       console.error(error);
