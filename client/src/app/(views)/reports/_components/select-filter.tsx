@@ -53,7 +53,7 @@ export default function SelectFilter({
         {canView && (
           <div className="flex flex-col gap-2 w-full">
             <Label htmlFor="branch_code">Branch Code</Label>
-            <MultiSelect modal={true} onValuesChange={handleMultipleSelect}>
+            <MultiSelect modal={true} values={filterBy?.branch_code === "ALL" ? [] : filterBy?.branch_code?.split(",")} onValuesChange={handleMultipleSelect}>
               <MultiSelectTrigger className="w-full max-w-[385px] max-h-[200px] overflow-y-auto">
                 <MultiSelectValue placeholder="Select branch codes..." />
               </MultiSelectTrigger>

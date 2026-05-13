@@ -108,7 +108,7 @@ function SubCategories() {
         </CardHeader>
         <CardContent>
           <DataTableComponent
-            data={data}
+            data={data?.data?.data}
             columns={[
               ...SUB_CATEGORIES_COLUMNS,
               ...SUB_CATEGORY_COLUMNS_ACTIONS,

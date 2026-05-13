@@ -39,9 +39,13 @@ class SubCategoryController extends Controller
             ->paginate($take);
 
         return response()->json([
-            "message"       => "Sub Categories fetched successfully",
-            "data"          => $sub_categories,
-            'category_name' => $ticket_category_name
+            "message"               => "Sub Categories fetched successfully",
+            "data"                  => [
+                "data"              => [
+                    "data"          => $sub_categories,
+                    'category_name' => $ticket_category_name
+                ]
+            ]
         ], 200);
     }
 

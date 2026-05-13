@@ -172,7 +172,6 @@ class ReportsService
             ->get();
 
         $grouped = $tickets->groupBy(fn($item) => implode('|', [
-            $item->branch_name,
             $item->isCounted,
             $item->branch->b_code,
             $item->branch->category,
@@ -379,7 +378,6 @@ class ReportsService
             ->get();
 
         $grouped = $tickets->groupBy(fn($item) => implode('|', [
-            $item->branch_name,
             $item->branch->b_code,
         ]))->map(function ($group) {
             $first = $group->first();
