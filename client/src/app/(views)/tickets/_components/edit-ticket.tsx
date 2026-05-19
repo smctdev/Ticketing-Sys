@@ -19,7 +19,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import BasicForm from "./basic-form";
 
 export function EditTicket({
-  setData,
+  fetchData,
   ticketData,
   categories,
   user,
@@ -66,6 +66,7 @@ export function EditTicket({
       branch_head_id: String(
         ticketData?.approve_by_head?.login_id || ticketData?.displayTicket,
       ),
+      for_branch: String(ticketData.branch_id),
     });
     setTicketType(ticketData.ticket_detail.ticket_type);
     refreshCategories(true);
@@ -162,6 +163,10 @@ export function EditTicket({
         formData.append("to", formInput.to);
       }
 
+      if (formInput?.for_branch) {
+        formData.append("for_branch", formInput.for_branch);
+      }
+
       if (formInput?.ticket_sub_category) {
         formData.append("ticket_sub_category", formInput.ticket_sub_category);
       }
@@ -190,14 +195,7 @@ export function EditTicket({
           description: response.data.message,
           position: "bottom-center",
         });
-        setData((prev: any) =>
-          prev.map((item: any) =>
-            item.ticket_details_id === ticketData.ticket_details_id
-              ? response.data.data
-              : item,
-          ),
-        );
-        fetchBranchHeads();
+        fetchData();
       }
     } catch (error: any) {
       console.error(error);
@@ -210,6 +208,7 @@ export function EditTicket({
       }
     } finally {
       setIsLoading(false);
+      fetchBranchHeads();
     }
   };
 

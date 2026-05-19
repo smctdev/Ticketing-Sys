@@ -88,7 +88,7 @@ class TicketNotification extends Notification implements ShouldQueue, ShouldBroa
                 'read_at'                   => null,
                 'created_at'                => now(),
                 'updated_at'                => now(),
-                'unread_notification_count' => $notifiable->unreadNotifications()->count(),
+                'unread_notification_count' => $notifiable->unreadNotifications()->where('created_at', '>=', now()->subDays(2))->count(),
             ]
         );
     }

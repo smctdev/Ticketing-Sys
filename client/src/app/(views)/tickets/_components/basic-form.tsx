@@ -23,6 +23,9 @@ import { CalendarIcon, FileSpreadsheet, X } from "lucide-react";
 import Image from "next/image";
 import { Activity, useMemo } from "react";
 import SqlForm from "./sql-form";
+import { ROLE } from "@/constants/roles";
+import useFetch from "@/hooks/use-fetch";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function BasicForm({
   formInput,
@@ -40,7 +43,13 @@ export default function BasicForm({
   oldFiles,
   branchHeads,
 }: any) {
+  const { isLoading: branchIsLoading, data } = useFetch({
+    url: "/branches",
+  });
   const oldFilesLength = oldFiles?.length ?? 0;
+  const isAccountingStaff =
+    ROLE.ACCOUNTING_STAFF === user?.user_role?.role_name;
+  const isBranchHead = ROLE.BRANCH_HEAD === user?.user_role?.role_name;
 
   const ticketSubCategories = useMemo(() => {
     return categories?.find(
@@ -98,6 +107,46 @@ export default function BasicForm({
           </small>
         )}
       </div>
+      {isAccountingStaff && (
+        <div className="flex flex-col gap-3">
+          <Label htmlFor="for_branch" className="px-1">
+            Ticket for what branch?
+          </Label>
+          {branchIsLoading ? (
+            <Skeleton className="h-9" />
+          ) : (
+            <Select
+              onValueChange={handleChange("for_branch")}
+              value={String(formInput.for_branch)}
+            >
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Select branch" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectItem value="Select branch" disabled>
+                    Select branch
+                  </SelectItem>
+                  {data?.length === 0 ? (
+                    <SelectItem value="No ticket categories found">
+                      No ticket categories found
+                    </SelectItem>
+                  ) : (
+                    data?.map((branch: any, index: number) => (
+                      <SelectItem key={index} value={String(branch.blist_id)}>
+                        {`(${branch.b_code}) ${branch.b_name}`}
+                      </SelectItem>
+                    ))
+                  )}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          )}
+          {errors?.for_branch && (
+            <small className="text-red-500">{errors?.for_branch[0]}</small>
+          )}
+        </div>
+      )}
       <div className="flex flex-col gap-3">
         <Label htmlFor="ticket_category" className="px-1">
           Ticket category
@@ -184,7 +233,13 @@ export default function BasicForm({
           )}
         </div>
       )}
-      <Activity mode={branchHeads?.length > 1 ? "visible" : "hidden"}>
+      <Activity
+        mode={
+          branchHeads?.length > 1 && !isAccountingStaff && !isBranchHead
+            ? "visible"
+            : "hidden"
+        }
+      >
         <div className="flex flex-col gap-3">
           <Label htmlFor="branch_head_id" className="px-1">
             Branch Head
@@ -261,7 +316,7 @@ export default function BasicForm({
             <SelectContent>
               <SelectGroup>
                 <SelectItem value="Select ticket for" disabled>
-                  Selec ticket for
+                  Select ticket for
                 </SelectItem>
                 {user?.branches?.length === 0 ? (
                   <SelectItem value="No branches found">

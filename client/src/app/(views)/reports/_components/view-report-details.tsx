@@ -248,6 +248,14 @@ export function ViewReportDetails({ data, open, setIsOpen, fetchData }: any) {
           open={isViewDialogOpen}
           setOpen={setIsViewDialogOpen}
           setNote={setNoteValue}
+          setIsCounted={() => {}}
+          role={""}
+          note={""}
+          error={""}
+          isCounted={""}
+          handleApproveTicket={() => {}}
+          handleEditTicket={() => {}}
+          handleReviseTicket={() => {}}
           handleDirectToAutomation={() => {}}
         />
       )}

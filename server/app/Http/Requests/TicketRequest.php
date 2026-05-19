@@ -53,7 +53,8 @@ class TicketRequest extends FormRequest
             'from'                    => ['required', 'max:255', 'min:2'],
             'to'                      => ['required', 'max:255', 'min:2'],
             'ticket_reference_number' => ['required', 'max:255', 'min:2'],
-            'branch_head_id'          => [Rule::requiredIf($this->branchHeads() > 1)]
+            'branch_head_id'          => [Rule::requiredIf($this->branchHeads() > 1 && !Auth::user()->isAccountingStaff() && !Auth::user()->isBranchHead())],
+            'for_branch'              => [Rule::requiredIf(Auth::user()->isAccountingStaff())]
         ];
     }
 
@@ -75,7 +76,7 @@ class TicketRequest extends FormRequest
             'ticket_reference_number.required' => 'Ticket reference number is required.',
             'ticket_reference_number.max'      => 'Ticket reference number must be less than 255 characters.',
             'ticket_reference_number.min'      => 'Ticket reference number must be at least 2 characters.',
-            'branch_head_id.required_if'       => 'Branch head is required.',
+            'branch_head_id.required'          => 'Branch head is required.',
         ];
     }
 
@@ -95,7 +96,7 @@ class TicketRequest extends FormRequest
                 }
             }
 
-            if ($selected_branch_head?->userRole?->role_name !== UserRoles::BRANCH_HEAD && $this->branchHeads() > 1) {
+            if ($selected_branch_head?->userRole?->role_name !== UserRoles::BRANCH_HEAD && $this->branchHeads() > 1 && !Auth::user()->isAccountingStaff() && !Auth::user()->isBranchHead()) {
                 $validator->errors()->add('branch_head_id', 'Selected user is not a Branch Head. Please Select Another Branch Head.');
             }
         });

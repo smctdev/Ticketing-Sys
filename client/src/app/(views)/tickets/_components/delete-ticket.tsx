@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/tooltip";
 import { TooltipArrow } from "@radix-ui/react-tooltip";
 
-export function DeleteTicket({ data, setData }: any) {
+export function DeleteTicket({ data, fetchData }: any) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [isOpen, setIsOpen] = useState<boolean>(false);
@@ -40,11 +40,7 @@ export function DeleteTicket({ data, setData }: any) {
           description: response.data.message,
           position: "bottom-center",
         });
-        setData((prev: any) =>
-          prev.filter(
-            (item: any) => item.ticket_details_id !== data.ticket_details_id,
-          ),
-        );
+        fetchData()
       }
     } catch (error: any) {
       console.error(error);

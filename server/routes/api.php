@@ -49,7 +49,7 @@ Route::middleware([
         =>
         $request->user()
             ->loadCount('unreadMessages')
-            ->load(
+            ->load([
                 'userDetail',
                 'userRole',
                 'branch',
@@ -58,10 +58,10 @@ Route::middleware([
                 'assignedBranchCas.branch:blist_id,b_code',
                 'assignedAreaManagers.branch:blist_id,b_code',
                 'accountingAssignedBranches:blist_id,b_code',
-                'unreadNotifications',
+                'unreadNotifications' => fn($query) => $query->where('created_at', '>=', now()->subDays(2)),
                 'unreadMessages'
-            )
-            ->loadCount('unreadNotifications')
+            ])
+            ->loadCount(['unreadNotifications' => fn($query) => $query->where('created_at', '>=', now()->subDays(2))])
     );
 
     Route::post('/password-reset', [PasswordResetController::class, 'update']);

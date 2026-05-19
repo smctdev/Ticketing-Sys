@@ -228,6 +228,15 @@ export default function Notification() {
         open={isOpenView}
         setOpen={setIsOpenView}
         setNote={setNote}
+        setIsCounted={() => {}}
+        role={""}
+        note={""}
+        error={""}
+        isCounted={""}
+        handleApproveTicket={() => {}}
+        handleEditTicket={() => {}}
+        handleReviseTicket={() => {}}
+        handleDirectToAutomation={() => {}}
       />
     </div>
   );

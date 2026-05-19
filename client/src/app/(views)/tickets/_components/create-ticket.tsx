@@ -26,8 +26,7 @@ export function CreateTicket({
   refreshCategories,
   branchHeads,
   fetchBranchHeads,
-  setData,
-  perPage,
+  fetchData,
 }: any) {
   const [formInput, setFormInput] =
     useState<TicketFormDataType>(TICKET_FORM_DATA);
@@ -123,6 +122,10 @@ export function CreateTicket({
         formData.append("to", formInput.to);
       }
 
+      if (formInput?.for_branch) {
+        formData.append("for_branch", formInput.for_branch);
+      }
+
       if (formInput?.ticket_sub_category) {
         formData.append("ticket_sub_category", formInput.ticket_sub_category);
       }
@@ -152,10 +155,7 @@ export function CreateTicket({
           description: response.data.message,
           position: "bottom-center",
         });
-        setData((prev: any) =>
-          [response.data.data, ...prev]?.slice(0, perPage),
-        );
-        fetchBranchHeads();
+        fetchData();
       }
     } catch (error: any) {
       console.error(error);
@@ -168,6 +168,7 @@ export function CreateTicket({
       }
     } finally {
       setIsLoading(false);
+      fetchBranchHeads();
     }
   };
 

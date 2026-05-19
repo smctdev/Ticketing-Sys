@@ -8,6 +8,7 @@ import {
   Building,
   Truck,
   Pointer,
+  Notebook,
 } from "lucide-react";
 import Link from "next/link";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -268,8 +269,18 @@ export default function BottomCard({ data, totalTickets }: any) {
                   variant="outline"
                   className="justify-start w-full"
                 >
-                  <Activity className="mr-2 h-4 w-4" />
+                  <Notebook className="mr-2 h-4 w-4" />
                   Generate Reports
+                </Button>
+              </Link>
+              <Link className="w-full" href="/activities">
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="justify-start w-full"
+                >
+                  <Activity className="mr-2 h-4 w-4" />
+                  Activities
                 </Button>
               </Link>
             </div>

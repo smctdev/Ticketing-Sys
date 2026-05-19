@@ -234,7 +234,7 @@ class TicketController extends Controller
 
         return response()->json([
             "message" => "Ticket fetched successfully",
-            "data"    => $ticket
+            "data"    => $ticket->toResource(TicketResource::class)
         ], 200);
     }
 

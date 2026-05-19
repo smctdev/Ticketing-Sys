@@ -197,7 +197,7 @@ function Tickets() {
             </TooltipContent>
           </Tooltip>
           {(user?.login_id === row?.login_id || isAdmin) && (
-            <DeleteTicket data={row} setData={setData} />
+            <DeleteTicket data={row} fetchData={fetchData} />
           )}
           {isAdmin && (
             <Tooltip>
@@ -676,8 +676,7 @@ function Tickets() {
                   refreshCategories={refreshCategories}
                   branchHeads={branchHeads}
                   fetchBranchHeads={fetchBranchHeads}
-                  setData={setData}
-                  perPage={pagination.perPage}
+                  fetchData={fetchData}
                 />
               )}
             </div>
@@ -704,7 +703,7 @@ function Tickets() {
 
       {isOpenDialog && (
         <EditTicket
-          setData={setData}
+          fetchData={fetchData}
           ticketData={selectedTicketData}
           categories={categories}
           user={user}
@@ -740,7 +739,7 @@ function Tickets() {
           data={selectedTicketData}
           open={isOpenToTransfer}
           setOpen={setIsOpenToTransfer}
-          setData={setData}
+          fetchData={fetchData}
         />
       )}
     </div>

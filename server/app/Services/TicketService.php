@@ -264,7 +264,7 @@ class TicketService
 
     private function filterByUserBranch($q, $user, $request)
     {
-        $branchId = $user->hasMultipleBranches() ? $request->ticket_for :  $user->blist_id;
+        $branchId = $user->isAccountingStaff() ? $request->for_branch : ($user->hasMultipleBranches() ? $request->ticket_for :  $user->blist_id);
 
         return $q->where('blist_id', $branchId);
     }
@@ -368,7 +368,8 @@ class TicketService
             function () use ($request, $user, $assignedAutomation, $automationAdmin, $automationManager, $assignedBranchHead, $assignedAccountingStaff, $assignedAccountingHead, $directToAccounting) {
                 $paths = [];
                 $file = $request->file('ticket_support');
-                $branch = BranchList::findOrFail($request->ticket_for);
+                $branch = BranchList::findOrFail($user->isAccountingStaff() ? $request->for_branch : $request->ticket_for);
+                $is_accounting_staff_or_has_multiple_branches = $user->isAccountingStaff() || $user->hasMultipleBranches();
 
                 foreach ($file as $f) {
                     $fileName =  time() . '-' . $f->getClientOriginalName();
@@ -401,7 +402,7 @@ class TicketService
                     $user->isStaff()                             => $this->branchHeads() > 1 ? $request->branch_head_id : $assignedBranchHead->login_id,
                     $user->isBranchHead() && $directToAccounting => $assignedAccountingStaff->login_id,
                     $user->isBranchHead()                        => $automationManager->login_id,
-                    $user->isAccountingStaff()                   => $assignedAccountingHead->login_id ?? $automationManager->login_id,
+                    $user->isAccountingStaff()                   => $assignedAccountingHead->login_id ?? $assignedAutomation->assignedAutomation->login_id,
                     $assignedAutomation                          => $assignedAutomation->assignedAutomation->login_id,
                     default                                      => $automationAdmin->login_id
                 };
@@ -414,8 +415,8 @@ class TicketService
                 $ticket = $ticketDetail->ticket()->create([
                     'ticket_code'     => $code,
                     'login_id'        => $user->login_id,
-                    'branch_id'       => $user->hasMultipleBranches() ? $branch->blist_id : $user->blist_id,
-                    'branch_name'     => $user->hasMultipleBranches() ? $branch->b_name : $user->branch->b_name,
+                    'branch_id'       => $is_accounting_staff_or_has_multiple_branches ? $branch->blist_id : $user->blist_id,
+                    'branch_name'     => $is_accounting_staff_or_has_multiple_branches ? $branch->b_name : $user->branch->b_name,
                     'status'          => TicketStatus::PENDING,
                     'isCounted'       => 1,
                     'isApproved'      => 0,
@@ -448,6 +449,8 @@ class TicketService
 
     public function updateTicket($request, $id)
     {
+        $user = Auth::user();
+
         $assignedBranchHead = UserLogin::query()
             ->whereHas(
                 'userRole',
@@ -458,14 +461,23 @@ class TicketService
             ->whereRaw("FIND_IN_SET(?, blist_id)", [Auth::user()->blist_id])
             ->first();
 
+
+        $assignedAutomation = AssignedBranch::with([
+            'assignedAutomation',
+            'branch'
+        ])
+            ->where(
+                fn($q)
+                =>
+                $this->filterByUserBranch($q, $user, $request)
+            )
+            ->first();
+
         $data = DB::transaction(
-            function () use ($request, $id, $assignedBranchHead) {
-
-                // $branch = BranchList::findOrFail($request->ticket_for);
-
+            function () use ($request, $id, $assignedBranchHead, $assignedAutomation, $user) {
                 $ticketDetail = TicketDetail::findOrFail($id);
 
-                if (!$ticketDetail->ticket->pendingUser->isBranchHead() && $ticketDetail->ticket->status === TicketStatus::PENDING) {
+                if (!$ticketDetail->ticket->pendingUser->isBranchHead() && $ticketDetail->ticket->status === TicketStatus::PENDING && !$user->isAccountingStaff() && !$user->isBranchHead()) {
                     abort(400, 'You can not update this ticket because it has been already approved by your branch head.');
                 }
 
@@ -530,6 +542,15 @@ class TicketService
 
                 if ($ticketDetail->ticket->pendingUser->isBranchHead()) {
                     $to_update['displayTicket'] = $this->branchHeads() > 1 ? $request->branch_head_id : $assignedBranchHead->login_id;
+                }
+
+                if ($user->isAccountingStaff()) {
+                    $branch = BranchList::findOrFail($request->for_branch);
+
+                    $to_update['displayTicket']   = $assignedAutomation->assignedAutomation->login_id;
+                    $to_update['branch_id']       = $branch->blist_id;
+                    $to_update['branch_name']     = $branch->b_name;
+                    $to_update['assigned_person'] = $assignedAutomation->assignedAutomation->login_id ?? $ticketDetail->ticket->assignedPerson->login_id;
                 }
 
                 $ticketDetail->ticket->update($to_update);

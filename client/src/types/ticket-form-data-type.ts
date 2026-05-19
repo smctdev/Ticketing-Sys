@@ -11,4 +11,5 @@ export interface TicketFormDataType {
   ticket_sub_category?: string;
   ticket_reference_number?: string;
   branch_head_id?: string;
+  for_branch?: string;
 }

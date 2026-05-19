@@ -20,6 +20,7 @@ class TicketResource extends JsonResource
             'ticket_details_id'           => $this->ticket_details_id,
             'ticket_code'                 => $this->ticket_code,
             'status'                      => $this->status,
+            'branch_id'                   => $this->branch_id,
             'assigned_person'             => !$this->assignedPerson ? null : [
                 'login_id'                => $this->assignedPerson->login_id,
                 'full_name'               => $this->assignedPerson->full_name,

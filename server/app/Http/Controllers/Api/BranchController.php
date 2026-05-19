@@ -21,7 +21,8 @@ class BranchController extends Controller
             ->orderBy('b_code')
             ->get([
                 'blist_id',
-                'b_code'
+                'b_code',
+                'b_name'
             ]);
 
         return response()->json([

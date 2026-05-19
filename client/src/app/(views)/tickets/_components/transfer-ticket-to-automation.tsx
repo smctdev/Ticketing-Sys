@@ -41,14 +41,14 @@ type DialogProps = {
       login_id: string | number;
     };
   };
-  setData: Dispatch<SetStateAction<any>>;
+  fetchData: () => Promise<void>;
 };
 
 export function TransferTicketToAutomation({
   open,
   setOpen,
   data,
-  setData,
+  fetchData,
 }: DialogProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
@@ -83,16 +83,8 @@ export function TransferTicketToAutomation({
           description: response.data.message,
           position: "bottom-center",
         });
-
         if (response.data.message === "Nothing changed") return;
-
-        setData((prev: any) =>
-          prev.map((item: any) =>
-            item.ticket_details_id === response.data.data.ticket_details_id
-              ? response.data.data
-              : item,
-          ),
-        );
+        fetchData();
       }
     } catch (error: any) {
       console.error(error);
