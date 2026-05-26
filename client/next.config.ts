@@ -12,7 +12,7 @@ const nextConfig: NextConfig = {
       },
       {
         protocol: "https",
-        hostname: "beta-ticketing.smctgroup.ph",
+        hostname: "ticketing-server.smctgroup.ph",
         pathname: "/storage/uploads/**",
       },
       {

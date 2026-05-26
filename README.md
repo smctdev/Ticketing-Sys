@@ -1,4 +1,4 @@
-# Ticketing System — NetSuite V2
+# Ticketing System
 
 A full-stack internal ticketing and communication platform built for branch operations. It handles ticket submissions, multi-role approvals, real-time messaging, notifications, announcements, and reporting — all in one system.
 
@@ -268,9 +268,9 @@ docker compose up -d
 ```
 
 Services started:
-- `ticketing-netsuite-server-v2` — Laravel app (FrankenPHP)
-- `ticketing-netsuite-server-v2-nginx` — Nginx reverse proxy on port `7040`
-- `ticketing-netsuite-server-v2-reverb` — Reverb WebSocket server on port `8084`
+- `ticketing-server` — Laravel app (FrankenPHP)
+- `ticketing-server-nginx` — Nginx reverse proxy on port `7040`
+- `ticketing-server-reverb` — Reverb WebSocket server on port `8084`
 - `ticketing-v2-queue-worker` — Redis queue worker
 
 #### Frontend

@@ -5,7 +5,6 @@ use App\Http\Controllers\Api\AccountingController;
 use App\Http\Controllers\Api\AreaManagerController;
 use App\Http\Controllers\Api\AutomationController;
 use App\Http\Controllers\Api\BranchController;
-use App\Http\Controllers\Api\BranchListController;
 use App\Http\Controllers\Api\CasController;
 use App\Http\Controllers\Api\CategoryController;
 use App\Http\Controllers\Api\ChatController;
@@ -239,7 +238,7 @@ Route::middleware([
             $activities = Activity::with([
                 'causer:login_id,user_details_id,user_role_id',
                 'causer.userDetail:user_details_id,lname,fname,user_email',
-                'causer.userRole:user_role_id,role_name'
+                'causer.userRole:user_role_id,role_name',
             ])
                 ->when($request->search, function ($q) use ($request) {
                     $q->whereHas('causer', function ($query) use ($request) {
@@ -251,7 +250,7 @@ Route::middleware([
                 ->paginate($request->limit, ['id', 'description', 'causer_id', 'causer_type', 'created_at'])
                 ->through(function ($activity) {
                     return [
-                        'id' => $activity->id,
+                        'id'          => $activity->id,
                         'description' => $activity->description,
                         'full_name'   => $activity->causer?->full_name,
                         'email'       => $activity->causer?->userDetail?->user_email,

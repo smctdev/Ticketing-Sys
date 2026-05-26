@@ -742,11 +742,11 @@ class TicketService
                         'td_note_bh' => $request->td_note_bh,
                     ];
                 } else {
-
                     $requestData = [
                         'td_note'    => $request->td_note,
                     ];
                 }
+
                 $ticketApprovedData['displayTicket'] = $ticketDetail->ticket->assignedPerson?->login_id;
             }
 

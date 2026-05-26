@@ -1,10 +1,10 @@
 services:
-  ticketing-netsuite-server-v2:
+  ticketing-server:
     build:
       context: ./
       dockerfile: Dockerfile
-    image: ticketing-netsuite-server-v2
-    container_name: ticketing-netsuite-server-v2
+    image: ticketing-server
+    container_name: ticketing-server
     restart: unless-stopped
     environment:
       DB_CONNECTION: mysql
@@ -20,11 +20,11 @@ services:
       - ./php.ini:/usr/local/etc/php/php.ini
       - /home/webserver/systems/Ticketing-V2/Ticketing-Sys/server/.env:/var/www/.env
     networks:
-      - ticketing-netsuite-server-v2
+      - ticketing-server
 
-  ticketing-netsuite-server-v2-nginx:
+  ticketing-server-nginx:
     image: nginx:alpine
-    container_name: ticketing-netsuite-server-v2-nginx
+    container_name: ticketing-server-nginx
     restart: unless-stopped
     ports:
       - 7040:7040
@@ -36,9 +36,9 @@ services:
       - /home/webserver/systems/Ticketing-V2/Ticketing-Sys/server/.env:/var/www/.env
 
     networks:
-      - ticketing-netsuite-server-v2
+      - ticketing-server
 
-  ticketing-netsuite-server-v2-reverb:
+  ticketing-server-reverb:
     build:
       context: ./
       dockerfile: Dockerfile-reverb
@@ -49,28 +49,28 @@ services:
     - LARAVEL_REVERB_APP_KEY=${REVERB_APP_KEY}
     - LARAVEL_REVERB_APP_SECRET=${REVERB_APP_SECRET}
     depends_on:
-    - ticketing-netsuite-server-v2
+    - ticketing-server
     restart: unless-stopped
-    container_name: ticketing-netsuite-server-v2-reverb
+    container_name: ticketing-server-reverb
 
     networks:
-      - ticketing-netsuite-server-v2
+      - ticketing-server
 
   ticketing-v2-queue-worker:
-    image: ticketing-netsuite-server-v2
+    image: ticketing-server
     container_name: ticketing-v2-queue-worker
     working_dir: /var/www/
     depends_on:
-      - ticketing-netsuite-server-v2
+      - ticketing-server
     command: php artisan queue:work redis --tries=3
     volumes:
       - ./storage:/var/www/storage
       - ./bootstrap/cache:/var/www/bootstrap/cache
       - ./:/var/www
     networks:
-      - ticketing-netsuite-server-v2
+      - ticketing-server
     restart: unless-stopped
 
 networks:
-  ticketing-netsuite-server-v2:
+  ticketing-server:
     driver: bridge

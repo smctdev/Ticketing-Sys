@@ -17,7 +17,7 @@ return [
 
     'stateful' => explode(',', env('SANCTUM_STATEFUL_DOMAINS', sprintf(
         '%s%s',
-        'localhost,localhost:3000,localhost:3001,127.0.0.1,192.168.1.1,127.0.0.1:8000,localhost:4000,192.168.1.1:7030,beta-ticketing.smctgroup.ph,ticketing.smctgroup.ph,::1',
+        'localhost,localhost:3000,localhost:3001,127.0.0.1,192.168.1.1,127.0.0.1:8000,localhost:4000,192.168.1.1:7030,ticketing.smctgroup.ph,ticketing.smctgroup.ph,::1',
         Sanctum::currentApplicationUrlWithPort(),
         // Sanctum::currentRequestHost(),
     ))),

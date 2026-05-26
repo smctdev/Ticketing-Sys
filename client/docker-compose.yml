@@ -1,9 +1,9 @@
 version: '3.8'
 
 services:
-  ticketing-netsuite-client:
+  ticketing-client:
     build: .
-    container_name: ticketing-netsuite-client
+    container_name: ticketing-client
     restart: unless-stopped
     ports:
       - "7030:7030"

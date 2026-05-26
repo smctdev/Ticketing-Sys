@@ -50,7 +50,7 @@ export default function BaseLayout({ children }: { children: ReactNode }) {
           >
             <p className="text-center text-white">
               {isNoInternetConnection
-                ? "No internet connection. Please realod the page."
+                ? "No internet connection. Please reload the page or try again later."
                 : isConnecting
                   ? "Connecting..."
                   : "Back online."}
