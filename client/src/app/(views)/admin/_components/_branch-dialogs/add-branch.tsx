@@ -87,7 +87,7 @@ export function AddBranch({ fetchData }: AddBranchProps) {
               <AlertDescription>{error}</AlertDescription>
             </Alert>
           )}
-          <div className="max-h-[400px] overflow-y-auto space-y-2">
+          <div className="max-h-[400px] overflow-y-auto space-y-2 p-2">
             <div className="flex gap-2 flex-col">
               <Label htmlFor="branch_name">Branch name</Label>
               <Input
@@ -140,7 +140,7 @@ export function AddBranch({ fetchData }: AddBranchProps) {
             </div>
             <div className="flex gap-2 flex-col">
               <Label htmlFor="branch_contact_number">
-                Branch contact number
+                Branch contact number (optional)
               </Label>
               <Input
                 type="number"
@@ -155,7 +155,7 @@ export function AddBranch({ fetchData }: AddBranchProps) {
               )}
             </div>
             <div className="flex gap-2 flex-col">
-              <Label htmlFor="branch_email">Branch email</Label>
+              <Label htmlFor="branch_email">Branch email (optional)</Label>
               <Input
                 type="email"
                 placeholder="Enter branch email"
