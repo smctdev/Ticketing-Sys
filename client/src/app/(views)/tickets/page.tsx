@@ -150,7 +150,7 @@ function Tickets() {
       echo.leave(`approver-of-ticket-${user?.login_id}`);
       echo.leave("ticket-deleted");
     };
-  }, [echo, user, selectedTicketData, filterBy?.search]);
+  }, [echo, user, selectedTicketData, filterBy?.search, filterBy?.automation]);
 
   const isTurnToApprove = (userId: number | string | null) => {
     return userId === user?.login_id;
