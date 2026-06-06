@@ -91,7 +91,8 @@ function Tickets() {
   const ticketRef = useRef<any>(null);
 
   useEffect(() => {
-    if (!echo || !user || filterBy?.search) return;
+    if (!echo || !user || filterBy?.search || filterBy?.automation !== "ALL")
+      return;
 
     echo
       .private(`approver-of-ticket-${user?.login_id}`)
