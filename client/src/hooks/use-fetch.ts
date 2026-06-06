@@ -63,6 +63,7 @@ export default function useFetch({
     filterBy.created_end_date,
     filterBy.created_start_date,
     filterBy.ticket_type,
+    filterBy.automation,
     isRefresh,
     status,
   ]);

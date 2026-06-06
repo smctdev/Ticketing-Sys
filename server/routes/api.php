@@ -148,6 +148,7 @@ Route::middleware([
         Route::patch('/automation/{user_id}/update', 'update');
         Route::delete('/automation/{user_id}/delete', 'destroy');
         Route::get('/all-automations', 'getAllAutomations');
+        Route::get('/automations-pendings', 'showAutomationPendings');
     });
 
     Route::controller(AccountingBranchSetupController::class)->group(function () {

@@ -3,6 +3,7 @@ export const TICKETS_FILTER = {
   ticket_type: "ALL",
   search: "",
   defaultSearchValue: "",
+  automation: "ALL",
 };
 
 export const REPORTS_FILTER = {

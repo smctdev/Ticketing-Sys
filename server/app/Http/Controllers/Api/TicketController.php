@@ -37,6 +37,8 @@ class TicketController extends Controller
 
         $ticket_type = request('ticket_type');
 
+        $automation = request('automation');
+
         $user = Auth::user();
 
         $userRole = $user->userRole;
@@ -61,7 +63,8 @@ class TicketController extends Controller
             $assignedAreaManagers,
             $user,
             $take,
-            $accountingHeadCodes
+            $accountingHeadCodes,
+            $automation
         );
 
         return response()->json([

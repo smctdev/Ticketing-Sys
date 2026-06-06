@@ -39,6 +39,7 @@ class TicketService
         $user,
         $take,
         $accountingHeadCodes,
+        $automation
     ) {
         return Ticket::with([
             'userLogin.userDetail',
@@ -80,6 +81,13 @@ class TicketService
                 $q->where('status', $status)
             )
             ->search($search)
+            ->when(
+                $automation !== 'ALL',
+                fn($query)
+                =>
+                $query->where('displayTicket', $automation)
+                    ->where('status', TicketStatus::PENDING)
+            )
             ->when($ticket_type !== 'ALL', fn($query) => $query->whereRelation('ticketDetail', 'ticket_type', $ticket_type))
             ->when($ticket_category, fn($query) => $query->whereHas('ticketDetail', fn($subQuery) => $subQuery->where('ticket_category_id', $ticket_category)))
             ->when($bcode, fn($query) => $query->where('branch_id', $bcode))

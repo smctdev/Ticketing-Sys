@@ -147,4 +147,25 @@ class AutomationController extends Controller
             'message' => "{$branch_counts} branche(s) removed successfully",
         ], 200);
     }
+
+    public function showAutomationPendings()
+    {
+        $automations = UserLogin::query()
+            ->select(['login_id', 'user_details_id'])
+            ->withCount('pendingTickets')
+            ->with('userDetail:user_details_id,fname,lname')
+            ->where(
+                fn($q)
+                =>
+                $q->whereRelation('userRole', 'role_name', UserRoles::AUTOMATION)
+                    ->orWhereRelation('userRole', 'role_name', UserRoles::AUTOMATION_ADMIN)
+                    ->orWhereRelation('userRole', 'role_name', UserRoles::AUTOMATION_MANAGER)
+            )
+            ->get();
+
+        return response()->json([
+            'message' => 'Automation with Pendings Count Fetched Successfully',
+            'data'    => $automations
+        ], 200);
+    }
 }

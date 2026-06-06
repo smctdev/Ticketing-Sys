@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\TicketStatus;
 use App\Enums\UserRoles;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -306,5 +307,11 @@ class UserLogin extends Authenticatable
     public function feedbacks()
     {
         return $this->hasMany(Feedback::class, 'user_id', 'login_id');
+    }
+
+    public function pendingTickets()
+    {
+        return $this->hasMany(Ticket::class, 'displayTicket', 'login_id')
+            ->where('status', TicketStatus::PENDING);
     }
 }
