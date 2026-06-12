@@ -91,8 +91,8 @@ class TicketService
             ->when($ticket_type !== 'ALL', fn($query) => $query->whereRelation('ticketDetail', 'ticket_type', $ticket_type))
             ->when($ticket_category, fn($query) => $query->whereHas('ticketDetail', fn($subQuery) => $subQuery->where('ticket_category_id', $ticket_category)))
             ->when($bcode, fn($query) => $query->where('branch_id', $bcode))
-            ->when(!$isAdmin, function ($query) use ($userRole, $assignedBranchCas, $assignedAreaManagers, $accountingHeadCodes, $user) {
-                $query->where(function ($subQuery) use ($userRole, $assignedBranchCas, $assignedAreaManagers, $accountingHeadCodes, $user) {
+            ->when(!$isAdmin, function ($query) use ($userRole, $assignedBranchCas, $assignedAreaManagers, $accountingHeadCodes, $user, $automation) {
+                $query->where(function ($subQuery) use ($userRole, $assignedBranchCas, $assignedAreaManagers, $accountingHeadCodes, $user, $automation) {
                     $userBranchIds = explode(',', $user->blist_id);
 
                     switch ($userRole->role_name) {
@@ -107,9 +107,14 @@ class TicketService
                                 ->where('displayTicket', Auth::id());
                             break;
                         case UserRoles::AUTOMATION_MANAGER:
-                            $subQuery->whereNot('status', TicketStatus::EDITED)
-                                ->where('displayTicket', Auth::id());
-                            // ->orWhere('last_approver', Auth::id());
+                            $subQuery->when(
+                                $automation === 'ALL',
+                                function ($ticketQueryForAutomationManager) {
+                                    $ticketQueryForAutomationManager->whereNot('status', TicketStatus::EDITED)
+                                        ->where('displayTicket', Auth::id());
+                                    // ->orWhere('last_approver', Auth::id());
+                                }
+                            );
                             break;
                         case UserRoles::BRANCH_HEAD:
                             $subQuery->whereNot('status', TicketStatus::EDITED)
