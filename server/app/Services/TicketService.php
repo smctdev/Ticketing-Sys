@@ -340,12 +340,12 @@ class TicketService
                 'ticket_category_id',
                 $request->ticket_category
             )
-            ->whereHas(
-                'accountingAssignedBranches',
-                fn($query)
-                =>
-                $query->where('assigned_accounting_branches.blist_id', $user->hasMultipleBranches() ? $request->ticket_for : $user->blist_id)
-            )
+            // ->whereHas(
+            //     'accountingAssignedBranches',
+            //     fn($query)
+            //     =>
+            //     $query->where('assigned_accounting_branches.blist_id', $user->hasMultipleBranches() ? $request->ticket_for : $user->blist_id)
+            // )
             ->first();
 
         $assignedAccountingHead = UserLogin::query()
@@ -594,8 +594,8 @@ class TicketService
     {
         $ticketDetail = TicketDetail::findOrFail($id);
 
-        if (!$ticketDetail->ticket->pendingUser->isBranchHead() && $ticketDetail->ticket->status === TicketStatus::PENDING && !$this->user->isSuperAdmin()) {
-            abort(400, 'You can not delete this ticket because it has been already approved by your branch head.');
+        if ($ticketDetail->ticket->status === TicketStatus::PENDING && !$this->user->isSuperAdmin() && $ticketDetail->ticket->lastApprover) {
+            abort(400, 'You can not delete this ticket because it has been already approved.');
         }
 
         if ($ticketDetail->ticket->status === TicketStatus::EDITED) {
