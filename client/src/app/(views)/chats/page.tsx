@@ -131,7 +131,7 @@ function ChatsPage() {
                     >
                       <div className="relative shrink-0">
                         <Avatar className="w-10 h-10">
-                          <AvatarImage src={Storage(row.profile_pic)} />
+                          <AvatarImage src={Storage(row?.profile_pic)} />
                           <AvatarFallback className="font-semibold">
                             {nameShortHand(row?.full_name)}
                           </AvatarFallback>

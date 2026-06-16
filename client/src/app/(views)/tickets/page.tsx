@@ -75,8 +75,11 @@ function Tickets() {
   const { data: branchHeads, fetchData: fetchBranchHeads } = useFetch({
     url: `/user-branch-heads`,
   });
-  const { data: automationPendings, isLoading: isLoadingAutomationPendings } =
-    useFetch({ url: "/automations-pendings" });
+  const {
+    data: automationPendings,
+    isLoading: isLoadingAutomationPendings,
+    fetchData: fetchAutomationPendings,
+  } = useFetch({ url: "/automations-pendings" });
   const [selectedTicketData, setSelectedTicketData] = useState<null | any>(
     null,
   );
@@ -656,6 +659,7 @@ function Tickets() {
                   <Select
                     onValueChange={handleSelectFilter("automation")}
                     value={filterBy.automation}
+                    onOpenChange={(open) => open && fetchAutomationPendings()}
                   >
                     <SelectTrigger className="w-full">
                       <SelectValue placeholder="Filter by automation" />
@@ -665,7 +669,9 @@ function Tickets() {
                         <SelectItem value="Filter by automation" disabled>
                           Filter by automation
                         </SelectItem>
-                        <SelectItem value="ALL">ALL</SelectItem>
+                        <SelectItem value="ALL">
+                          <span className="font-extrabold">ALL</span>
+                        </SelectItem>
                         {automationPendings.length > 0 ? (
                           automationPendings.map(
                             (automation: {

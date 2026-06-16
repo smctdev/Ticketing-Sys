@@ -15,7 +15,10 @@ class ChatService
             ->with('userDetail')
             ->withMax('sentMessages as sent_message_latest', 'created_at')
             ->withMax('receivedMessages as received_message_latest', 'created_at')
-            ->with('sentMessages', 'receivedMessages')
+            ->with([
+                'sentMessages' => fn($q) => $q->latest()->take(1)->with('attachments'),
+                'receivedMessages' => fn($q) => $q->latest()->take(1)->with('attachments')
+            ])
             ->search($search)
             ->when(!$search, function ($q) {
                 $q->where(function ($sQ) {
@@ -26,18 +29,20 @@ class ChatService
             ->orderByRaw('GREATEST(COALESCE(sent_message_latest, 0), COALESCE(received_message_latest, 0)) DESC')
             ->paginate($limit)
             ->through(function ($user) {
-                $attachment_count = collect([$user->sentMessages->last(), $user->receivedMessages->last()])->max()?->attachments()?->count();
+                $collected_by_max = collect([$user->sentMessages->first(), $user->receivedMessages->first()])->max();
+                $attachment_count = $collected_by_max?->attachments?->count();
                 $last_message_by_attachment = $attachment_count > 0 ? "Sent {$attachment_count} " . Str::plural('attachment', $attachment_count) : "";
 
                 return [
                     'login_id'     => $user->login_id,
                     'full_name'    => $user->full_name,
                     'profile_pic'  => $user->userDetail->profile_pic,
-                    'timestamp'    => collect([$user->sent_message_latest, $user->received_message_latest])->max(),
-                    'last_message' => collect([$user->sentMessages->last(), $user->receivedMessages->last()])->max()?->body ?: $last_message_by_attachment,
+                    'timestamp'    => max($user->sent_message_latest, $user->received_message_latest),
+                    'last_message' => $collected_by_max?->body ?: $last_message_by_attachment,
                 ];
             });
     }
+
     public function getMessages($chat)
     {
         $messages = Message::query()
