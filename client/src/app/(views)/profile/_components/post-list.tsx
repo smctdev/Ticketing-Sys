@@ -5,7 +5,7 @@ import { Separator } from "@/components/ui/separator";
 import { formatDistanceToNowStrict } from "date-fns";
 import Storage from "@/utils/storage";
 import nameShortHand from "@/utils/name-short-hand";
-import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
 import { Heart, MessageSquare } from "lucide-react";
@@ -15,6 +15,7 @@ import { PostDropdown } from "./post-dropdown";
 import IsEdited from "./is-edited";
 import { EditPost } from "./post-dialogs/edit-post";
 import { DeletePost } from "./post-dialogs/delete-post";
+import { ROLE } from "@/constants/roles";
 
 interface User {
   login_id: number;
@@ -67,6 +68,7 @@ export default function PostList({
   const [postId, setPostId] = useState<number>(0);
   const isPostowner = Number(user?.login_id) === Number(post?.user?.login_id);
   const textRef = useRef<HTMLParagraphElement>(null);
+  const IS_SUPER_ADMIN = user?.user_role?.role_name === ROLE.SUPER_ADMIN;
 
   useEffect(() => {
     if (textRef.current) {
@@ -150,7 +152,7 @@ export default function PostList({
                 </p>
               </div>
             </div>
-            {isPostowner && (
+            {(isPostowner || IS_SUPER_ADMIN) && (
               <PostDropdown
                 handleEditPost={handleEditPost(post)}
                 handleDeletePost={handleDeletePost(post?.id)}
@@ -165,12 +167,28 @@ export default function PostList({
               isExpanded[post?.id] ? "" : "line-clamp-4"
             }`}
           >
-            {post.content}
+            {post?.content?.split("\n").map((word, index) => (
+              <span key={index}>
+                {word?.split(" ")?.map((w, idx) =>
+                  w.startsWith("#") ? (
+                    <span
+                      className="text-blue-400 hover:underline cursor-pointer"
+                      key={idx}
+                    >
+                      {`${w} `}
+                    </span>
+                  ) : (
+                    <span key={idx}>{`${w} `}</span>
+                  ),
+                )}
+                <br />
+              </span>
+            ))}
           </p>
           {showSeeMore[post?.id] ? (
             <span
               onClick={handleSeeMore(post.id)}
-              className="dark:text-white text-gray-400 font-thin text-sm cursor-pointer hover:dark:text-white text-gray-600"
+              className="dark:text-white text-gray-400 font-thin text-sm cursor-pointer hover:dark:text-white"
             >
               See more
             </span>
@@ -178,7 +196,7 @@ export default function PostList({
             isExpanded[post?.id] && (
               <span
                 onClick={handleSeeMore(post.id)}
-                className="dark:text-white text-gray-400 font-thin text-sm cursor-pointer hover:dark:text-white text-gray-600"
+                className="dark:text-white text-gray-400 font-thin text-sm cursor-pointer hover:dark:text-white"
               >
                 See less
               </span>
