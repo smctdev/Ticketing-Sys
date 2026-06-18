@@ -197,7 +197,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       });
 
     return () => {
-      echo.leave(`private-${channelName}`);
+      echo.leave(channelName);
       echo.leave(`presence-poked`);
     };
   }, [echo, user, pathname]);

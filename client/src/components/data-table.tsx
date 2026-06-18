@@ -10,6 +10,7 @@ import {
   EmptyTitle,
 } from "./ui/empty";
 import { CopySlash, Search } from "lucide-react";
+import { useSettings } from "@/context/settings-context";
 
 export default function DataTableComponent({
   data,
@@ -29,6 +30,8 @@ export default function DataTableComponent({
   isFixedHeader = false,
   error,
 }: DataTableType) {
+  const { theme } = useSettings();
+
   const NoData = () => {
     return (
       <Empty>
@@ -85,6 +88,7 @@ export default function DataTableComponent({
       conditionalRowStyles={conditionalRowStyles}
       paginationDefaultPage={currentPage}
       responsive
+      theme={theme}
     />
   );
 }
