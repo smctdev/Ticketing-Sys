@@ -14,7 +14,7 @@ import { api } from "@/lib/api";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import SelectableFeelings from "./selectable-feelings";
-import { Post } from "../post-list";
+import { PostData } from "@/components/post-item";
 
 export function EditPost({
   open,
@@ -25,9 +25,9 @@ export function EditPost({
 }: {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
-  data: Post | null;
+  data: PostData | null;
   fetchData: () => Promise<void>;
-  setSelectedPost: Dispatch<SetStateAction<Post | null>>;
+  setSelectedPost: Dispatch<SetStateAction<PostData | null>>;
 }) {
   const [formInput, setFormInput] =
     useState<PostFormInputType>(POST_FORM_ITEMS);
