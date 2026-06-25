@@ -145,7 +145,7 @@ export default function EditProfile({
               <Button
                 type="button"
                 onClick={() => inputFileRef.current?.click()}
-                className="bg-blue-500 hover:bg-blue-600"
+                className="bg-blue-500 hover:bg-blue-600 text-white"
                 size={"sm"}
               >
                 Upload
@@ -214,7 +214,9 @@ export default function EditProfile({
                   onChange={handleChange("email")}
                 />
                 {errors?.email && (
-                  <small className="text-red-500 text-sm">{errors.email[0]}</small>
+                  <small className="text-red-500 text-sm">
+                    {errors.email[0]}
+                  </small>
                 )}
               </div>
             </div>
@@ -268,7 +270,7 @@ export default function EditProfile({
             onClick={handleSaveChanges}
             type="button"
             disabled={isLoading}
-            className="bg-blue-500 hover:bg-blue-600"
+            className="bg-blue-500 hover:bg-blue-600 text-white"
           >
             {isLoading ? (
               <>

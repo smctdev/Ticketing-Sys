@@ -26,8 +26,9 @@ import nameShortHand from "@/utils/name-short-hand";
 import CommentLoader from "./comment-loader";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
+import { PostData } from "@/components/post-item";
 
-interface Comment {
+export interface Comment {
   id: number;
   comment: string;
   created_at: string;
@@ -47,13 +48,19 @@ export function PostComment({
   open,
   setOpen,
   fetchData,
-  isCommentOpen,
+  handleEditPost,
+  handleDeletePost,
+  handleComment,
+  setSelectedPost,
 }: {
   data: any;
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
   fetchData: () => Promise<void>;
-  isCommentOpen?: boolean;
+  handleEditPost: (data: PostData) => () => void;
+  handleDeletePost: (id: number) => () => void;
+  handleComment: (data: PostData) => () => void;
+  setSelectedPost: Dispatch<SetStateAction<PostData | null>>;
 }) {
   const { user } = useAuth();
   const {
@@ -85,6 +92,10 @@ export function PostComment({
         textareaRef.current?.focus();
         fetchData();
         fetchComments();
+        setSelectedPost((prev) => ({
+          ...prev!,
+          comments_count: prev!.comments_count + 1,
+        }));
       }
     } catch (error: any) {
       console.error(error);
@@ -104,9 +115,19 @@ export function PostComment({
     textareaRef.current?.focus();
   };
 
+  if (!data) return null;
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogContent className="px-0 pb-0 min-w-1/3">
+    <Dialog
+      open={open}
+      onOpenChange={(open) => {
+        setOpen(open);
+        if (!open) {
+          setSelectedPost(null);
+        }
+      }}
+    >
+      <DialogContent className="px-0 pb-0 min-w-2/5">
         <DialogHeader className="mx-5">
           <DialogTitle className="dark:text-white text-gray-600 font-bold text-xl text-center">
             {data?.user?.full_name}&apos;s post
@@ -116,8 +137,12 @@ export function PostComment({
           <PostList
             post={data}
             fetchData={fetchData}
-            isCommentOpen={isCommentOpen}
+            isCommentOpen={open}
             handleCommentChange={handleCommentChange}
+            handleEditPost={handleEditPost}
+            handleDeletePost={handleDeletePost}
+            handleComment={handleComment}
+            setSelectedPost={setSelectedPost}
           />
           <div className="flex flex-col gap-2">
             {isLoading ? (

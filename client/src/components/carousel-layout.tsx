@@ -179,6 +179,7 @@ function ZoomableImage({
           style={{ rotate: rotate.rotation }}
           loading="lazy"
           draggable={false}
+          onDoubleClick={() => reset()}
         />
       </div>
     </div>

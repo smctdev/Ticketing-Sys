@@ -9,8 +9,6 @@ use Illuminate\Database\Eloquent\Model;
 
 class Ticket extends Model
 {
-    public $timestamps = false;
-
     protected $primaryKey = 'ticket_id';
 
     protected $guarded = [];

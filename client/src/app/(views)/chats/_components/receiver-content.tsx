@@ -22,10 +22,11 @@ export default function ReceiverContent({
       {message?.reply_from && (
         <div className="flex justify-start items-start flex-col">
           <span className="text-[10px] font-semibold flex gap-1 items-center">
-            <Reply className="size-3" /> <span>{data?.user?.full_name} replied to a message</span>
+            <Reply className="size-3" />{" "}
+            <span>{data?.user?.full_name} replied to a message</span>
           </span>
           <div
-            className="max-w-4/5 w-fit px-4 py-2.5 rounded-2xl rounded-bl-sm text-sm wrap-break-word whitespace-break-spaces leading-relaxed bg-chat-receiver-background/20 -mb-2 dark:text-whit"
+            className="max-w-4/5 w-fit px-4 py-2.5 rounded-3xl rounded-bl-sm text-sm wrap-break-word whitespace-break-spaces leading-relaxed bg-chat-receiver-background/20 -mb-2 dark:text-whit"
             dangerouslySetInnerHTML={{
               __html:
                 message?.reply_from?.body ||
@@ -44,7 +45,7 @@ export default function ReceiverContent({
           <div className="self-start w-full">
             {message?.body && (
               <div
-                className="px-4 py-2.5 rounded-2xl rounded-bl-sm text-sm wrap-break-word whitespace-break-spaces leading-relaxed bg-chat-receiver-background dark:text-white shadow-lg shadow-chat-background/50"
+                className="px-4 py-2.5 rounded-3xl rounded-bl-sm text-sm wrap-break-word whitespace-break-spaces leading-relaxed bg-chat-receiver-background dark:text-white shadow-lg shadow-chat-background/50"
                 dangerouslySetInnerHTML={{
                   __html: message?.body,
                 }}

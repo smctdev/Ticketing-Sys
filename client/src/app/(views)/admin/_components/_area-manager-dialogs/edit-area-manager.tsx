@@ -145,7 +145,7 @@ export default function EditAreaManagerDialog({
             </DialogClose>
             <Button
               type="submit"
-              className="bg-blue-500 hover:bg-blue-600"
+              className="bg-blue-500 hover:bg-blue-600 text-white"
               variant={"default"}
               disabled={isLoading}
             >

@@ -42,6 +42,7 @@ export default function DateFilter({ filterBy, handleDateFilter }: any) {
             <PopoverContent className="w-auto p-0" align="start">
               <Calendar
                 mode="range"
+                captionLayout="dropdown"
                 defaultMonth={filterBy.edited_end_date}
                 selected={{
                   from: filterBy.edited_start_date,
@@ -90,6 +91,7 @@ export default function DateFilter({ filterBy, handleDateFilter }: any) {
             <PopoverContent className="w-auto p-0" align="start">
               <Calendar
                 mode="range"
+                captionLayout="dropdown"
                 defaultMonth={filterBy.edited_transaction_end_date}
                 selected={{
                   from: filterBy.edited_transaction_start_date,

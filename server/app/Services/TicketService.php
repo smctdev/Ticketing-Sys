@@ -171,7 +171,7 @@ class TicketService
                 =>
                 $query->whereNot('status', TicketStatus::EDITED)
             )
-            ->orderBy('ticket_id', 'desc')
+            ->orderBy('updated_at', 'desc')
             ->paginate($take);
     }
 
@@ -490,8 +490,8 @@ class TicketService
             function () use ($request, $id, $assignedBranchHead, $assignedAutomation, $user) {
                 $ticketDetail = TicketDetail::findOrFail($id);
 
-                if (!$ticketDetail->ticket->pendingUser->isBranchHead() && $ticketDetail->ticket->status === TicketStatus::PENDING && !$user->isAccountingStaff() && !$user->isBranchHead()) {
-                    abort(400, 'You can not update this ticket because it has been already approved by your branch head.');
+                if ($ticketDetail->ticket->status !== TicketStatus::EDITED && !$this->user->isSuperAdmin() && $ticketDetail->ticket->lastApprover) {
+                    abort(400, 'You can not delete this ticket because it has been already approved.');
                 }
 
                 if ($ticketDetail->ticket->status === TicketStatus::EDITED) {
@@ -594,7 +594,7 @@ class TicketService
     {
         $ticketDetail = TicketDetail::findOrFail($id);
 
-        if ($ticketDetail->ticket->status === TicketStatus::PENDING && !$this->user->isSuperAdmin() && $ticketDetail->ticket->lastApprover) {
+        if ($ticketDetail->ticket->status !== TicketStatus::EDITED && !$this->user->isSuperAdmin() && $ticketDetail->ticket->lastApprover) {
             abort(400, 'You can not delete this ticket because it has been already approved.');
         }
 

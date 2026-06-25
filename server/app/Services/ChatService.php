@@ -27,7 +27,7 @@ class ChatService
                 });
             })
             ->orderByRaw('GREATEST(COALESCE(sent_message_latest, 0), COALESCE(received_message_latest, 0)) DESC')
-            ->paginate($limit)
+            ->paginate(5)
             ->through(function ($user) {
                 $collected_by_max = collect([$user->sentMessages->first(), $user->receivedMessages->first()])->max();
                 $attachment_count = $collected_by_max?->attachments?->count();

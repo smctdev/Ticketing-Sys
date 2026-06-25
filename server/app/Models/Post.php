@@ -4,13 +4,15 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Auth;
 
 class Post extends Model
 {
     protected $guarded = [];
 
     protected $appends = [
-        'is_edited'
+        'is_edited',
+        'is_liked_by_you'
     ];
 
     public function user()
@@ -45,5 +47,16 @@ class Post extends Model
     public function getIsEditedAttribute()
     {
         return Carbon::parse($this->updated_at)->gt(Carbon::parse($this->created_at));
+    }
+
+    public function latestComment()
+    {
+        return $this->hasOne(Comment::class)
+            ->latest();
+    }
+
+    public function getIsLikedByYouAttribute()
+    {
+        return $this->userLikes()->where('user_id', Auth::id())->exists();
     }
 }

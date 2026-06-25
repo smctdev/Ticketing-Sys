@@ -19,6 +19,7 @@ import { useChat } from "@/context/chat-context";
 import useFetch from "@/hooks/use-fetch";
 import { api } from "@/lib/api";
 import withAuthPage from "@/lib/hoc/with-auth-page";
+import diffForHumans from "@/utils/diff-for-humans";
 import nameShortHand from "@/utils/name-short-hand";
 import Storage from "@/utils/storage";
 import {
@@ -85,8 +86,9 @@ function ChatsPage() {
                 <div key={i} className="flex items-center gap-3 px-6 py-4">
                   <Skeleton className="w-10 h-10 rounded-full shrink-0" />
                   <div className="flex-1 space-y-2">
-                    <Skeleton className="h-3 w-32 rounded" />
-                    <Skeleton className="h-2.5 w-48 rounded" />
+                    <Skeleton className="h-4 w-32 rounded" />
+                    <Skeleton className="h-3 w-48 rounded" />
+                    <Skeleton className="h-3 w-15 rounded" />
                   </div>
                 </div>
               ))}
@@ -159,9 +161,14 @@ function ChatsPage() {
                           <p
                             className={`text-xs truncate ${unread > 0 ? "text-foreground font-medium" : "text-muted-foreground"}`}
                           >
-                            {lastMessage}
+                            <span
+                              dangerouslySetInnerHTML={{ __html: lastMessage }}
+                            />
                           </p>
                         )}
+                        <span className="text-xs opacity-60">
+                          {diffForHumans(row.timestamp)}
+                        </span>
                       </div>
                     </Link>
                     <div className="flex items-center gap-1 shrink-0">

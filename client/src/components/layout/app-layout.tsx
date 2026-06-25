@@ -39,6 +39,10 @@ const AppLayout = ({ children }: { children: ReactNode }) => {
       ? ["Home"]
       : pathname.replace(/-/g, " ").split("/").slice(1);
 
+  const isAuthUser = (userId: number) => {
+    return authUser?.login_id === userId;
+  };
+
   return (
     <>
       <AppSidebar />
@@ -79,19 +83,25 @@ const AppLayout = ({ children }: { children: ReactNode }) => {
                       <div className="flex flex-col max-h-[300px] overflow-y-auto">
                         {usersOnline?.map((user) => (
                           <Link
-                            href={`/chats/${user.id}`}
+                            href={
+                              !isAuthUser(user.id) ? `/chats/${user.id}` : "#"
+                            }
                             className="font-bold"
                             key={user.id}
                           >
                             <div className="flex justify-between items-center group hover:bg-black/10 rounded-md p-2">
                               <div className="text-xs flex items-center gap-2">
                                 <span className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
-                                <span className="font-bold group-hover:hidden truncate w-25">
+                                <span
+                                  className={`${!isAuthUser(user.id) && "group-hover:hidden"} font-bold truncate w-25`}
+                                >
                                   {authUser.login_id === user.id
                                     ? "You"
                                     : user.full_name}
                                 </span>
-                                <span className="font-bold group-hover:block hidden gap-1">
+                                <span
+                                  className={`font-bold ${!isAuthUser(user.id) && "group-hover:block"} hidden gap-1`}
+                                >
                                   <span className="flex gap-1 items-center text-blue-500">
                                     <MessageCircleMore size={15} />{" "}
                                     <span>Chat now!</span>

@@ -6,7 +6,7 @@ export default function PostLoader() {
   return (
     <>
       {Array.from({ length: 5 }).map((_, index) => (
-        <Card key={index}>
+        <Card key={index} className="gap-1 pb-0">
           <CardHeader className="pb-3">
             <div className="flex justify-between">
               <div className="flex items-center space-x-2">

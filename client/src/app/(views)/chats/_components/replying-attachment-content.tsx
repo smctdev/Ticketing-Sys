@@ -47,7 +47,11 @@ export default function ReplyingAttachmentContent({
             {formInput.reply_message_content && (
               <div className="text-xs line-clamp-2 wrap-break-word">
                 <span className="font-semibold">Replying to:</span>{" "}
-                {formInput.reply_message_content}
+                <span
+                  dangerouslySetInnerHTML={{
+                    __html: formInput.reply_message_content,
+                  }}
+                />
               </div>
             )}
             {formInput.attachments.length > 0 && (

@@ -18,7 +18,7 @@ class CommentController extends Controller
             ->with('user.userDetail:user_details_id,profile_pic,fname,lname')
             ->where('post_id', $post_id)
             ->latest()
-            ->cursorPaginate(20);
+            ->cursorPaginate(5);
 
         return response()->json([
             'message' => 'Comments fetched successfully',

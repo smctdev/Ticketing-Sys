@@ -29,6 +29,7 @@ use App\Http\Controllers\Api\SubCategoryController;
 use App\Http\Controllers\Api\UserRoleController;
 use App\Models\BranchList;
 use App\Models\GroupCategory;
+use App\Models\Ticket;
 use App\Models\UserLogin;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -203,6 +204,7 @@ Route::middleware([
 
     Route::controller(PostController::class)->group(function () {
         Route::get('/posts', 'index');
+        Route::get('/owned-posts', 'ownedPosts');
         Route::post('/posts', 'store');
         Route::patch('/posts/{id}/update', 'update');
         Route::delete('/posts/{id}/delete', 'destroy');
@@ -335,5 +337,34 @@ Route::post('/change-password-to-all-user', function () {
 
     return response()->json([
         'message' => "Successfully changed password to {$total_user_added} users."
+    ], 200);
+});
+
+Route::get('submit-timestamp', function () {
+    $formed_data_to_store = [];
+
+    Ticket::query()
+        ->with('ticketDetail')
+        ->whereNull('created_at')
+        ->whereNull('updated_at')
+        ->limit(15000)
+        ->chunk(1000, function ($chunked_tickets) use (&$formed_data_to_store) {
+            $chunked_tickets->each(function ($ticket) use (&$formed_data_to_store) {
+                $formed_data_to_store[] = [
+                    'ticket_id'   => $ticket->ticket_id,
+                    'ticket_code' => $ticket->ticket_code,
+                    'created_at'  => $ticket->ticketDetail->date_created,
+                    'updated_at'  => $ticket->ticketDetail->date_created
+                ];
+            });
+        });
+
+    Ticket::query()
+        ->upsert($formed_data_to_store, ['ticket_id'], ['created_at', 'updated_at']);
+
+    $affected_count = count($formed_data_to_store);
+
+    return response()->json([
+        'message' => "Successfully updated timestamps. {$affected_count} records affected.",
     ], 200);
 });

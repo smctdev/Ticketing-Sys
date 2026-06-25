@@ -1,3 +1,4 @@
+import { PostData } from "@/components/post-item";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -18,9 +19,18 @@ interface DeletePostProps {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
   fetchData: () => Promise<void>;
+  setSelectedPost: Dispatch<SetStateAction<PostData | null>>;
+  setIsOpenComment: Dispatch<SetStateAction<boolean>>;
 }
 
-export function DeletePost({ id, open, setOpen, fetchData }: DeletePostProps) {
+export function DeletePost({
+  id,
+  open,
+  setOpen,
+  fetchData,
+  setSelectedPost,
+  setIsOpenComment,
+}: DeletePostProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string>("");
 
@@ -36,6 +46,8 @@ export function DeletePost({ id, open, setOpen, fetchData }: DeletePostProps) {
         });
         setOpen(false);
         setError("");
+        setSelectedPost(null);
+        setIsOpenComment(false);
         fetchData();
       }
     } catch (error: any) {

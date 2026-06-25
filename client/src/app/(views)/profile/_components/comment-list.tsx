@@ -72,7 +72,7 @@ export default function CommentList({
   };
   return (
     <div className="flex space-x-2 relative">
-      <Avatar className="h-8 w-8 mx-3 my-1.5">
+      <Avatar className="h-8 w-8 mx-2 my-1.5">
         <AvatarImage
           src={Storage(comment?.user?.user_detail?.profile_pic)}
           alt={comment?.user?.full_name}
@@ -83,7 +83,7 @@ export default function CommentList({
       </Avatar>
       <div className="flex flex-col px-3 py-1.5 rounded-xl w-full">
         <div className="flex items-center gap-1">
-          <span className="dark:text-white text-gray-500 font-bold">
+          <span className="dark:text-white text-gray-500 font-bold text-sm">
             {comment?.user?.full_name}
           </span>
           <span className="dark:text-white text-gray-500 font-bold text-[8px]">

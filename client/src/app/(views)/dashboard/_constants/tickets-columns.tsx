@@ -37,21 +37,37 @@ export const TICKETS_COLUMNS = [
   {
     name: "Requested By",
     cell: (row: any) => (
-      <div className="flex flex-col gap-1 py-1.5">
-        <span className="font-extrabold text-xs text-blue-400 border rounded-2xl border-blue-500 w-fit py-0.5 px-1">
-          {`(${row?.branch?.b_code}) ${row?.branch?.b_name || row?.branch_name}`}
-        </span>
-        <span
-          className={`${row.user_login?.full_name ? "dark:text-white text-gray-600" : "text-red-500"} font-bold text-xs`}
-        >
-          {row.user_login?.full_name || "Deleted Account"}
-        </span>
+      <div className="flex flex-col gap-1 py-1.5 truncate">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span className="font-extrabold text-xs text-blue-400 border rounded-2xl border-blue-500 truncate py-0.5 px-1">
+              {`(${row?.branch?.b_code}) ${row?.branch?.b_name || row?.branch_name}`}
+            </span>
+          </TooltipTrigger>
+          <TooltipContent>
+            <TooltipArrow />
+            {`(${row?.branch?.b_code}) ${row?.branch?.b_name || row?.branch_name}`}
+          </TooltipContent>
+        </Tooltip>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <span
+              className={`${row.user_login?.full_name ? "dark:text-white text-gray-600" : "text-red-500"} font-bold text-xs truncate`}
+            >
+              {row.user_login?.full_name || "Deleted Account"}
+            </span>
+          </TooltipTrigger>
+          <TooltipContent>
+            <TooltipArrow />
+            {row.user_login?.full_name || "Deleted Account"}
+          </TooltipContent>
+        </Tooltip>
       </div>
     ),
     sortable: false,
     sortField: "user_details.fname",
     grow: 0,
-    width: "270px",
+    width: "170px",
   },
   {
     name: "Category",

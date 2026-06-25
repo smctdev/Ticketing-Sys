@@ -1,5 +1,12 @@
 import { api } from "@/lib/api";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import {
+  Dispatch,
+  RefObject,
+  SetStateAction,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 
 const CURSOR_ITEMS = {
   prev_cursor: null,
@@ -7,7 +14,7 @@ const CURSOR_ITEMS = {
   active_cursor: null,
 };
 
-interface CursorType {
+export interface CursorType {
   prev_cursor: string | null;
   next_cursor: string | null;
   active_cursor: string | null;
@@ -24,6 +31,7 @@ interface CursorTypes {
   setData: Dispatch<SetStateAction<any[]>>;
   handleCursor: (title: "next" | "prev") => () => void;
   fetchData: () => Promise<void>;
+  scrollToTopRef: RefObject<HTMLDivElement | null>;
 }
 
 export const useFetchCursor = ({ url }: { url: string }): CursorTypes => {
@@ -31,6 +39,7 @@ export const useFetchCursor = ({ url }: { url: string }): CursorTypes => {
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [cursor, setCursor] = useState<CursorType>(CURSOR_ITEMS);
   const [data, setData] = useState<any[]>([]);
+  const scrollToTopRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchData();
@@ -64,6 +73,7 @@ export const useFetchCursor = ({ url }: { url: string }): CursorTypes => {
       ...cursor,
       active_cursor: title === "next" ? cursor.next_cursor : cursor.prev_cursor,
     }));
+    scrollToTopRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   return {
@@ -77,5 +87,6 @@ export const useFetchCursor = ({ url }: { url: string }): CursorTypes => {
     setData,
     handleCursor,
     fetchData,
+    scrollToTopRef,
   };
 };

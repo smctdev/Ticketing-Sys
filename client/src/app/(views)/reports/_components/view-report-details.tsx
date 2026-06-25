@@ -79,7 +79,7 @@ export function ViewReportDetails({ data, open, setIsOpen, fetchData }: any) {
           <div className="flex gap-2">
             <Button
               type="button"
-              className="bg-blue-500 hover:bg-blue-600"
+              className="bg-blue-500 hover:bg-blue-600 text-white"
               size="xs"
               onClick={handleOpenDialog(row.ticket_code, "return")}
             >

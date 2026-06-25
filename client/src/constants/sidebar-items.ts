@@ -6,6 +6,7 @@ import {
   LayoutDashboard,
   MessageCircleMore,
   MessageSquareQuote,
+  NewspaperIcon,
   Notebook,
   ShieldUserIcon,
   TicketCheck,
@@ -36,8 +37,24 @@ export const SIDEBAR_ITEMS = [
     icon: MessageCircleMore,
     allowedFor: CAN_ACCESS_NO_AUDIT,
   },
-  { title: "Reports", url: "/reports", icon: Notebook, allowedFor: CAN_ACCESS_ALL },
-  { title: "Feedbacks", url: "/feedbacks", icon: MessageSquareQuote, allowedFor: CAN_ACCESS_ALL },
+  {
+    title: "Reports",
+    url: "/reports",
+    icon: Notebook,
+    allowedFor: CAN_ACCESS_ALL,
+  },
+  {
+    title: "Feedbacks",
+    url: "/feedbacks",
+    icon: MessageSquareQuote,
+    allowedFor: CAN_ACCESS_ALL,
+  },
+  {
+    title: "Posts",
+    url: "/posts",
+    icon: NewspaperIcon,
+    allowedFor: CAN_ACCESS_ALL,
+  },
 ];
 
 export const COLLAPSABLE_SIDEBAR_ITEMS = [

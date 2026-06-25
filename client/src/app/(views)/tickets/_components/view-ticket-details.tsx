@@ -314,7 +314,7 @@ export function ViewTicketDetails({
                     onClick={handleDownloadAsZip(
                       data?.ticket_detail?.ticket_details_id,
                     )}
-                    className="text-[10px] bg-blue-500 hover:bg-blue-600"
+                    className="text-[10px] bg-blue-500 hover:bg-blue-600 text-white"
                   >
                     Download as Zip
                   </Button>

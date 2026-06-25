@@ -17,6 +17,13 @@ class LikeController extends Controller
 
         return response()->json([
             'message' => "Post {$message} successfully",
+            'data'    => $post->load([
+                'user.userDetail',
+                'latestComment.user.userDetail:user_details_id,profile_pic,fname,lname'
+            ])->loadCount([
+                'comments',
+                'userLikes'
+            ])
         ], 201);
     }
 }

@@ -40,7 +40,7 @@ export default function SenderContent({
             <Reply className="size-3" /> <span>You replied to a message</span>
           </span>
           <div
-            className="max-w-4/5 w-fit px-4 py-2.5 rounded-2xl rounded-br-sm text-sm wrap-break-word whitespace-break-spaces leading-relaxed bg-chat-background/20 -mb-2 dark:text-white"
+            className="max-w-4/5 w-fit px-4 py-2.5 rounded-3xl rounded-br-sm text-sm wrap-break-word whitespace-break-spaces leading-relaxed bg-chat-background/20 -mb-2 dark:text-white"
             dangerouslySetInnerHTML={{
               __html:
                 message?.reply_from?.body ||
@@ -108,7 +108,7 @@ export default function SenderContent({
           <div className="self-end w-full">
             {message?.body && (
               <div
-                className="px-4 py-2.5 rounded-2xl rounded-br-sm text-sm wrap-break-word whitespace-break-spaces leading-relaxed bg-chat-background dark:text-white shadow-lg shadow-chat-background/50"
+                className="px-4 py-2.5 rounded-3xl rounded-br-sm text-sm wrap-break-word whitespace-break-spaces leading-relaxed bg-chat-background dark:text-white shadow-lg shadow-chat-background/50"
                 dangerouslySetInnerHTML={{
                   __html: message?.body,
                 }}

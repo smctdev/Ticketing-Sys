@@ -28,7 +28,7 @@ import { CreateTicket } from "./_components/create-ticket";
 import { useAuth } from "@/context/auth-context";
 import { canCreateTicket } from "@/utils/permissions";
 import SearchInput from "@/components/ui/search-input";
-import { Activity, useEffect, useRef, useState } from "react";
+import { Activity, useEffect, useMemo, useRef, useState } from "react";
 import echo from "@/lib/echo";
 import { EditTicket } from "./_components/edit-ticket";
 import { DeleteTicket } from "./_components/delete-ticket";
@@ -578,6 +578,14 @@ function Tickets() {
     }
   };
 
+  const overAllTotalPendings = useMemo(() => {
+    return automationPendings?.reduce(
+      (acc: number, curr: { pending_tickets_count: number }) =>
+        acc + (curr?.pending_tickets_count || 0),
+      0,
+    );
+  }, [automationPendings]);
+
   return (
     <div className="flex flex-col gap-3">
       <Card className="gap-0">
@@ -670,7 +678,15 @@ function Tickets() {
                           Filter by automation
                         </SelectItem>
                         <SelectItem value="ALL">
-                          <span className="font-extrabold">ALL</span>
+                          <div>
+                            <p className="font-bold italic text-start">ALL</p>
+                            <p className="opacity-60">
+                              Automation Pendings:{" "}
+                              <span className="font-bold text-blue-500">
+                                {overAllTotalPendings}
+                              </span>
+                            </p>
+                          </div>
                         </SelectItem>
                         {automationPendings.length > 0 ? (
                           automationPendings.map(
@@ -684,16 +700,16 @@ function Tickets() {
                                 key={automation.login_id}
                                 className="cursor-pointer"
                               >
-                                <div className="flex flex-col">
-                                  <p className="font-bold italic">
+                                <div>
+                                  <p className="font-bold italic text-start">
                                     {automation.full_name}
                                   </p>
-                                  <span className="opacity-60">
+                                  <p className="opacity-60">
                                     Total pending tickets:{" "}
                                     <span className="text-blue-500 font-bold">
                                       {automation.pending_tickets_count}
                                     </span>
-                                  </span>
+                                  </p>
                                 </div>
                               </SelectItem>
                             ),
@@ -731,7 +747,7 @@ function Tickets() {
               <div>
                 <ButtonLoader
                   type="button"
-                  className="bg-yellow-500 hover:bg-yellow-600"
+                  className="bg-yellow-500 hover:bg-yellow-600 text-white"
                   isLoading={isRefreshing}
                   onClick={handleRefresh}
                 >

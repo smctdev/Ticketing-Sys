@@ -96,7 +96,7 @@ export function EditNote({
               value={note}
               onChange={(e) => setNote(e.target.value)}
               placeholder="Enter note"
-              className="break-all whitespace-break-spaces"
+              className="break-all whitespace-break-spaces resize-none max-h-94"
             />
             {errors?.note && (
               <small className="text-red-500">{errors?.note[0]}</small>

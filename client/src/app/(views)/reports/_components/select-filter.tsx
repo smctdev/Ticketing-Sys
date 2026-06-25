@@ -19,6 +19,7 @@ import {
   MultiSelectValue,
 } from "@/components/ui/multi-select";
 import { ROLE } from "@/constants/roles";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export default function SelectFilter({
   isLoading,
@@ -53,13 +54,32 @@ export default function SelectFilter({
         {canView && (
           <div className="flex flex-col gap-2 w-full">
             <Label htmlFor="branch_code">Branch Code</Label>
-            <MultiSelect modal={true} values={filterBy?.branch_code === "ALL" ? [] : filterBy?.branch_code?.split(",")} onValuesChange={handleMultipleSelect}>
+            <MultiSelect
+              modal={true}
+              values={
+                filterBy?.branch_code === "ALL"
+                  ? []
+                  : filterBy?.branch_code?.split(",")
+              }
+              onValuesChange={handleMultipleSelect}
+            >
               <MultiSelectTrigger className="w-full max-w-[385px] max-h-[200px] overflow-y-auto">
                 <MultiSelectValue placeholder="Select branch codes..." />
               </MultiSelectTrigger>
               <MultiSelectContent>
                 <MultiSelectGroup>
-                  {forFilterData?.branches?.length === 0 ? (
+                  {isLoading ? (
+                    Array.from({ length: 5 }).map((_, index) => (
+                      <MultiSelectItem value="Loading..." disabled key={index}>
+                        <Skeleton
+                          className="h-7 w-full"
+                          style={{
+                            animationDelay: `${index * 0.5}s`,
+                          }}
+                        />
+                      </MultiSelectItem>
+                    ))
+                  ) : forFilterData?.branches?.length === 0 ? (
                     <MultiSelectItem value="No branches yet." disabled>
                       No branches yet.
                     </MultiSelectItem>

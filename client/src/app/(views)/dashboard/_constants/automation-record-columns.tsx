@@ -17,18 +17,20 @@ export const AUTOMATION_RECORD_COLUMNS = [
             src={Storage(row?.profile_picture)}
             alt={row.full_name}
           />
-          <AvatarFallback className="font-bold text-gray-600">
+          <AvatarFallback className="font-bold text-gray-600 dark:text-gray-300">
             {nameShortHand(row.full_name)}
           </AvatarFallback>
         </Avatar>
-        <span className="text-gray-600 font-bold text-xs">{row.full_name}</span>
+        <span className="text-gray-600 dark:text-gray-300 font-bold text-xs">
+          {row.full_name}
+        </span>
       </div>
     ),
   },
   {
     name: "MOST EDITED CATEGORY",
     cell: (row: any) => (
-      <span className="font-bold text-gray-700">
+      <span className="font-bold text-gray-700 dark:text-gray-100">
         {row.mostUsedCategory.category}
       </span>
     ),
@@ -36,16 +38,18 @@ export const AUTOMATION_RECORD_COLUMNS = [
   {
     name: "EDITED THIS MONTH",
     cell: (row: any) => (
-      <span className="font-bold text-gray-800">{row.ticketsThisMonth}</span>
+      <span className="font-bold text-gray-800 dark:text-gray-200">
+        {row.ticketsThisMonth}
+      </span>
     ),
   },
   {
     name: "LAST MONTH COMPARISON TICKET",
     cell: (row: any) => (
       <div className="w-full">
-        <p className="text-gray-800 font-semibold text-xs">
+        <p className="text-gray-800 dark:text-gray-200 font-semibold text-xs">
           {row.roundedPercentage.toFixed(2)}%{" "}
-          <span className="text-[10px] text-gray-600">
+          <span className="text-[10px] text-gray-600 dark:text-gray-300">
             ({row.ticketsLastMonth} tickets edited last month)
           </span>
         </p>

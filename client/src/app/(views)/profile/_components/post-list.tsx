@@ -1,46 +1,36 @@
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { formatDistanceToNowStrict } from "date-fns";
 import Storage from "@/utils/storage";
 import nameShortHand from "@/utils/name-short-hand";
-import { useEffect, useRef, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
 import { Heart, MessageSquare } from "lucide-react";
 import { useAuth } from "@/context/auth-context";
-import { PostComment } from "./post-comment";
 import { PostDropdown } from "./post-dropdown";
 import IsEdited from "./is-edited";
-import { EditPost } from "./post-dialogs/edit-post";
-import { DeletePost } from "./post-dialogs/delete-post";
 import { ROLE } from "@/constants/roles";
+import Link from "next/link";
+import { PostData } from "@/components/post-item";
+import CommentList from "./comment-list";
 
-interface User {
-  login_id: number;
-  user_detail: {
-    profile_pic: string;
-  };
-  full_name: string;
-  username: string;
-}
-interface Post {
-  id: number;
-  user: User;
-  content: string;
-  category: string;
-  comments_count: number;
-  user_likes: any[];
-  created_at: string;
-  updated_at: string;
-  is_edited: boolean;
-}
 interface PostListProps {
-  post: Post;
+  post: PostData;
   fetchData: () => Promise<void>;
   isCommentOpen?: boolean;
   handleCommentChange?: () => void;
+  handleEditPost: (data: PostData) => () => void;
+  handleDeletePost: (id: number) => () => void;
+  handleComment: (data: PostData) => () => void;
+  setSelectedPost: Dispatch<SetStateAction<PostData | null>>;
 }
 
 export default function PostList({
@@ -48,6 +38,10 @@ export default function PostList({
   fetchData,
   isCommentOpen,
   handleCommentChange,
+  handleEditPost,
+  handleDeletePost,
+  handleComment,
+  setSelectedPost,
 }: PostListProps) {
   const { user } = useAuth();
   const [isLoadingLike, setIsLoadingLike] = useState<{
@@ -59,13 +53,6 @@ export default function PostList({
   const [showSeeMore, setShowSeeMore] = useState<{ [key: string]: boolean }>({
     [0]: false,
   });
-  const [isOpenComment, setIsOpenComment] = useState<boolean>(false);
-  const [isOpenEditPostDialog, setIsOpenEditPostDialog] =
-    useState<boolean>(false);
-  const [isOpenDeletePostDialog, setIsOpenDeletePostDialog] =
-    useState<boolean>(false);
-  const [selectedPost, setSelectedPost] = useState<Post>(post);
-  const [postId, setPostId] = useState<number>(0);
   const isPostowner = Number(user?.login_id) === Number(post?.user?.login_id);
   const textRef = useRef<HTMLParagraphElement>(null);
   const IS_SUPER_ADMIN = user?.user_role?.role_name === ROLE.SUPER_ADMIN;
@@ -88,6 +75,7 @@ export default function PostList({
           description: response.data.message,
           position: "bottom-center",
         });
+        setSelectedPost(response.data.data);
         fetchData();
       }
     } catch (error) {
@@ -102,23 +90,9 @@ export default function PostList({
     setShowSeeMore({ [postId]: !showSeeMore[postId] });
   };
 
-  const handleComment = () => {
-    setIsOpenComment(true);
-  };
-
-  const handleEditPost = (data: Post) => () => {
-    setIsOpenEditPostDialog(!isOpenEditPostDialog);
-    setSelectedPost(data);
-  };
-
-  const handleDeletePost = (id: number) => () => {
-    setIsOpenDeletePostDialog(!isOpenDeletePostDialog);
-    setPostId(id);
-  };
-
   return (
     <>
-      <Card className="hover:border-gray-300 hover:shadow-lg">
+      <Card className="hover:border-gray-300 hover:dark:border-gray-600 hover:shadow-lg gap-0 pb-0">
         <CardHeader className="pb-3">
           <div className="flex justify-between">
             <div className="flex items-center space-x-2">
@@ -163,7 +137,7 @@ export default function PostList({
         <CardContent className="pb-3">
           <p
             ref={textRef}
-            className={`whitespace-break-spaces break-all ${
+            className={`whitespace-break-spaces wrap-break-word ${
               isExpanded[post?.id] ? "" : "line-clamp-4"
             }`}
           >
@@ -171,12 +145,14 @@ export default function PostList({
               <span key={index}>
                 {word?.split(" ")?.map((w, idx) =>
                   w.startsWith("#") ? (
-                    <span
+                    <Link
+                      // href={`/posts/hashtag/${w.slice(1)}`}
+                      href={`#`}
                       className="text-blue-400 hover:underline cursor-pointer"
                       key={idx}
                     >
                       {`${w} `}
-                    </span>
+                    </Link>
                   ) : (
                     <span key={idx}>{`${w} `}</span>
                   ),
@@ -188,7 +164,7 @@ export default function PostList({
           {showSeeMore[post?.id] ? (
             <span
               onClick={handleSeeMore(post.id)}
-              className="dark:text-white text-gray-400 font-thin text-sm cursor-pointer hover:dark:text-white"
+              className="dark:text-white text-gray-400 font-bold text-xs cursor-pointer hover:dark:text-white"
             >
               See more
             </span>
@@ -196,18 +172,18 @@ export default function PostList({
             isExpanded[post?.id] && (
               <span
                 onClick={handleSeeMore(post.id)}
-                className="dark:text-white text-gray-400 font-thin text-sm cursor-pointer hover:dark:text-white"
+                className="dark:text-white text-gray-400 font-bold text-xs cursor-pointer hover:dark:text-white"
               >
                 See less
               </span>
             )
           )}
-          <Separator className="my-3" />
+          <Separator className="my-2" />
           <div className="flex justify-between dark:text-white text-gray-500">
             <div className="w-full">
               <Button
                 variant="ghost"
-                size="sm"
+                size="lg"
                 type="button"
                 className="w-full"
                 onClick={handleLike(post.id)}
@@ -215,23 +191,23 @@ export default function PostList({
               >
                 <Heart
                   className={`h-4 w-4 mr-1 ${
-                    post?.user_likes.some(
-                      (userLike: any) => userLike.login_id === user?.login_id,
-                    ) && "text-pink-500"
+                    post?.is_liked_by_you && "text-pink-500"
                   }`}
                 />
-                {post.user_likes?.length > 0
-                  ? post.user_likes?.length
-                  : post?.user_likes?.length > 9 && "9+"}
+                {post?.user_likes_count > 0
+                  ? post?.user_likes_count
+                  : post?.user_likes_count > 9 && "9+"}
               </Button>
             </div>
             <div className="w-full">
               <Button
                 variant="ghost"
-                size="sm"
+                size="lg"
                 type="button"
                 className="w-full"
-                onClick={isCommentOpen ? handleCommentChange : handleComment}
+                onClick={
+                  isCommentOpen ? handleCommentChange : handleComment(post)
+                }
               >
                 <MessageSquare className="h-4 w-4 mr-1" />
                 {Number(post.comments_count) > 0
@@ -240,36 +216,18 @@ export default function PostList({
               </Button>
             </div>
           </div>
+          {!isCommentOpen && post?.latest_comment && (
+            <>
+              <Separator className="my-2" />
+              <CommentList
+                comment={post?.latest_comment}
+                fetchData={fetchData}
+                fetchComments={fetchData}
+              />
+            </>
+          )}
         </CardContent>
       </Card>
-
-      {isOpenComment && (
-        <PostComment
-          data={post}
-          fetchData={fetchData}
-          open={isOpenComment}
-          setOpen={setIsOpenComment}
-          isCommentOpen={isOpenComment}
-        />
-      )}
-
-      {isOpenEditPostDialog && (
-        <EditPost
-          open={isOpenEditPostDialog}
-          setOpen={setIsOpenEditPostDialog}
-          fetchData={fetchData}
-          data={selectedPost}
-        />
-      )}
-
-      {isOpenDeletePostDialog && (
-        <DeletePost
-          id={postId}
-          open={isOpenDeletePostDialog}
-          setOpen={setIsOpenDeletePostDialog}
-          fetchData={fetchData}
-        />
-      )}
     </>
   );
 }

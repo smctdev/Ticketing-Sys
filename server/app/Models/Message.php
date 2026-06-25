@@ -33,7 +33,7 @@ class Message extends Model
         return preg_replace_callback($pattern, function ($matches) {
             $url  = $matches[0];
             $href = preg_match('/^https?:\/\//i', $url) ? $url : 'https://' . $url;
-            return '<a href="' . $href . '" target="_blank" rel="noopener noreferrer" class="underline underline-offset-2 opacity-90 hover:opacity-100 break-all">' . $url . '</a>';
+            return '<a href="' . $href . '" target="_blank" rel="noopener noreferrer" class="underline underline-offset-2 opacity-90 hover:opacity-100 break-all text-blue-600">' . $url . '</a>';
         }, $text);
     }
 

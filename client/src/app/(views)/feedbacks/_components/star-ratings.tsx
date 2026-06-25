@@ -2,7 +2,7 @@ import { Star } from "lucide-react";
 
 export default function StarRatings({ rating }: { rating: number }) {
   return (
-    <div className="flex gap-0.5">
+    <span className="flex gap-0.5">
       {Array.from({ length: 5 }).map((_, i) => (
         <Star
           key={i}
@@ -13,6 +13,6 @@ export default function StarRatings({ rating }: { rating: number }) {
           }`}
         />
       ))}
-    </div>
+    </span>
   );
 }

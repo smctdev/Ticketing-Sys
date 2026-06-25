@@ -115,7 +115,7 @@ export function EditSubCategory({ data, fetchData }: EditSubCategoryProps) {
             <Button
               type="submit"
               disabled={isLoading}
-              className="bg-blue-500 hover:bg-blue-600"
+              className="bg-blue-500 hover:bg-blue-600 text-white"
             >
               {isLoading ? (
                 <>

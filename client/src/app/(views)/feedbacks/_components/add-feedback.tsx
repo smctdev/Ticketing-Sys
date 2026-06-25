@@ -72,13 +72,13 @@ export function AddFeedback({ setFeedbacks }: Props) {
           className="bg-blue-500 hover:bg-blue-600 text-white hover:text-white"
         >
           <Plus className="h-4 w-4" />
-          <span className="hidden md:block">Add Feedback</span>
+          <span className="hidden md:block">Submit a Feedback</span>
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <form onSubmit={handleSubmit} className="space-y-4">
           <DialogHeader>
-            <DialogTitle>Add Feedback</DialogTitle>
+            <DialogTitle>Submit a Feedback</DialogTitle>
             <DialogDescription>
               Please enter your honest feedback so that we can improve.
             </DialogDescription>
@@ -160,7 +160,7 @@ export function AddFeedback({ setFeedbacks }: Props) {
             <ButtonLoader
               type="submit"
               isLoading={isLoading}
-              className="bg-blue-500 hover:bg-blue-600"
+              className="bg-blue-500 hover:bg-blue-600 text-white"
             >
               Submit
             </ButtonLoader>

@@ -10,35 +10,24 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { PostFormInputType } from "../../_types/form-input-type";
 import { POST_FORM_ITEMS } from "../../_constants/form-input";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
-
-interface Post {
-  id: number;
-  content: string;
-  category: string;
-}
+import SelectableFeelings from "./selectable-feelings";
+import { Post } from "../post-list";
 
 export function EditPost({
   open,
   setOpen,
   data,
   fetchData,
+  setSelectedPost,
 }: {
   open: boolean;
   setOpen: Dispatch<SetStateAction<boolean>>;
-  data: Post;
+  data: Post | null;
   fetchData: () => Promise<void>;
+  setSelectedPost: Dispatch<SetStateAction<Post | null>>;
 }) {
   const [formInput, setFormInput] =
     useState<PostFormInputType>(POST_FORM_ITEMS);
@@ -70,6 +59,7 @@ export function EditPost({
         });
         setErrors(null);
         setOpen(false);
+        setSelectedPost(response.data.post);
         fetchData();
       }
     } catch (error: any) {
@@ -90,79 +80,10 @@ export function EditPost({
         </DialogHeader>
         <div className="grid gap-4">
           <div className="grid gap-3">
-            <Select
-              onValueChange={(value) =>
-                setFormInput((prev) => ({ ...prev, category: value }))
-              }
-              value={formInput.category}
-            >
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="How are you feeling?" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectGroup>
-                  <SelectLabel>How are you feeling?</SelectLabel>
-                  <SelectItem value="😵 Feeling dizzy">
-                    😵 Feeling dizzy
-                  </SelectItem>
-                  <SelectItem value="😊 Feeling happy">
-                    😊 Feeling happy
-                  </SelectItem>
-                  <SelectItem value="😢 Feeling sad">😢 Feeling sad</SelectItem>
-                  <SelectItem value="😠 Feeling angry">
-                    😠 Feeling angry
-                  </SelectItem>
-                  <SelectItem value="😴 Feeling tired">
-                    😴 Feeling tired
-                  </SelectItem>
-                  <SelectItem value="😨 Feeling scared">
-                    😨 Feeling scared
-                  </SelectItem>
-                  <SelectItem value="😤 Feeling frustrated">
-                    😤 Feeling frustrated
-                  </SelectItem>
-                  <SelectItem value="🤒 Feeling sick">
-                    🤒 Feeling sick
-                  </SelectItem>
-                  <SelectItem value="😰 Feeling stressed">
-                    😰 Feeling stressed
-                  </SelectItem>
-                  <SelectItem value="🥰 Feeling loved">
-                    🥰 Feeling loved
-                  </SelectItem>
-                  <SelectItem value="😎 Feeling confident">
-                    😎 Feeling confident
-                  </SelectItem>
-                  <SelectItem value="🤩 Feeling excited">
-                    🤩 Feeling excited
-                  </SelectItem>
-                  <SelectItem value="😔 Feeling lonely">
-                    😔 Feeling lonely
-                  </SelectItem>
-                  <SelectItem value="😇 Feeling grateful">
-                    😇 Feeling grateful
-                  </SelectItem>
-                  <SelectItem value="🤗 Feeling blessed">
-                    🤗 Feeling blessed
-                  </SelectItem>
-                  <SelectItem value="😶 Feeling numb">
-                    😶 Feeling numb
-                  </SelectItem>
-                  <SelectItem value="🥺 Feeling hopeful">
-                    🥺 Feeling hopeful
-                  </SelectItem>
-                  <SelectItem value="😏 Feeling playful">
-                    😏 Feeling playful
-                  </SelectItem>
-                  <SelectItem value="🤔 Feeling confused">
-                    🤔 Feeling confused
-                  </SelectItem>
-                  <SelectItem value="😌 Feeling relaxed">
-                    😌 Feeling relaxed
-                  </SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
+            <SelectableFeelings
+              setFormInput={setFormInput}
+              formInput={formInput}
+            />
             {errors?.category && (
               <small className="text-red-500">{errors?.category[0]}</small>
             )}

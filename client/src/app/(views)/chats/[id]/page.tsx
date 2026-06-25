@@ -169,7 +169,7 @@ function ChatsPage() {
       inputRef.current?.focus();
       setFormInput({
         ...formInput,
-        message: isEditingMessage.message.body,
+        message: isEditingMessage.message.body.replace(/<[^>]*>/g, ""),
       });
     }
   }, [isEditingMessage]);
