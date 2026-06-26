@@ -365,6 +365,6 @@ Route::get('submit-timestamp', function () {
     $affected_count = count($formed_data_to_store);
 
     return response()->json([
-        'message' => "Successfully updated timestamps. {$affected_count} records affected.",
+        'message' => "Successfully updated timestamps. {$affected_count} records are affected.",
     ], 200);
 });
