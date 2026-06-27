@@ -16,8 +16,8 @@ class ChatService
             ->withMax('sentMessages as sent_message_latest', 'created_at')
             ->withMax('receivedMessages as received_message_latest', 'created_at')
             ->with([
-                'sentMessages' => fn($q) => $q->latest()->take(1)->with('attachments'),
-                'receivedMessages' => fn($q) => $q->latest()->take(1)->with('attachments')
+                'sentMessages' => fn($q) => $q->latest()->take(1)->withCount('attachments'),
+                'receivedMessages' => fn($q) => $q->latest()->take(1)->withCount('attachments')
             ])
             ->search($search)
             ->when(!$search, function ($q) {
@@ -30,7 +30,7 @@ class ChatService
             ->paginate(5)
             ->through(function ($user) {
                 $collected_by_max = collect([$user->sentMessages->first(), $user->receivedMessages->first()])->max();
-                $attachment_count = $collected_by_max?->attachments?->count();
+                $attachment_count = $collected_by_max?->attachments_count ?? 0;
                 $last_message_by_attachment = $attachment_count > 0 ? "Sent {$attachment_count} " . Str::plural('attachment', $attachment_count) : "";
 
                 return [
