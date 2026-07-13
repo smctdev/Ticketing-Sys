@@ -82,7 +82,7 @@ function ChatsPage() {
         <CardContent className="p-0">
           {isLoading || pagination.isLoading ? (
             <div className="divide-y">
-              {Array.from({ length: 6 }).map((_, i) => (
+              {Array.from({ length: 5 }).map((_, i) => (
                 <div key={i} className="flex items-center gap-3 px-6 py-4">
                   <Skeleton className="w-10 h-10 rounded-full shrink-0" />
                   <div className="flex-1 space-y-2">
@@ -166,9 +166,11 @@ function ChatsPage() {
                             />
                           </p>
                         )}
-                        <span className="text-xs opacity-60">
-                          {diffForHumans(row.timestamp)}
-                        </span>
+                        {row.timestamp && (
+                          <span className="text-xs opacity-60">
+                            {diffForHumans(row.timestamp)}
+                          </span>
+                        )}
                       </div>
                     </Link>
                     <div className="flex items-center gap-1 shrink-0">

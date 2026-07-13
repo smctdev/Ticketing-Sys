@@ -1,7 +1,26 @@
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import nameShortHand from "@/utils/name-short-hand";
+import Storage from "@/utils/storage";
+
 export const USERS_COLUMNS = [
   {
     name: "Full Name",
-    cell: (row: any) => row?.full_name,
+    cell: (row: any) => (
+      <div className="flex items-center gap-1">
+        <Avatar>
+          <AvatarImage
+            src={Storage(row?.user_detail?.profile_pic)}
+            alt={row.full_name}
+          />
+          <AvatarFallback className="font-bold text-gray-600 dark:text-gray-300">
+            {nameShortHand(row?.full_name)}
+          </AvatarFallback>
+        </Avatar>
+        <span className="text-gray-600 dark:text-gray-300 font-bold text-xs">
+          {row.full_name}
+        </span>
+      </div>
+    ),
     sortable: false,
   },
   {

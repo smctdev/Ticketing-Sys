@@ -49,6 +49,7 @@ import {
 import ReceiverContent from "../_components/receiver-content";
 import SenderContent from "../_components/sender-content";
 import ReplyingAttachmentContent from "../_components/replying-attachment-content";
+import { Spinner } from "@/components/ui/spinner";
 
 export type AttachmentType = {
   id: number;
@@ -206,11 +207,18 @@ function ChatsPage() {
     e.preventDefault();
     setIsSubmitting(true);
     textAreaRef.current?.focus();
+    setFormInput({
+      message: "",
+      message_id: null,
+      attachments: [],
+      reply_message_content: "",
+    });
     try {
       const formData = new FormData();
 
       formData.append("receiver_id", id as string);
       formData.append("body", formInput.message);
+
       if (formInput.attachments.length > 0) {
         formInput.attachments.forEach((attachment) => {
           formData.append("attachments[]", attachment);
@@ -224,12 +232,6 @@ function ChatsPage() {
       const response = await api.post(`/chats`, formData);
 
       if (response.status === 201) {
-        setFormInput({
-          message: "",
-          message_id: null,
-          attachments: [],
-          reply_message_content: "",
-        });
         setMessages((prev) => [response.data.data, ...prev]);
 
         if (inputRef.current) {
@@ -277,6 +279,12 @@ function ChatsPage() {
     e.preventDefault();
     setIsSubmitting(true);
     textAreaRef.current?.focus();
+    setFormInput({
+      message: "",
+      message_id: null,
+      attachments: [],
+      reply_message_content: "",
+    });
     try {
       const response = await api.patch(
         `/chats/${isEditingMessage.message.id}`,
@@ -286,13 +294,6 @@ function ChatsPage() {
       );
 
       if (response.status === 200) {
-        setFormInput({
-          message: "",
-          message_id: null,
-          attachments: [],
-          reply_message_content: "",
-        });
-
         setMessages((prev) =>
           prev.map((message) =>
             message.id === response.data.data.id ? response.data.data : message,
@@ -318,6 +319,7 @@ function ChatsPage() {
         setMessages((prev) =>
           prev.filter((message) => message.id !== isDeletingMessage.message.id),
         );
+
         setIsDeletingMessage({
           isDeleting: false,
           message: {} as MessageType,
@@ -390,6 +392,12 @@ function ChatsPage() {
               className="flex flex-col-reverse px-6 py-4 overflow-y-auto h-full w-full"
               ref={convoRef}
             >
+              {isSubmitting && (
+                <span className="text-right self-end items-center flex gap-1">
+                  <Spinner className="size-3" />{" "}
+                  <span className="text-[10px] font-medium">Sending...</span>
+                </span>
+              )}
               {typing.isTyping &&
                 typing.target_id === user?.login_id &&
                 typing.typer_id === Number(id) && (

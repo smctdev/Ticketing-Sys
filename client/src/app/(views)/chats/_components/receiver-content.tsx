@@ -78,7 +78,7 @@ export default function ReceiverContent({
           </div>
         </div>
       </div>
-      <p className="text-[10px] dark:text-white/20 mt-1 text-left">
+      <p className="text-[10px] dark:text-white/80 mt-1 text-left">
         {formattedDateAndTimeStrict(message?.created_at)}
       </p>
     </div>

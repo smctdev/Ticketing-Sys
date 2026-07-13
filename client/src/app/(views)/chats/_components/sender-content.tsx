@@ -119,7 +119,7 @@ export default function SenderContent({
           <AttachmentContent message={message} />
         </div>
       </div>
-      <p className="text-[10px] dark:text-white/20 mt-1 text-right">
+      <p className="text-[10px] dark:text-white/80 mt-1 text-right">
         {formattedDateAndTimeStrict(message?.created_at)}
       </p>
     </div>

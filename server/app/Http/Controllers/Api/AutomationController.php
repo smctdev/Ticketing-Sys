@@ -161,6 +161,7 @@ class AutomationController extends Controller
                     ->orWhereRelation('userRole', 'role_name', UserRoles::AUTOMATION_ADMIN)
                     ->orWhereRelation('userRole', 'role_name', UserRoles::AUTOMATION_MANAGER)
             )
+            ->orderByDesc('pending_tickets_count')
             ->get();
 
         return response()->json([
