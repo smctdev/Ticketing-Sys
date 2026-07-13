@@ -110,8 +110,8 @@ class TicketService
                             $subQuery->when(
                                 $automation === 'ALL',
                                 function ($ticketQueryForAutomationManager) {
-                                    $ticketQueryForAutomationManager->whereNot('status', TicketStatus::EDITED)
-                                        ->where('displayTicket', Auth::id());
+                                    $ticketQueryForAutomationManager->whereNot('status', TicketStatus::EDITED);
+                                    // ->where('displayTicket', Auth::id());
                                     // ->orWhere('last_approver', Auth::id());
                                 }
                             );
