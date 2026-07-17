@@ -67,6 +67,7 @@ export function ViewTicketDetails({
   handleEditTicket,
   handleReviseTicket,
   handleDirectToAutomation,
+  handleDirectToAssignedAutomation,
 }: any) {
   const { user, isAdmin } = useAuth();
   const isYourPendingTicket = user?.login_id === data?.pending_user?.login_id;
@@ -521,6 +522,21 @@ export function ViewTicketDetails({
                     </Button>
                   )}
                 </>
+              )}
+            {isAdmin &&
+              data.pending_user &&
+              !isAutomation(data.pending_user?.user_role?.role_name) &&
+              !isAutomationManager(data.pending_user?.user_role?.role_name) && (
+                <Button
+                  type="button"
+                  onClick={handleDirectToAssignedAutomation(
+                    data?.ticket_code,
+                    data?.ticket_details_id,
+                  )}
+                  className="rounded-lg bg-cyan-500 hover:bg-cyan-600 text-white md:w-auto w-full"
+                >
+                  Direct To Assigned Automation
+                </Button>
               )}
             {isAdmin &&
               data.pending_user &&

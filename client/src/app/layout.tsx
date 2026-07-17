@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://ticketing.smctgroup.ph"),
   title: {
     default: "SMCT Group of Companies Ticketing",
-    template: "SMCT Ticketing | %s",
+    template: "%s | SMCT Ticketing",
   },
   description: "The official website for SMCT Group of Companies Ticketing",
   icons: {
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: {
       default: "SMCT Group of Companies Ticketing",
-      template: "SMCT Ticketing | %s",
+      template: "%s | SMCT Ticketing",
     },
     description: "The official website for SMCT Group of Companies Ticketing",
     images: [

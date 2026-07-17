@@ -568,6 +568,77 @@ function Tickets() {
       });
     };
 
+  const handleDirectToAssignedAutomation =
+    (ticketCode: string | number, ticketDetailsId: string | number) => () => {
+      setIsOpenView(false);
+      Swal.fire({
+        title: "Direct to Assigned Automation Ticket",
+        text: `Are you sure you want to direct this ticket to assigned automation with ticket code of "${ticketCode}"?`,
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Yes, direct it!",
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          Swal.fire({
+            title: "Directing to assigned automation...",
+            text: "Please wait while the ticket is being directing to assigned automation...",
+            allowOutsideClick: false,
+            didOpen: () => {
+              Swal.showLoading();
+            },
+          });
+
+          try {
+            const response = await api.post(
+              `/direct-to-automation-ticket/${ticketDetailsId}/direct-to-assigned-automation`,
+            );
+            if (response.status === 200) {
+              setIsOpenView(false);
+              toast.success("Success", {
+                description: response.data.message,
+                position: "bottom-center",
+              });
+              setNote("");
+              setError(null);
+              fetchData();
+              Swal.close();
+            }
+          } catch (error: any) {
+            console.error(error);
+            if (error.response.status === 422) {
+              setError(error.response.data.errors);
+              Swal.close();
+              setIsOpenView(true);
+            } else if (
+              error.response &&
+              [404, 500, 502, 503, 504].includes(error.response.status)
+            ) {
+              const message =
+                error.response.data.message ||
+                "Something went wrong directing the ticket to assigned automation!";
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: message,
+              });
+              setError(null);
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: "Oops...",
+                text: "Something went wrong directing the ticket to assigned automation!",
+              });
+              setError(null);
+            }
+          }
+        } else {
+          setIsOpenView(true);
+        }
+      });
+    };
+
   const handleRefresh = async () => {
     setIsRefreshing(true);
     try {
@@ -817,6 +888,7 @@ function Tickets() {
           handleEditTicket={handleEditTicket}
           handleReviseTicket={handleReviseTicket}
           handleDirectToAutomation={handleDirectToAutomation}
+          handleDirectToAssignedAutomation={handleDirectToAssignedAutomation}
         />
       )}
 

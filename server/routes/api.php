@@ -106,6 +106,7 @@ Route::middleware([
         Route::delete('/delete-ticket/{id}/delete', 'destroy');
         Route::patch('/revise-ticket/{id}/revise', 'revise');
         Route::post('/direct-to-automation-ticket/{ticket_detail}/direct-to-automation', 'directToAutomation');
+        Route::post('/direct-to-automation-ticket/{ticket_detail}/direct-to-assigned-automation', 'directToAssignedAutomation');
         Route::patch('/approve-ticket/{id}/approve', 'approve');
         Route::patch('/mark-as-edited-ticket/{id}/mark-as-edited', 'markAsEdited');
         Route::get('/view-ticket/{id}/view', 'show');

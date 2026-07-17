@@ -162,7 +162,7 @@ function ChatsPage() {
       ),
     ]);
 
-    document.title = `${originalTitle.current} | ${data?.user?.full_name}`;
+    document.title = `${data?.user?.full_name} | ${originalTitle.current}`;
   }, [data]);
 
   useEffect(() => {
@@ -238,7 +238,7 @@ function ChatsPage() {
           inputRef.current.value = "";
         }
 
-        document.title = `SMCT Ticketing | Chats | ${data?.user?.full_name}`;
+        document.title = `${data?.user?.full_name} | Chats | SMCT Ticketing`;
       }
     } catch (error: any) {
       console.error(error);

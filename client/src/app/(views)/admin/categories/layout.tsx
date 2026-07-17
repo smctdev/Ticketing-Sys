@@ -4,7 +4,7 @@ import { ReactNode } from "react";
 export const metadata: Metadata = {
   title: {
     default: "Categories",
-    template: "SMCT Ticketing | %s",
+    template: "%s | SMCT Ticketing",
   },
   description:
     "The official categories page for the SMCT Group of Companies Ticketing website.",
