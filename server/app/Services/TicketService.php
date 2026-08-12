@@ -553,7 +553,7 @@ class TicketService
                     'status' => TicketStatus::PENDING,
                 ];
 
-                if ($ticketDetail->ticket->pendingUser->isBranchHead()) {
+                if ($ticketDetail->ticket->pendingUser?->isBranchHead()) {
                     $to_update['displayTicket'] = $this->branchHeads() > 1 ? $request->branch_head_id : $assignedBranchHead->login_id;
                 }
 
@@ -568,7 +568,7 @@ class TicketService
 
                 $ticketDetail->ticket->update($to_update);
 
-                $ticketDetail->ticket->pendingUser->notify(new TicketNotification(
+                $ticketDetail->ticket->pendingUser?->notify(new TicketNotification(
                     "Ticket from {$ticketDetail->ticket->branch->b_name} - ({$ticketDetail->ticket->branch->b_code}) has been updated",
                     $ticketDetail->ticket->ticket_code,
                     $this->user->userDetail->profile_pic,
