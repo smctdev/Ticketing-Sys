@@ -437,7 +437,7 @@ class TicketController extends Controller
             'assigned_person' => $request->automation,
         ];
 
-        if ($data->pendingUser->isAutomation()) {
+        if ($data->pendingUser->isAutomation() || $data->pendingUser->isAutomationAdmin()) {
             $itemToUpdate['displayTicket'] = $request->automation;
         }
 
