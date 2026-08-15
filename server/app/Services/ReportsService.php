@@ -146,7 +146,7 @@ class ReportsService
                             $subQuery->where('login_id', Auth::id());
                             break;
                         case UserRoles::AUTOMATION:
-                            $subQuery->where('assigned_person', $user->login_id);
+                            $subQuery->whereIn('branch_id', $user->assignedBranches()->pluck('blist_id'));
                             break;
                         case UserRoles::BRANCH_HEAD:
                             $subQuery->whereIn('branch_id', $userBranchIds);
@@ -345,13 +345,7 @@ class ReportsService
                             $subQuery->where('login_id', Auth::id());
                             break;
                         case UserRoles::AUTOMATION:
-                            $subQuery->whereAny(
-                                [
-                                    'assigned_person',
-                                    'edited_by'
-                                ],
-                                $user->login_id
-                            );
+                            $subQuery->whereIn('branch_id', $user->assignedBranches()->pluck('blist_id'));
                             break;
                         case UserRoles::BRANCH_HEAD:
                             $subQuery->whereIn('branch_id', $userBranchIds);
