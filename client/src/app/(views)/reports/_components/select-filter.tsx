@@ -66,7 +66,12 @@ export default function SelectFilter({
               <MultiSelectTrigger className="w-full max-w-[385px] max-h-[200px] overflow-y-auto">
                 <MultiSelectValue placeholder="Select branch codes..." />
               </MultiSelectTrigger>
-              <MultiSelectContent>
+              <MultiSelectContent
+                search={{
+                  placeholder: "Search branch codes...",
+                  emptyMessage: "No data available",
+                }}
+              >
                 <MultiSelectGroup>
                   {isLoading ? (
                     Array.from({ length: 5 }).map((_, index) => (

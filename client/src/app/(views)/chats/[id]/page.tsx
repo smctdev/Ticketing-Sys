@@ -251,8 +251,7 @@ function ChatsPage() {
     if (
       !e.shiftKey &&
       e.key === "Enter" &&
-      (formInput.message.trim() || formInput?.attachments?.length > 0) &&
-      !isSubmitting
+      (formInput.message.trim() || formInput?.attachments?.length > 0)
     ) {
       isEditingMessage.isEditing ? handleUpdate(e) : handleSubmit(e);
     }
@@ -539,7 +538,6 @@ function ChatsPage() {
                 disabled={
                   (!formInput.message.trim() &&
                     formInput.attachments.length <= 0) ||
-                  isSubmitting ||
                   isLoading
                 }
                 className="self-end w-11 h-11 rounded-2xl bg-chat-background flex items-center justify-center shadow-lg shadow-violet-500/25 transition-all hover:-translate-y-0.5 active:translate-y-0 shrink-0"
