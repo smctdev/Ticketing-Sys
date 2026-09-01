@@ -223,34 +223,20 @@ class TicketService
             ->count();
     }
 
-    public function getTotalEditedTickets()
+    public function getTicketCounts(string $status)
     {
-        return Ticket::query()
-            ->where([
-                ['login_id', $this->user->login_id],
-                ['status', TicketStatus::EDITED]
-            ])
-            ->count();
-    }
+        $ticket_counts = Ticket::query()
+            ->where('login_id', $this->user->login_id)
+            ->select('status', DB::raw('COUNT(*) as total'))
+            ->groupBy('status')
+            ->pluck('total', 'status')
+            ->toArray();
 
-    public function getTotalRejectedTickets()
-    {
-        return Ticket::query()
-            ->where([
-                ['login_id', $this->user->login_id],
-                ['status', TicketStatus::REJECTED]
-            ])
-            ->count();
-    }
-
-    public function getTotalPendingTickets()
-    {
-        return Ticket::query()
-            ->where([
-                ['login_id', $this->user->login_id],
-                ['status', TicketStatus::PENDING]
-            ])
-            ->count();
+        return match ($status) {
+            'edited'   => (int) ($ticket_counts[TicketStatus::EDITED?->value] ?? 0),
+            'pending'  => (int) ($ticket_counts[TicketStatus::PENDING?->value] ?? 0),
+            'rejected' => (int) ($ticket_counts[TicketStatus::REJECTED?->value] ?? 0)
+        };
     }
 
     public function getRecentTickets()
