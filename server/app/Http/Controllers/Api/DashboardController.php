@@ -9,6 +9,7 @@ use App\Models\BranchList;
 use App\Models\Supplier;
 use App\Models\Ticket;
 use App\Models\UserLogin;
+use App\Models\UserRole;
 use App\Services\AutomationDashboardService;
 use App\Services\TicketService;
 use Illuminate\Container\Attributes\CurrentUser;
@@ -84,85 +85,23 @@ class DashboardController extends Controller
             ->where('login_id', '!=', Auth::id())
             ->count();
 
-        $total_automation = UserLogin::query()
+        $user_counts = UserLogin::query()
             ->where('login_id', '!=', Auth::id())
-            ->whereHas(
-                "userRole",
-                fn($query)
-                =>
-                $query->where('role_name', UserRoles::AUTOMATION)
-            )
-            ->count();
-
-        $total_accounting_head = UserLogin::query()
-            ->where('login_id', '!=', Auth::id())
-            ->whereHas(
-                "userRole",
-                fn($query)
-                =>
-                $query->where('role_name', UserRoles::ACCOUNTING_HEAD)
-            )
-            ->count();
-
-        $total_branch_head = UserLogin::query()
-            ->where('login_id', '!=', Auth::id())
-            ->whereHas(
-                "userRole",
-                fn($query)
-                =>
-                $query->where('role_name', UserRoles::BRANCH_HEAD)
-            )
-            ->count();
-
-        $total_staff = UserLogin::query()
-            ->where('login_id', '!=', Auth::id())
-            ->whereHas(
-                "userRole",
-                fn($query)
-                =>
-                $query->where('role_name', UserRoles::STAFF)
-            )
-            ->count();
-
-        $total_cas = UserLogin::query()
-            ->where('login_id', '!=', Auth::id())
-            ->whereHas(
-                "userRole",
-                fn($query)
-                =>
-                $query->where('role_name', UserRoles::CAS)
-            )
-            ->count();
-
-        $total_accounting_staff = UserLogin::query()
-            ->where('login_id', '!=', Auth::id())
-            ->whereHas(
-                "userRole",
-                fn($query)
-                =>
-                $query->where('role_name', UserRoles::ACCOUNTING_STAFF)
-            )
-            ->count();
-
-        $total_area_manager = UserLogin::query()
-            ->where('login_id', '!=', Auth::id())
-            ->whereHas(
-                "userRole",
-                fn($query)
-                =>
-                $query->where('role_name', UserRoles::AREA_MANAGER)
-            )
-            ->count();
+            ->join('user_roles', 'user_logins.user_role_id', '=', 'user_roles.user_role_id')
+            ->select('user_roles.role_name', DB::raw('COUNT(*) as total'))
+            ->groupBy('user_roles.role_name')
+            ->pluck('total', 'role_name')
+            ->toArray();
 
         return [
             'total_users'            => $total_users,
-            'total_automation'       => $total_automation,
-            'total_accounting_head'  => $total_accounting_head,
-            'total_branch_head'      => $total_branch_head,
-            'total_staff'            => $total_staff,
-            'total_cas'              => $total_cas,
-            'total_accounting_staff' => $total_accounting_staff,
-            'total_area_manager'     => $total_area_manager
+            'total_automation'       => (int) ($user_counts[UserRoles::AUTOMATION?->value] ?? 0),
+            'total_accounting_head'  => (int) ($user_counts[UserRoles::ACCOUNTING_HEAD?->value] ?? 0),
+            'total_branch_head'      => (int) ($user_counts[UserRoles::BRANCH_HEAD?->value] ?? 0),
+            'total_staff'            => (int) ($user_counts[UserRoles::STAFF?->value] ?? 0),
+            'total_cas'              => (int) ($user_counts[UserRoles::CAS?->value] ?? 0),
+            'total_accounting_staff' => (int) ($user_counts[UserRoles::ACCOUNTING_STAFF?->value] ?? 0),
+            'total_area_manager'     => (int) ($user_counts[UserRoles::AREA_MANAGER?->value] ?? 0)
         ];
     }
 
@@ -228,23 +167,17 @@ class DashboardController extends Controller
         $overallTickets = (clone $this->tickets)
             ->count();
 
-        $ticketsPending = (clone $this->tickets)
-            ->where('status', TicketStatus::PENDING)
-            ->count();
-
-        $ticketsRejected = (clone $this->tickets)
-            ->where('status', TicketStatus::REJECTED)
-            ->count();
-
-        $ticketsEdited = (clone $this->tickets)
-            ->where('status', TicketStatus::EDITED)
-            ->count();
+        $ticket_counts = (clone $this->tickets)
+            ->select('status', DB::raw('COUNT(*) as total'))
+            ->groupBy('status')
+            ->pluck('total', 'status')
+            ->toArray();
 
         return [
             "overall_tickets"  => $overallTickets,
-            "tickets_pending"  => $ticketsPending,
-            "tickets_rejected" => $ticketsRejected,
-            "tickets_edited"   => $ticketsEdited
+            "tickets_pending"  => (int) ($ticket_counts[TicketStatus::PENDING?->value] ?? 0),
+            "tickets_rejected" => (int) ($ticket_counts[TicketStatus::REJECTED?->value] ?? 0),
+            "tickets_edited"   => (int) ($ticket_counts[TicketStatus::EDITED?->value] ?? 0)
         ];
     }
 
@@ -280,9 +213,9 @@ class DashboardController extends Controller
             "data"                       => [
                 "data"                   => $ticketService->getDashboardData(),
                 "total_tickets"          => $ticketService->getTotalTickets(),
-                "total_edited_tickets"   => $ticketService->getTotalEditedTickets(),
-                "total_rejected_tickets" => $ticketService->getTotalRejectedTickets(),
-                "total_pending_tickets"  => $ticketService->getTotalPendingTickets(),
+                "total_edited_tickets"   => $ticketService->getTicketCounts('edited'),
+                "total_rejected_tickets" => $ticketService->getTicketCounts('rejected'),
+                "total_pending_tickets"  => $ticketService->getTicketCounts('pending'),
                 'recent_tickets'         => $ticketService->getRecentTickets(),
 
             ],
