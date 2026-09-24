@@ -11,6 +11,15 @@ services:
       - /home/webserver/systems/Ticketing-V2/Ticketing-Sys/client/.env:/app/.env
     networks:
       - ticketing-v2-client
+
+  cloudflared-ticketingv2-client-tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: ticketing-client-tunnel
+    restart: unless-stopped
+    command: tunnel run --url http://ticketing-client:7030
+    environment:
+    - TUNNEL_TOKEN=eyJhIjoiODE3YmEzYzg5MGM0YTRmYzRjN2YwYTg1NmQ3YzFmODciLCJ0IjoiMDM0MTNkZTItYjMzZC00ZTM3LThkMzItODBkMDA2NDk3ODE1IiwicyI6Ik9ESmhZMlUzTjJRdE4yRXdPUzAwWVRWakxUazFNakF0WldNeU56SmpZamRqTnpGaCJ9
+    
   
 networks:
   ticketing-v2-client:
