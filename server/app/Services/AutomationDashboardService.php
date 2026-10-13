@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Enums\TicketStatus;
 use App\Models\Ticket;
 use App\Models\UserLogin;
+use Illuminate\Support\Facades\DB;
 
 class AutomationDashboardService
 {
@@ -16,26 +17,18 @@ class AutomationDashboardService
             ->where('assigned_person', $this->user->login_id)
             ->count();
 
-        $all_edited_tickets_assigned = (clone $this->tickets)
+        $ticket_counts = (clone $this->tickets)
             ->where('assigned_person', $this->user->login_id)
-            ->where('status', TicketStatus::EDITED)
-            ->count();
-
-        $all_pending_tickets_assigned = (clone $this->tickets)
-            ->where('assigned_person', $this->user->login_id)
-            ->where('status', TicketStatus::PENDING)
-            ->count();
-
-        $all_rejected_tickets_assigned = (clone $this->tickets)
-            ->where('assigned_person', $this->user->login_id)
-            ->where('status', TicketStatus::REJECTED)
-            ->count();
+            ->select('status', DB::raw('COUNT(*) as total'))
+            ->groupBy('status')
+            ->pluck('total', 'status')
+            ->toArray();
 
         return [
             "all_tickets_assigned"          => $all_tickets_assigned,
-            "all_edited_tickets_assigned"   => $all_edited_tickets_assigned,
-            "all_pending_tickets_assigned"  => $all_pending_tickets_assigned,
-            "all_rejected_tickets_assigned" => $all_rejected_tickets_assigned
+            "all_edited_tickets_assigned"   => (int) ($ticket_counts[TicketStatus::EDITED?->value] ?? 0),
+            "all_pending_tickets_assigned"  => (int) ($ticket_counts[TicketStatus::PENDING?->value] ?? 0),
+            "all_rejected_tickets_assigned" => (int) ($ticket_counts[TicketStatus::REJECTED?->value] ?? 0)
         ];
     }
 

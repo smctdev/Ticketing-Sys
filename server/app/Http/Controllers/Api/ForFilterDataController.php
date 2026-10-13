@@ -5,12 +5,26 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\BranchList;
 use App\Models\TicketCategory;
+use Illuminate\Support\Facades\Auth;
 
 class ForFilterDataController extends Controller
 {
     public function index()
     {
+        $user = Auth::user();
+
+        $is_automation = $user->isAutomation();
+
         $branches = BranchList::whereHas('tickets', fn($q) => $q->where('status', 'EDITED'))
+            ->when(
+                $is_automation,
+                fn($q)
+                =>
+                $q->whereIn(
+                    'blist_id',
+                    $user->assignedBranches()->pluck('blist_id')
+                )
+            )
             ->orderBy('b_name')
             ->get();
 

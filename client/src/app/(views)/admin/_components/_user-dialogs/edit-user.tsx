@@ -156,7 +156,7 @@ export function EditUser({
               isOptional={true}
               type={"number"}
               error={errors?.contact_number}
-              value={formItems?.contact_number}
+              value={formItems?.contact_number ?? ""}
               placeholder={"Enter contact number"}
               onChange={handleInputChange("contact_number")}
             />
