@@ -21,6 +21,7 @@ use ZipArchive;
 
 class TicketService
 {
+    private const ITEM_RECEIPT_CATEGORY_ID = 125;
     public function __construct(protected $user = null)
     {
         $this->user = Auth::user();
@@ -361,7 +362,13 @@ class TicketService
 
         $isSql = $request->ticket_type === 'sql_ticket';
 
-        $directToAccounting = $isLastMonth && $isSql && $assignedAccountingStaff;
+        $isItemReceipt = (int) $request->ticket_category === self::ITEM_RECEIPT_CATEGORY_ID;
+
+        if ($isItemReceipt && !$assignedAccountingStaff) {
+            abort(400, 'No assigned accounting staff for Item Receipt category.');
+        }
+
+        $directToAccounting = ($isLastMonth && $isSql && $assignedAccountingStaff) || ($isItemReceipt && $assignedAccountingStaff);
 
         $data = DB::transaction(
             function () use ($request, $user, $assignedAutomation, $automationAdmin, $automationManager, $assignedBranchHead, $assignedAccountingStaff, $assignedAccountingHead, $directToAccounting) {
@@ -709,13 +716,16 @@ class TicketService
 
             $isSql = $ticketDetail->ticket_type === 'sql_ticket';
 
-            $directToAccounting = $isLastMonth && $isSql && $accountingStaff;
+            // Kuhaa sa ticket mismo, kay ang approve request walay ticket_category
+            $isItemReceipt = (int) $ticketDetail->ticket_category_id === self::ITEM_RECEIPT_CATEGORY_ID;
 
-            $errorForNoBranchesOrAccountingStaff = $isLastMonth && $isSql && !$accountingStaff;
+            $directToAccounting = ($isLastMonth && $isSql && $accountingStaff) || ($isItemReceipt && $accountingStaff);
+
+            $errorForNoBranchesOrAccountingStaff = (($isLastMonth && $isSql) || $isItemReceipt) && !$accountingStaff;
 
             $ticketGroupCategoryFromAutomation = $ticketDetail->ticketCategory?->groupCategory?->group_code === 'Automation';
 
-            if ($errorForNoBranchesOrAccountingStaff && $this->user->isBranchHead() && !$ticketGroupCategoryFromAutomation) {
+            if ($errorForNoBranchesOrAccountingStaff && $this->user->isBranchHead() && ($isItemReceipt || !$ticketGroupCategoryFromAutomation)) {
                 abort(400, 'No assigned accounting staff for this branch and category.');
             }
 
