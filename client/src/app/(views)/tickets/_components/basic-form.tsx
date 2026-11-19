@@ -42,6 +42,9 @@ export default function BasicForm({
   handleRemoveFile,
   oldFiles,
   branchHeads,
+  suppliers,
+  isSuppliersLoading,
+  isItemReceiptPO,
 }: any) {
   const { isLoading: branchIsLoading, data } = useFetch({
     url: "/branches",
@@ -230,6 +233,47 @@ export default function BasicForm({
             <small className="text-red-500">
               {errors?.ticket_sub_category[0]}
             </small>
+          )}
+        </div>
+      )}
+      {isItemReceiptPO && (
+        <div className="flex flex-col gap-3">
+          <Label htmlFor="supplier_id" className="px-1">
+            Supplier
+          </Label>
+          {isSuppliersLoading ? (
+            <Skeleton className="h-9" />
+          ) : (
+            <Select
+              onValueChange={handleChange("supplier_id")}
+              value={String(formInput.supplier_id ?? "")}
+            >
+              <SelectTrigger id="supplier_id" className="w-full">
+                <SelectValue placeholder="Select supplier" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  <SelectLabel>Select supplier</SelectLabel>
+                  {!Array.isArray(suppliers) || suppliers.length === 0 ? (
+                    <SelectItem value="No suppliers found" disabled>
+                      No suppliers found
+                    </SelectItem>
+                  ) : (
+                    suppliers.map((supplier: any, index: number) => (
+                      <SelectItem
+                        key={index}
+                        value={String(supplier.id)}
+                      >
+                        {String(supplier.suppliers ?? "").trim()}
+                      </SelectItem>
+                    ))
+                  )}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          )}
+          {errors?.supplier_id && (
+            <small className="text-red-500">{errors?.supplier_id[0]}</small>
           )}
         </div>
       )}

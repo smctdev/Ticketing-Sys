@@ -19,6 +19,9 @@ import { toast } from "sonner";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import BasicForm from "./basic-form";
 
+// Dapat parehas sa ITEM_RECEIPT_CATEGORY_ID sa backend (TicketService)
+const ITEM_RECEIPT_PO_ID = 125;
+
 export function CreateTicket({
   categories,
   user,
@@ -34,7 +37,12 @@ export function CreateTicket({
   const [errors, setErrors] = useState<any>({});
   const [error, setError] = useState<string | null>(null);
   const [open, setOpen] = useState<boolean>(false);
+  const [suppliers, setSuppliers] = useState<any[]>([]);
+  const [isSuppliersLoading, setIsSuppliersLoading] = useState<boolean>(false);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  const isItemReceiptPO =
+    Number(formInput.ticket_category) === ITEM_RECEIPT_PO_ID;
 
   useEffect(() => {
     if (!user) return;
@@ -53,6 +61,53 @@ export function CreateTicket({
       }));
     }
   }, [formInput.ticket_category]);
+
+  // Fetch suppliers kung Item Receipt - PO ang category
+  useEffect(() => {
+    if (!isItemReceiptPO) {
+      // clear supplier kung dili na Item Receipt - PO
+      setFormInput((formData) => ({ ...formData, supplier_id: "" }));
+      return;
+    }
+
+    // ayaw na i-refetch kung naa na
+    if (suppliers.length > 0) return;
+
+    const fetchSuppliers = async () => {
+      setIsSuppliersLoading(true);
+      try {
+        const response = await api.get("/all-suppliers");
+        const res = response.data;
+        const list = Array.isArray(res)
+          ? res
+          : Array.isArray(res?.data)
+            ? res.data
+            : Array.isArray(res?.data?.data)
+              ? res.data.data
+              : Array.isArray(res?.suppliers)
+                ? res.suppliers
+                : [];
+        setSuppliers(list);
+      } catch (err: any) {
+        console.error(
+          "suppliers error:",
+          err?.response?.status,
+          err?.response?.data ?? err?.message,
+        );
+        toast.error("Failed to load suppliers", {
+          description:
+            err?.response?.data?.message ??
+            `Status: ${err?.response?.status ?? "no response"}`,
+          position: "bottom-center",
+        });
+      } finally {
+        setIsSuppliersLoading(false);
+      }
+    };
+
+    fetchSuppliers();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isItemReceiptPO]);
 
   const handleInputChange =
     (title: string) => (e: ChangeEvent<HTMLInputElement>) => {
@@ -139,6 +194,10 @@ export function CreateTicket({
 
       if (formInput?.branch_head_id) {
         formData.append("branch_head_id", formInput.branch_head_id);
+      }
+
+      if (isItemReceiptPO && formInput?.supplier_id) {
+        formData.append("supplier_id", formInput.supplier_id);
       }
 
       const response = await api.post("/submit-ticket", formData);
@@ -273,6 +332,9 @@ export function CreateTicket({
                 errors={errors}
                 handleDateChange={handleDateChange}
                 branchHeads={branchHeads}
+                suppliers={suppliers}
+                isSuppliersLoading={isSuppliersLoading}
+                isItemReceiptPO={isItemReceiptPO}               
               />
               {/* <TabsContent value="netsuite_ticket"></TabsContent>
               <TabsContent value="sql_ticket" className="space-y-4">

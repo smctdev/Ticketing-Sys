@@ -364,14 +364,30 @@ class TicketService
 
         $isItemReceipt = (int) $request->ticket_category === self::ITEM_RECEIPT_CATEGORY_ID;
 
+        $accountingStaffQuery = UserLogin::query()
+            ->with('assignedCategories.categoryGroupCode.ticketCategories')
+            ->has('assignedCategories')
+            ->whereRelation('userRole', 'role_name', UserRoles::ACCOUNTING_STAFF)
+            ->whereRelation(
+                'assignedCategories.categoryGroupCode.ticketCategories',
+                'ticket_category_id',
+                $request->ticket_category
+            );
+
+        $assignedAccountingStaff = $this->pickAccountingStaff(
+            $accountingStaffQuery,
+            $isItemReceipt,
+            $request->supplier_id
+        );
+
         if ($isItemReceipt && !$assignedAccountingStaff) {
-            abort(400, 'No assigned accounting staff for Item Receipt category.');
+            abort(400, 'No assigned accounting staff for this Item Receipt supplier or category.');
         }
 
         $directToAccounting = ($isLastMonth && $isSql && $assignedAccountingStaff) || ($isItemReceipt && $assignedAccountingStaff);
 
         $data = DB::transaction(
-            function () use ($request, $user, $assignedAutomation, $automationAdmin, $automationManager, $assignedBranchHead, $assignedAccountingStaff, $assignedAccountingHead, $directToAccounting) {
+            function () use ($request, $user, $assignedAutomation, $automationAdmin, $automationManager, $assignedBranchHead, $assignedAccountingStaff, $assignedAccountingHead, $directToAccounting, $isItemReceipt) {
                 $paths = [];
                 $file = $request->file('ticket_support');
                 $branch = BranchList::findOrFail($user->isAccountingStaff() ? $request->for_branch : $request->ticket_for);
@@ -386,6 +402,7 @@ class TicketService
                     'ticket_type'             => $request->ticket_type,
                     'ticket_category_id'      => $request->ticket_category,
                     'sub_category_id'         => $request->ticket_sub_category,
+                    'suppliers'               => $isItemReceipt ? $request->supplier_id : null,
                     'ticket_transaction_date' => $request->ticket_transaction_date,
                     'td_support'              => $paths,
                     'date_created'            => now(),
@@ -534,6 +551,7 @@ class TicketService
                     'ticket_type'             => $request->ticket_type,
                     'ticket_category_id'      => $request->ticket_category,
                     'sub_category_id'         => $request->ticket_sub_category,
+                    'suppliers'               => (int) $request->ticket_category === self::ITEM_RECEIPT_CATEGORY_ID ? $request->supplier_id : null,
                     'ticket_transaction_date' => $request->ticket_transaction_date,
                     'td_support'              => $newPaths,
                     'td_purpose'              => $request->purpose,
@@ -553,7 +571,18 @@ class TicketService
                 if ($user->isAccountingStaff()) {
                     $branch = BranchList::findOrFail($request->for_branch);
 
-                    $to_update['displayTicket']   = $assignedAutomation->assignedAutomation->login_id;
+                    $pendingRole = $ticketDetail->ticket->pendingUser?->userRole?->role_name;
+
+                    // Ibalik sa nag-reject kung accounting head o automation manager
+                    $returnToRejector = in_array($pendingRole, [
+                        UserRoles::ACCOUNTING_HEAD,
+                        UserRoles::AUTOMATION_MANAGER,
+                    ], true);
+
+                    if (!$returnToRejector) {
+                        $to_update['displayTicket'] = $assignedAutomation->assignedAutomation->login_id;
+                    }
+
                     $to_update['branch_id']       = $branch->blist_id;
                     $to_update['branch_name']     = $branch->b_name;
                     $to_update['assigned_person'] = $assignedAutomation->assignedAutomation->login_id ?? $ticketDetail->ticket->assignedPerson->login_id;
@@ -718,6 +747,19 @@ class TicketService
 
             // Kuhaa sa ticket mismo, kay ang approve request walay ticket_category
             $isItemReceipt = (int) $ticketDetail->ticket_category_id === self::ITEM_RECEIPT_CATEGORY_ID;
+
+            $accountingStaffQuery = UserLogin::query()
+                ->whereRelation('userRole', 'role_name', UserRoles::ACCOUNTING_STAFF)
+                ->whereRelation(
+                    'assignedCategories',
+                    fn($category) => $category->where('group_code', $ticketDetail->ticketCategory->group_code)
+                );
+
+            $accountingStaff = $this->pickAccountingStaff(
+                $accountingStaffQuery,
+                $isItemReceipt,
+                $ticketDetail->suppliers
+            );
 
             $directToAccounting = ($isLastMonth && $isSql && $accountingStaff) || ($isItemReceipt && $accountingStaff);
 
@@ -943,5 +985,19 @@ class TicketService
         }
 
         return $zipPath;
+    }
+
+    private function pickAccountingStaff($baseQuery, bool $isItemReceipt, $supplierId = null)
+    {
+        if (!$isItemReceipt || !$supplierId) {
+            return (clone $baseQuery)->first();
+        }
+
+        return (clone $baseQuery)
+            ->whereHas('assignedSuppliers', fn($q) => $q->whereKey($supplierId))
+            ->first()
+            ?? (clone $baseQuery)
+            ->doesntHave('assignedSuppliers')
+            ->first();
     }
 }

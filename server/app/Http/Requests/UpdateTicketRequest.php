@@ -52,7 +52,9 @@ class UpdateTicketRequest extends FormRequest
             'to'                      => ['required', 'max:255', 'min:2'],
             'ticket_reference_number' => ['required', 'max:255', 'min:2'],
             'branch_head_id'          => [Rule::requiredIf($this->branchHeads() > 1 && !Auth::user()->isAccountingStaff() && !Auth::user()->isBranchHead())],
-            'for_branch'              => [Rule::requiredIf(Auth::user()->isAccountingStaff())]
+            'for_branch'              => [Rule::requiredIf(Auth::user()->isAccountingStaff())],
+            'supplier_id'             => [Rule::requiredIf((int) $this->ticket_category === 125),'nullable',Rule::exists('suppliers', 'id'),
+        ],
         ];
     }
 
@@ -72,6 +74,8 @@ class UpdateTicketRequest extends FormRequest
             'ticket_reference_number.max'         => 'Ticket reference number must be less than 255 characters.',
             'ticket_reference_number.min'         => 'Ticket reference number must be at least 2 characters.',
             'branch_head_id.required'             => 'Branch head is required.',
+            'supplier_id.required' => 'Supplier is required for Item Receipt - PO tickets.',
+            'supplier_id.exists'   => 'The selected supplier is invalid.',
         ];
     }
 

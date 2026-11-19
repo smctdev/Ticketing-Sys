@@ -37,6 +37,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Spatie\Activitylog\Models\Activity;
+use App\Http\Controllers\Api\AccountingAssignSupplierController;
 
 // AUTHENTICATED ROUTES
 Route::middleware([
@@ -158,6 +159,10 @@ Route::middleware([
         Route::patch('/accounting/{user_id}/update', 'update');
         Route::delete('/accounting/{user_id}/delete', 'destroy');
     });
+
+    Route::get('/all-suppliers', [SupplierController::class, 'index2']);
+    Route::get('/accounting-staff/{login_id}/suppliers', [AccountingAssignSupplierController::class, 'index']);
+    Route::put('/accounting-staff/{login_id}/suppliers', [AccountingAssignSupplierController::class, 'update']);
 
     Route::controller(AccountingController::class)->group(function () {
         Route::get('/accountings', 'index');

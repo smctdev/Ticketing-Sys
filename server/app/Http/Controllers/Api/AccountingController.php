@@ -23,7 +23,8 @@ class AccountingController extends Controller
             'branch',
             'userDetail',
             'assignedCategories.categoryGroupCode',
-            'accountingAssignedBranches:blist_id,b_code'
+            'accountingAssignedBranches:blist_id,b_code',
+            'assignedSuppliers',
         ])
             ->search($search)
             ->whereHas(

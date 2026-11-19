@@ -4,7 +4,7 @@ import DataTableComponent from "@/components/data-table";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import useFetch from "@/hooks/use-fetch";
 import withAuthPage from "@/lib/hoc/with-auth-page";
-import { PenBox, PenIcon, Trash, Users2 } from "lucide-react";
+import { PackageSearch, PenBox, PenIcon, Trash, Users2 } from "lucide-react";
 import { SEARCH_FILTER } from "@/constants/filter-by";
 import { ACCOUNTINGS_COLUMNS } from "../_constants/accountings-columns";
 import SearchInput from "@/components/ui/search-input";
@@ -19,6 +19,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import EditAccountingDialog from "../_components/_accounting-dialogs/edit-accounting";
+import AssignSuppliersDialog from "../_components/_accounting-dialogs/assign-suppliers";
 import { ADMIN_ACCESS, ROLE } from "@/constants/roles";
 
 function Accountings() {
@@ -40,7 +41,61 @@ function Accountings() {
   const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
   const [isDialogForBranchesOpen, setIsDialogForBranchesOpen] =
     useState<boolean>(false);
+  const [isDialogForSuppliersOpen, setIsDialogForSuppliersOpen] =
+    useState<boolean>(false);
   const [user, setUser] = useState<any>(null);
+
+  // Column para sa assigned suppliers (Accounting Staff lang)
+  const ACCOUNTINGS_COLUMNS_SUPPLIERS = [
+    {
+      name: "Assigned Suppliers",
+      cell: (row: any) => {
+        if (row?.user_role?.role_name !== ROLE.ACCOUNTING_STAFF) {
+          return <span className="text-xs text-muted-foreground">N/A</span>;
+        }
+
+        const suppliers: any[] = row?.assigned_suppliers ?? [];
+
+        if (suppliers.length === 0) {
+          return (
+            <span className="rounded-full bg-gray-200 dark:bg-gray-700 px-2 py-0.5 text-xs font-bold text-gray-600 dark:text-gray-200">
+              No specific supplier
+            </span>
+          );
+        }
+
+        const names = suppliers.map((s) => String(s.suppliers ?? "").trim());
+        const shown = names.slice(0, 2);
+        const rest = names.length - shown.length;
+
+        return (
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="flex flex-wrap gap-1 py-1">
+                {shown.map((name) => (
+                  <span
+                    key={name}
+                    className="rounded-full bg-blue-600 px-2 py-0.5 text-xs font-bold text-white"
+                  >
+                    {name}
+                  </span>
+                ))}
+                {rest > 0 && (
+                  <span className="rounded-full bg-blue-100 px-2 py-0.5 text-xs font-bold text-blue-700">
+                    +{rest}
+                  </span>
+                )}
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <span>{names.join(", ")}</span>
+            </TooltipContent>
+          </Tooltip>
+        );
+      },
+      sortable: false,
+    },
+  ];
 
   const ACCOUNTINGS_COLUMNS_ACTIONS = [
     {
@@ -82,6 +137,20 @@ function Accountings() {
                 <span>Edit Assigned Branches</span>
               </TooltipContent>
             </Tooltip>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  onClick={handleEdit(row, "supplier")}
+                  className="text-emerald-600 hover:text-emerald-700 hover:scale-105 transition-all duration-300 ease-in-out"
+                >
+                  <PackageSearch size={18} />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <span>Edit Assigned Suppliers</span>
+              </TooltipContent>
+            </Tooltip>
           </Activity>
           <button
             type="button"
@@ -96,17 +165,22 @@ function Accountings() {
     },
   ];
 
-  const handleEdit = (row: any, title: "category" | "branch") => () => {
-    if (title === "category") {
+  const handleEdit =
+    (row: any, title: "category" | "branch" | "supplier") => () => {
       setUser(row);
-      setIsDialogOpen(true);
-    }
 
-    if (title === "branch") {
-      setUser(row);
-      setIsDialogForBranchesOpen(true);
-    }
-  };
+      if (title === "category") {
+        setIsDialogOpen(true);
+      }
+
+      if (title === "branch") {
+        setIsDialogForBranchesOpen(true);
+      }
+
+      if (title === "supplier") {
+        setIsDialogForSuppliersOpen(true);
+      }
+    };
 
   const handleDeleteAllCategories = (id: string | number) => () => {
     Swal.fire({
@@ -198,7 +272,11 @@ function Accountings() {
         <CardContent>
           <DataTableComponent
             data={data}
-            columns={[...ACCOUNTINGS_COLUMNS, ...ACCOUNTINGS_COLUMNS_ACTIONS]}
+            columns={[
+              ...ACCOUNTINGS_COLUMNS,
+              ...ACCOUNTINGS_COLUMNS_SUPPLIERS,
+              ...ACCOUNTINGS_COLUMNS_ACTIONS,
+            ]}
             loading={isLoading}
             handlePageChange={handlePageChange}
             handlePerPageChange={handlePerPageChange}
@@ -227,6 +305,15 @@ function Accountings() {
           user={user}
           open={isDialogForBranchesOpen}
           setOpen={setIsDialogForBranchesOpen}
+          fetchData={fetchData}
+        />
+      )}
+
+      {isDialogForSuppliersOpen && (
+        <AssignSuppliersDialog
+          user={user}
+          open={isDialogForSuppliersOpen}
+          setOpen={setIsDialogForSuppliersOpen}
           fetchData={fetchData}
         />
       )}

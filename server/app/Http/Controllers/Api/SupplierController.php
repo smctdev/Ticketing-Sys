@@ -33,6 +33,16 @@ class SupplierController extends Controller
         ], 200);
     }
 
+    public function index2()
+    {
+        $suppliers = Supplier::all();
+        
+        return response()->json([
+            "message" => "Suppliers fetched successfully",
+            "data"    => $suppliers
+        ], 200);
+    }
+
     /**
      * Show the form for creating a new resource.
      */

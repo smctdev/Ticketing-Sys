@@ -314,4 +314,14 @@ class UserLogin extends Authenticatable
         return $this->hasMany(Ticket::class, 'displayTicket', 'login_id')
             ->where('status', TicketStatus::PENDING);
     }
+
+    public function assignedSuppliers()
+    {
+        return $this->belongsToMany(
+            Supplier::class,
+            'assigned_accounting_suppliers',
+            'login_id',
+            'supplier_id'
+        );
+    }
 }

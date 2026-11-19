@@ -41,6 +41,7 @@ import {
   Layers,
   MessageCircleMore,
   Tag,
+  Truck,
   User,
   UserCheck,
   Users,
@@ -298,6 +299,13 @@ export function ViewTicketDetails({
                     label="Reference Number"
                     value={data.ticket_detail.td_ref_number}
                     icon={<Hash className="w-3 h-3" />}
+                  />
+                )}
+                {data?.ticket_detail?.supplier?.suppliers && (
+                  <InfoField
+                    label="Supplier"
+                    value={String(data.ticket_detail.supplier.suppliers).trim()}
+                    icon={<Truck className="w-3 h-3" />}
                   />
                 )}
               </div>

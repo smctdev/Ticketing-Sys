@@ -45,7 +45,11 @@ class TicketResource extends JsonResource
                 'date_created'            => $this->ticketDetail->date_created,
                 'sub_category'            => !$this->ticketDetail?->subCategory ? null : [
                     'sub_category_name'   => $this->ticketDetail?->subCategory?->sub_category_name
-                ]
+                ],
+                'supplier'                => !$this->ticketDetail?->supplier ? null : [
+                    'id'                  => $this->ticketDetail->supplier->id,
+                    'suppliers'           => $this->ticketDetail->supplier->suppliers,
+                ],
             ],
             'displayTicket'               => $this->displayTicket,
             'user_login'                  => !$this->userLogin ? null : [
